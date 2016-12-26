@@ -1,7 +1,10 @@
-include [%matchenv switch (GL_BACKEND) {
-    | "web" => Reglweb.Webgl
-    | "native" => Reglnative.Opengl
-   }];
+include [%matchenv
+  switch GL_BACKEND {
+  | "web" => Reglweb.Webgl
+  | "native" => Reglnative.Opengl
+  }
+];
+
 module Constants = Reglinterface.Constants;
 
 type glState = Gl.Window.t;
@@ -25,6 +28,7 @@ type glEnv = {
   mouseY: int,
   pmouseX: int,
   pmouseY: int,
+  mousePressed: bool
 };
 
 let vertexShaderSource = {|
@@ -96,6 +100,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   Gl.Window.setWindowSize ::window ::width ::height;
   let gl = Gl.Window.getContext window;
   Gl.viewport context::gl x::(-1) y::(-1) ::width ::height;
+  Gl.clearColor context::gl r::0. g::0. b::0. a::1.;
   Gl.clear context::gl mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 
   /** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
@@ -126,8 +131,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     out::camera.projectionMatrix
     left::0.
     right::(float_of_int (Gl.Window.getWidth window))
-    bottom::0.
-    top::(float_of_int (Gl.Window.getHeight window))
+    bottom::(float_of_int (Gl.Window.getHeight window))
+    top::0.
     near::0.
     far::100.;
   let currFill = {r: 0, g: 0, b: 0};
@@ -147,6 +152,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     mouseY: 0,
     pmouseX: 0,
     pmouseY: 0,
+    mousePressed: false
   }
 };
 
@@ -159,17 +165,19 @@ module P = {
   let mouseY env => (!env).mouseY;
   let pmouseX env => (!env).pmouseX;
   let pmouseY env => (!env).pmouseY;
+  let mousePressed env => (!env).mousePressed;
   let background (env: ref glEnv) (c: color) => env := {...!env, currBackground: c};
   let fill (env: ref glEnv) (c: color) => env := {...!env, currFill: c};
   let size (env: ref glEnv) width height => {
     Gl.Window.setWindowSize window::(!env).window ::width ::height;
     Gl.viewport context::(!env).gl x::0 y::0 ::width ::height;
+    Gl.clearColor context::(!env).gl r::0. g::0. b::0. a::1.;
     Gl.Mat4.ortho
       out::(!env).camera.projectionMatrix
       left::0.
       right::(float_of_int width)
-      bottom::0.
-      top::(float_of_int height)
+      bottom::(float_of_int height)
+      top::0.
       near::0.
       far::100.
   };
@@ -259,7 +267,6 @@ module ReProcessor: ReProcessorT = {
   let run ::setup ::draw=? ::mouseMove=? ::mouseDragged=? ::mouseDown=? ::mouseUp=? () => {
     let env = ref (createCanvas (Gl.Window.init argv::Sys.argv) 200 200);
     let userState = ref (setup env);
-    let isMouseButtonDown = ref false;
     Gl.render
       window::(!env).window
       displayFunc::(
@@ -268,44 +275,42 @@ module ReProcessor: ReProcessorT = {
         | None => (fun f => ())
         }
       )
-      mouseDown::(fun ::button ::state ::x ::y => {
-        env := {
-          ...!env,
-          pmouseX: (!env).mouseX,
-          pmouseY: (!env).mouseY,
-          mouseX: x,
-          mouseY: y
-        };
-        isMouseButtonDown := true;
-        switch mouseDown {
-          | Some mouseDown => userState := mouseDown !userState env
-          | None => ()
-        };
-      })
-      mouseUp::(fun ::button ::state ::x ::y => {
-        env := {
-          ...!env,
-          pmouseX: (!env).mouseX,
-          pmouseY: (!env).mouseY,
-          mouseX: x,
-          mouseY: y
-        };
-        isMouseButtonDown := false;
-        switch mouseUp {
-          | Some mouseUp => userState := mouseUp !userState env
-          | None => ()
-        };
-      })
-      mouseMove::(
-        fun ::x ::y => {
+      mouseDown::(
+        fun ::button ::state ::x ::y => {
           env := {
             ...!env,
             pmouseX: (!env).mouseX,
             pmouseY: (!env).mouseY,
             mouseX: x,
-            mouseY: y
+            mouseY: y,
+            mousePressed: true
           };
-          if !isMouseButtonDown {
+          switch mouseDown {
+          | Some mouseDown => userState := mouseDown !userState env
+          | None => ()
+          }
+        }
+      )
+      mouseUp::(
+        fun ::button ::state ::x ::y => {
+          env := {
+            ...!env,
+            pmouseX: (!env).mouseX,
+            pmouseY: (!env).mouseY,
+            mouseX: x,
+            mouseY: y,
+            mousePressed: false
+          };
+          switch mouseUp {
+          | Some mouseUp => userState := mouseUp !userState env
+          | None => ()
+          }
+        }
+      )
+      mouseMove::(
+        fun ::x ::y => {
+          env := {...!env, pmouseX: (!env).mouseX, pmouseY: (!env).mouseY, mouseX: x, mouseY: y};
+          if (!env).mousePressed {
             switch mouseDragged {
             | Some mouseDragged => userState := mouseDragged !userState env
             | None => ()
