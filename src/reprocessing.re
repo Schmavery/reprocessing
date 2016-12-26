@@ -20,7 +20,11 @@ type glEnv = {
   aVertexPosition: Gl.attributeT,
   pMatrixUniform: Gl.uniformT,
   currFill: color,
-  currBackground: color
+  currBackground: color,
+  mouseX: int,
+  mouseY: int,
+  pmouseX: int,
+  pmouseY: int,
 };
 
 let vertexShaderSource = {|
@@ -138,7 +142,11 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     aVertexColor,
     pMatrixUniform,
     currFill,
-    currBackground
+    currBackground,
+    mouseX: 0,
+    mouseY: 0,
+    pmouseX: 0,
+    pmouseY: 0,
   }
 };
 
@@ -147,9 +155,13 @@ module PUtils = {
 };
 
 module P = {
-  let background (env: ref glEnv) (c: color) => {env := {...!env, currBackground: c}};
-  let fill (env: ref glEnv) (c: color) => {env := {...!env, currFill: c}};
-  let size (env: ref glEnv) width height  => {
+  let mouseX env => (!env).mouseX;
+  let mouseY env => (!env).mouseY;
+  let pmouseX env => (!env).pmouseX;
+  let pmouseY env => (!env).pmouseY;
+  let background (env: ref glEnv) (c: color) => env := {...!env, currBackground: c};
+  let fill (env: ref glEnv) (c: color) => env := {...!env, currFill: c};
+  let size (env: ref glEnv) width height => {
     Gl.Window.setWindowSize window::(!env).window ::width ::height;
     Gl.viewport context::(!env).gl x::0 y::0 ::width ::height;
     Gl.Mat4.ortho
@@ -161,8 +173,9 @@ module P = {
       near::0.
       far::100.
   };
-  let rect (env: ref glEnv) x y width height  => {
+  let rect (env: ref glEnv) x y width height => {
     let env = !env;
+
     /** Setup vertices to be sent to the GPU **/
     let square_vertices = [|
       float_of_int @@ x + width,
@@ -222,27 +235,87 @@ module P = {
       context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
 
     /** Final call which actually does the "draw" **/
-    Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4;
+    Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4
   };
+  let clear env => Gl.clear (!env).gl (Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 };
 
 type userCallbackT 'a = 'a => ref glState => ('a, glState);
 
 module type ReProcessorT = {
-  let run: setup::(ref glEnv => 'a) => draw::('a => ref glEnv => 'a)? => unit => unit;
+  let run:
+    setup::(ref glEnv => 'a) =>
+    draw::('a => ref glEnv => 'a)? =>
+    mouseMove::('a => ref glEnv => 'a)? =>
+    mouseDragged::('a => ref glEnv => 'a)? =>
+    mouseDown::('a => ref glEnv => 'a)? =>
+    mouseUp::('a => ref glEnv => 'a)? =>
+    unit =>
+    unit;
 };
 
 module ReProcessor: ReProcessorT = {
   type t;
-  let run ::setup ::draw=? () => {
+  let run ::setup ::draw=? ::mouseMove=? ::mouseDragged=? ::mouseDown=? ::mouseUp=? () => {
     let env = ref (createCanvas (Gl.Window.init argv::Sys.argv) 200 200);
     let userState = ref (setup env);
+    let isMouseButtonDown = ref false;
     Gl.render
       window::(!env).window
       displayFunc::(
         switch draw {
-        | Some draw => (fun f => userState := (draw !userState env))
+        | Some draw => (fun f => userState := draw !userState env)
         | None => (fun f => ())
+        }
+      )
+      mouseDown::(fun ::button ::state ::x ::y => {
+        env := {
+          ...!env,
+          pmouseX: (!env).mouseX,
+          pmouseY: (!env).mouseY,
+          mouseX: x,
+          mouseY: y
+        };
+        isMouseButtonDown := true;
+        switch mouseDown {
+          | Some mouseDown => userState := mouseDown !userState env
+          | None => ()
+        };
+      })
+      mouseUp::(fun ::button ::state ::x ::y => {
+        env := {
+          ...!env,
+          pmouseX: (!env).mouseX,
+          pmouseY: (!env).mouseY,
+          mouseX: x,
+          mouseY: y
+        };
+        isMouseButtonDown := false;
+        switch mouseUp {
+          | Some mouseUp => userState := mouseUp !userState env
+          | None => ()
+        };
+      })
+      mouseMove::(
+        fun ::x ::y => {
+          env := {
+            ...!env,
+            pmouseX: (!env).mouseX,
+            pmouseY: (!env).mouseY,
+            mouseX: x,
+            mouseY: y
+          };
+          if !isMouseButtonDown {
+            switch mouseDragged {
+            | Some mouseDragged => userState := mouseDragged !userState env
+            | None => ()
+            }
+          } else {
+            switch mouseMove {
+            | Some mouseMove => userState := mouseMove !userState env
+            | None => ()
+            }
+          }
         }
       )
       ()
