@@ -4,7 +4,7 @@
   "description": "Simple example project for regl",
   "scripts": {
     "start": "_build/native/src/app.native",
-    "build": "eval $(dependencyEnv) && nopam && rebel && webpack _build/web/src/index.js",
+    "build": "eval $(dependencyEnv) && nopam && rebel && webpack _build/web/src/index.js _build/web/src/app.js",
     "top": "eval $(dependencyEnv) && rtop",
     "env": "eval $(dependencyEnv) && env",
     "ocamldep": "eval $(dependencyEnv) && ocamldep",
