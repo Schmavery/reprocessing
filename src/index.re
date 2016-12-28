@@ -17,6 +17,7 @@ let setup env => {
 };
 
 let draw state env => {
+  background env (color 150 255 255);
   let (sx, sy) = state.squarePos;
   let (px, py) = (pmouseX env, pmouseY env);
   let (x, y) as squarePos =
@@ -28,7 +29,6 @@ let draw state env => {
     } else {
       state.squarePos
     };
-  clear env;
   rect env x y squareWidth squareHeight;
   {...state, squarePos}
 };

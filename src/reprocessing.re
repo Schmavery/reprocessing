@@ -258,6 +258,14 @@ module P = {
     /** Final call which actually does the "draw" **/
     Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4
   };
+  let background env color => {
+    let width = Gl.Window.getWidth (!env).window;
+    let height = Gl.Window.getHeight (!env).window;
+    let oldEnv = (!env);
+    fill env color;
+    rect env 0 0 width height;
+    env := oldEnv;
+  };
   let clear env => Gl.clear (!env).gl (Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 };
 
