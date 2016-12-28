@@ -16,23 +16,21 @@ let setup env => {
   {squarePos: (0, 0)}
 };
 
-let mouseDragged state env => {
-  let {squarePos: (x, y)} = state;
-  let (mouseX, mouseY) = (mouseX env, mouseY env);
-  if (mouseX > x && mouseX < x + squareHeight && mouseY > y && mouseY < y + squareWidth) {
-    let dx = mouseX - pmouseX env;
-    let dy = mouseY - pmouseY env;
-    {...state, squarePos: (x + dx, y + dy)}
-  } else {
-    state
-  }
-};
-
 let draw state env => {
-  let (x, y) = state.squarePos;
+  let (sx, sy) = state.squarePos;
+  let (px, py) = (pmouseX env, pmouseY env);
+  let (x, y) as squarePos =
+    if (mousePressed env && px > sx && px < sx + squareHeight && py > sy && py < sy + squareWidth) {
+      let (mx, my) = (mouseX env, mouseY env);
+      let dx = mx - px;
+      let dy = my - py;
+      (sx + dx, sy + dy)
+    } else {
+      state.squarePos
+    };
   clear env;
   rect env x y squareWidth squareHeight;
-  state
+  {...state, squarePos}
 };
 
-ReProcessor.run ::setup ::draw ::mouseDragged ();
+ReProcessor.run ::setup ::draw ();

@@ -31,6 +31,19 @@ type glEnv = {
   mousePressed: bool
 };
 
+module type ReProcessorT = {
+  type t;
+  let run:
+    setup::(ref glEnv => 'a) =>
+    draw::('a => ref glEnv => 'a)? =>
+    mouseMove::('a => ref glEnv => 'a)? =>
+    mouseDragged::('a => ref glEnv => 'a)? =>
+    mouseDown::('a => ref glEnv => 'a)? =>
+    mouseUp::('a => ref glEnv => 'a)? =>
+    unit =>
+    unit;
+};
+
 let vertexShaderSource = {|
   attribute vec3 aVertexPosition;
   attribute vec4 aVertexColor;
@@ -250,20 +263,10 @@ module P = {
 
 type userCallbackT 'a = 'a => ref glState => ('a, glState);
 
-module type ReProcessorT = {
-  let run:
-    setup::(ref glEnv => 'a) =>
-    draw::('a => ref glEnv => 'a)? =>
-    mouseMove::('a => ref glEnv => 'a)? =>
-    mouseDragged::('a => ref glEnv => 'a)? =>
-    mouseDown::('a => ref glEnv => 'a)? =>
-    mouseUp::('a => ref glEnv => 'a)? =>
-    unit =>
-    unit;
-};
+let afterDraw (env: ref glEnv) => env := {...!env, pmouseX: (!env).mouseX, pmouseY: (!env).mouseY};
 
 module ReProcessor: ReProcessorT = {
-  type t;
+  type t = ref glEnv;
   let run ::setup ::draw=? ::mouseMove=? ::mouseDragged=? ::mouseDown=? ::mouseUp=? () => {
     let env = ref (createCanvas (Gl.Window.init argv::Sys.argv) 200 200);
     let userState = ref (setup env);
@@ -271,20 +274,18 @@ module ReProcessor: ReProcessorT = {
       window::(!env).window
       displayFunc::(
         switch draw {
-        | Some draw => (fun f => userState := draw !userState env)
+        | Some draw => (
+            fun f => {
+              userState := draw !userState env;
+              afterDraw env
+            }
+          )
         | None => (fun f => ())
         }
       )
       mouseDown::(
         fun ::button ::state ::x ::y => {
-          env := {
-            ...!env,
-            pmouseX: (!env).mouseX,
-            pmouseY: (!env).mouseY,
-            mouseX: x,
-            mouseY: y,
-            mousePressed: true
-          };
+          env := {...!env, mouseX: x, mouseY: y, mousePressed: true};
           switch mouseDown {
           | Some mouseDown => userState := mouseDown !userState env
           | None => ()
@@ -293,14 +294,7 @@ module ReProcessor: ReProcessorT = {
       )
       mouseUp::(
         fun ::button ::state ::x ::y => {
-          env := {
-            ...!env,
-            pmouseX: (!env).mouseX,
-            pmouseY: (!env).mouseY,
-            mouseX: x,
-            mouseY: y,
-            mousePressed: false
-          };
+          env := {...!env, mouseX: x, mouseY: y, mousePressed: false};
           switch mouseUp {
           | Some mouseUp => userState := mouseUp !userState env
           | None => ()
@@ -309,7 +303,7 @@ module ReProcessor: ReProcessorT = {
       )
       mouseMove::(
         fun ::x ::y => {
-          env := {...!env, pmouseX: (!env).mouseX, pmouseY: (!env).mouseY, mouseX: x, mouseY: y};
+          env := {...!env, mouseX: x, mouseY: y};
           if (!env).mousePressed {
             switch mouseDragged {
             | Some mouseDragged => userState := mouseDragged !userState env
