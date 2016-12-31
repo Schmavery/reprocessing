@@ -169,7 +169,31 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 
 module PUtils = {
   let color ::r ::g ::b :color => {r, g, b};
+  /*Calculation Functions*/
   let round i => floor (i +. 0.5);
+  let max = max;
+  let min = min;
+  let sqrt = sqrt;
+  let abs = abs;
+  let ceil = ceil;
+  let exp = exp;
+  let log = log;
+  let sq x => x * x;
+  let rec pow a =>
+    fun
+    | 0 => 1
+    | 1 => a
+    | n => {
+        let b = pow a (n / 2);
+        b * b * (
+          if (n mod 2 == 0) {
+            1
+          } else {
+            a
+          }
+        )
+      };
+  let constrain amt low high => max (min amt high) low;
   let remapf x a b c d => x -. a /. b -. a *. (d -. c) +. c;
   let remap x a b c d =>
     int_of_float (
@@ -178,6 +202,19 @@ module PUtils = {
   let norm value low high => remapf value low high 0. 1.;
   let randomf low high => Random.float (high -. low) +. low;
   let random low high => Random.int (high - low) + low;
+  let lerpf start stop amt => remapf amt 0. 1. start stop;
+  let lerp start stop amt => int_of_float (lerpf (float_of_int start) (float_of_int stop) amt);
+  let dist (x1, y1) (x2, y2) => {
+    let dx = float_of_int (x2 - x1);
+    let dy = float_of_int (y2 - y1);
+    sqrt (dx *. dx +. dy *. dy)
+  };
+  let mag vec => dist (0, 0) vec;
+  let lerpColor low high amt => {
+    r: lerp low.r high.r amt,
+    g: lerp low.g high.g amt,
+    b: lerp low.b high.b amt
+  };
 };
 
 let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
@@ -270,10 +307,10 @@ module P = {
   let line env (xx1, yy1) (xx2, yy2) => {
     let dx = xx2 - xx1;
     let dy = yy2 - yy1;
-    let mag = sqrt (float_of_int (dx * dx + dy * dy));
+    let mag = PUtils.dist (xx1, yy1) (xx2, yy2);
     let radius = float_of_int (!env).stroke.weight /. 2.;
-    let xthing = PUtils.round (float_of_int (yy2 - yy1) /. mag *. radius);
-    let ything = PUtils.round (-. float_of_int (xx2 - xx1) /. mag *. radius);
+    let xthing = PUtils.round (float_of_int dy /. mag *. radius);
+    let ything = PUtils.round (-. float_of_int dx /. mag *. radius);
     let x1 = float_of_int xx1 +. xthing;
     let y1 = float_of_int yy1 +. ything;
     let x2 = float_of_int xx2 +. xthing;
@@ -283,7 +320,6 @@ module P = {
     let x4 = float_of_int xx1 -. xthing;
     let y4 = float_of_int yy1 -. ything;
     drawRectInternal (x2, y2) (x3, y3) (x1, y1) (x4, y4) (!env).stroke.color !env
-    /* drawRectInternal  */
   };
 };
 
