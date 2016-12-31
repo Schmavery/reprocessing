@@ -224,6 +224,8 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
 };
 
 module P = {
+  let width env => Gl.Window.getWidth (!env).window;
+  let height env => Gl.Window.getHeight (!env).window;
   let mouse env => (!env).mouse.pos;
   let pmouse env => (!env).mouse.prevPos;
   let mousePressed env => (!env).mouse.pressed;
