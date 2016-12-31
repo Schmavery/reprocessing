@@ -19,10 +19,10 @@ let setup env => {
 let draw state env => {
   background env (color 150 255 255);
   let (sx, sy) = state.squarePos;
-  let (px, py) = (pmouseX env, pmouseY env);
+  let (px, py) = pmouse env;
   let (x, y) as squarePos =
     if (mousePressed env && px > sx && px < sx + squareHeight && py > sy && py < sy + squareWidth) {
-      let (mx, my) = (mouseX env, mouseY env);
+      let (mx, my) = mouse env;
       let dx = mx - px;
       let dy = my - py;
       (sx + dx, sy + dy)
@@ -30,6 +30,12 @@ let draw state env => {
       state.squarePos
     };
   rect env x y squareWidth squareHeight;
+  stroke env (color 0 0 255);
+  lineWeight env 10;
+  line env (0, 0) (150, 150);
+  lineWeight env 1;
+  stroke env (color 0 255 0);
+  line env (100, 100) (100, 200);
   {...state, squarePos}
 };
 
