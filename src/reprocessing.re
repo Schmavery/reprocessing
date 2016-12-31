@@ -170,6 +170,14 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 module PUtils = {
   let color ::r ::g ::b :color => {r, g, b};
   let round i => floor (i +. 0.5);
+  let remapf x a b c d => x -. a /. b -. a *. (d -. c) +. c;
+  let remap x a b c d =>
+    int_of_float (
+      remapf (float_of_int x) (float_of_int a) (float_of_int b) (float_of_int c) (float_of_int d)
+    );
+  let norm value low high => remapf value low high 0. 1.;
+  let randomf low high => Random.float (high -. low) +. low;
+  let random low high => Random.int (high - low) + low;
 };
 
 let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
@@ -193,11 +201,7 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
 
   /** Setup colors to be sent to the GPU **/
   let toColorFloat i => float_of_int i /. 255.;
-  let (r, g, b) = (
-    toColorFloat color.r,
-    toColorFloat color.g,
-    toColorFloat color.b
-  );
+  let (r, g, b) = (toColorFloat color.r, toColorFloat color.g, toColorFloat color.b);
   let square_colors = ref [];
   for i in 0 to 3 {
     square_colors := [r, g, b, 1., ...!square_colors]
@@ -262,7 +266,7 @@ module P = {
   };
   let clear env => Gl.clear (!env).gl (Constants.color_buffer_bit lor Constants.depth_buffer_bit);
   let stroke env color => env := {...!env, stroke: {...(!env).stroke, color}};
-  let lineWeight env weight => env := {...!env, stroke: {...(!env).stroke, weight}};
+  let strokeWeight env weight => env := {...!env, stroke: {...(!env).stroke, weight}};
   let line env (xx1, yy1) (xx2, yy2) => {
     let dx = xx2 - xx1;
     let dy = yy2 - yy1;
