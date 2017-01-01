@@ -194,7 +194,8 @@ module PUtils = {
         )
       };
   let constrain amt low high => max (min amt high) low;
-  let remapf x a b c d => x -. a /. b -. a *. (d -. c) +. c;
+  let remapf value istart istop ostart ostop =>
+    ostart +. (ostop -. ostart) *. ((value -. istart) /. (istop -. istart));
   let remap x a b c d =>
     int_of_float (
       remapf (float_of_int x) (float_of_int a) (float_of_int b) (float_of_int c) (float_of_int d)
@@ -215,6 +216,11 @@ module PUtils = {
     g: lerp low.g high.g amt,
     b: lerp low.b high.b amt
   };
+};
+
+module PConstants = {
+  let white = PUtils.color 255 255 255;
+  let black = PUtils.color 0 0 0;
 };
 
 let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {

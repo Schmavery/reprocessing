@@ -4,13 +4,22 @@ open P;
 
 open PUtils;
 
+open PConstants;
+
 /* https://www.youtube.com/watch?v=KkyIDI6rQJI
    Purple rain processing demo */
-type dropT = {x: int, y: int, z: int, len: int, yspeed: int};
+type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: color};
 
 let make w => {
   let z = random 0 20;
-  {x: random 0 w, y: random (-500) (-50), z, len: remap z 0 20 10 20, yspeed: remap z 0 20 1 20}
+  {
+    x: random 0 w,
+    y: random (-500) (-50),
+    z,
+    len: remap z 0 20 10 20,
+    yspeed: remap z 0 20 5 15,
+    color: lerpColor white (color 138 43 226) (randomf 0.3 1.)
+  }
 };
 
 let setup env => {
@@ -42,8 +51,8 @@ let draw lst env => {
   List.iter
     (
       fun drop => {
-        strokeWeight env (remap drop.z 0 20 1 3);
-        stroke env (color 138 43 226);
+        strokeWeight env (remap drop.z 0 20 1 5);
+        stroke env drop.color;
         line env (drop.x, drop.y) (drop.x, drop.y + drop.len)
       }
     )
