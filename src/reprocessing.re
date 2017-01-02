@@ -220,11 +220,70 @@ module PUtils = {
     g: lerp low.g high.g amt,
     b: lerp low.b high.b amt
   };
+  let acos = acos;
+  let asin = asin;
+  let atan = atan;
+  let atan2 = atan2;
+  let cos = cos;
+  let degrees x => 180.0 /. (4.0 *. atan 1.0) *. x;
+  let radians x => 4.0 *. atan 1.0 /. 180.0 *. x;
+  let sin = sin;
+  let tan = tan;
+  let noise x y z => {
+    let p = Permutation.lookup_table;
+    let fade t => t *. t *. t *. (t *. (t *. 6.0 -. 15.0) +. 10.0);
+    let grad hash x y z =>
+      switch (hash land 15) {
+      | 0 => x +. y
+      | 1 => -. x +. y
+      | 2 => x -. y
+      | 3 => -. x -. y
+      | 4 => x +. z
+      | 5 => -. x +. z
+      | 6 => x -. z
+      | 7 => -. x -. z
+      | 8 => y +. z
+      | 9 => -. y +. z
+      | 10 => y -. z
+      | 11 => -. y -. z
+      | 12 => y +. x
+      | 13 => -. y +. z
+      | 14 => y -. x
+      | 15 => -. y -. z
+      | _ => 0.0
+      };
+    let xi = int_of_float x land 255;
+    let yi = int_of_float y land 255;
+    let zi = int_of_float z land 255;
+    let xf = x -. floor x;
+    let yf = y -. floor y;
+    let zf = z -. floor z;
+    let u = fade xf;
+    let v = fade yf;
+    let w = fade zf;
+    let aaa = p.(p.(p.(xi) + yi) + zi);
+    let aba = p.(p.(p.(xi) + (yi + 1)) + zi);
+    let aab = p.(p.(p.(xi) + yi) + (zi + 1));
+    let abb = p.(p.(p.(xi) + (yi + 1)) + (zi + 1));
+    let baa = p.(p.(p.(xi + 1) + yi) + zi);
+    let bba = p.(p.(p.(xi + 1) + (yi + 1)) + zi);
+    let bab = p.(p.(p.(xi + 1) + yi) + (zi + 1));
+    let bbb = p.(p.(p.(xi + 1) + (yi + 1)) + (zi + 1));
+    let x1 = lerpf (grad aaa xf yf zf) (grad baa (xf -. 1.0) yf zf) u;
+    let x2 = lerpf (grad aba xf (yf -. 1.0) zf) (grad bba (xf -. 1.0) (yf -. 1.0) zf) u;
+    let y1 = lerpf x1 x2 v;
+    let x1 = lerpf (grad aab xf yf (zf -. 1.0)) (grad bab (xf -. 1.0) yf (zf -. 1.0)) u;
+    let x2 =
+      lerpf (grad abb xf (yf -. 1.0) (zf -. 1.0)) (grad bbb (xf -. 1.0) (yf -. 1.0) (zf -. 1.0)) u;
+    let y2 = lerpf x1 x2 v;
+    (lerpf y1 y2 w +. 1.0) /. 2.0
+  };
 };
 
 module PConstants = {
-  let white = PUtils.color 255 255 255;
-  let black = PUtils.color 0 0 0;
+let white = PUtils.color 255 255 255;
+let black = PUtils.color 0 0 0;
+let pi = 4.0 *. atan 1.0;
 };
 
 let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
@@ -402,7 +461,6 @@ type userCallbackT 'a = 'a => ref glState => ('a, glState);
 
 let afterDraw f (env: ref glEnv) => {
   let rate = int_of_float (1000. /. f);
-  print_endline ((string_of_float f) ^ " -- " ^ (string_of_int rate));
   env := {
     ...!env,
     mouse: {...(!env).mouse, prevPos: (!env).mouse.pos},
