@@ -270,6 +270,70 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
   Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4
 };
 
+let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
+  let noOfFans = (max radx rady) * 3;
+  let pi = 4.0 *. atan 1.0;
+  let anglePerFan = 2. *. pi /. float_of_int noOfFans;
+  let verticesData = ref [];
+  for i in 0 to (noOfFans - 1) {
+    let angle = anglePerFan *. float_of_int (i + 1);
+    let xCoordinate = float_of_int xCenterOfCircle +. cos angle *. float_of_int radx;
+    let yCoordinate = float_of_int yCenterOfCircle +. sin angle *. float_of_int rady;
+    verticesData := [0., yCoordinate, xCoordinate, ...!verticesData]
+  };
+  verticesData := [
+    0.,
+    float_of_int yCenterOfCircle,
+    float_of_int xCenterOfCircle,
+    ...!verticesData
+  ];
+  verticesData := List.rev !verticesData;
+  let verticesArray = Array.of_list !verticesData;
+  Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
+  Gl.bufferData
+    context::env.gl
+    target::Constants.array_buffer
+    data::(Gl.Float32 verticesArray)
+    usage::Constants.static_draw;
+  Gl.vertexAttribPointer
+    context::env.gl
+    attribute::env.aVertexPosition
+    size::3
+    type_::Constants.float_
+    normalize::false
+    stride::0
+    offset::0;
+
+  /** Setup colors to be sent to the GPU **/
+  let toColorFloat i => float_of_int i /. 255.;
+  let (r, g, b) = (
+    toColorFloat env.currFill.r,
+    toColorFloat env.currFill.g,
+    toColorFloat env.currFill.b
+  );
+  let colors = ref [];
+  for i in 0 to noOfFans {
+    colors := [r, g, b, 1., ...!colors]
+  };
+  Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.colorBuffer;
+  Gl.bufferData
+    context::env.gl
+    target::Constants.array_buffer
+    data::(Gl.Float32 (Array.of_list !colors))
+    usage::Constants.static_draw;
+  Gl.vertexAttribPointer
+    context::env.gl
+    attribute::env.aVertexColor
+    size::4
+    type_::Constants.float_
+    normalize::false
+    stride::0
+    offset::0;
+  Gl.uniformMatrix4fv
+    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
+  Gl.drawArrays context::env.gl mode::Constants.triangle_fan first::0 count::(noOfFans + 1)
+};
+
 module P = {
   let width env => Gl.Window.getWidth (!env).window;
   let height env => Gl.Window.getHeight (!env).window;
@@ -327,6 +391,7 @@ module P = {
     let y4 = float_of_int yy1 -. ything;
     drawRectInternal (x2, y2) (x3, y3) (x1, y1) (x4, y4) (!env).stroke.color !env
   };
+  let ellipse env a b c d => drawEllipseInternal !env a b c d;
 };
 
 type userCallbackT 'a = 'a => ref glState => ('a, glState);

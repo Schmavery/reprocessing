@@ -57,6 +57,7 @@ let draw lst env => {
       }
     )
     lst;
+  ellipse env 200 200 100 50;
   lst
 };
 
