@@ -51,13 +51,11 @@ let draw lst env => {
   List.iter
     (
       fun drop => {
-        strokeWeight env (remap drop.z 0 20 1 5);
-        stroke env drop.color;
-        line env (drop.x, drop.y) (drop.x, drop.y + drop.len)
+        fill env drop.color;
+        ellipse env drop.x drop.y (remap drop.z 0 20 1 5) drop.yspeed;
       }
     )
     lst;
-  ellipse env 200 200 100 50;
   lst
 };
 

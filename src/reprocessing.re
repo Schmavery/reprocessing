@@ -17,6 +17,8 @@ type strokeT = {color: color, weight: int};
 
 type mouseT = {pos: (int, int), prevPos: (int, int), pressed: bool};
 
+type frameT = {count: int, rate: int};
+
 type glEnv = {
   camera: glCamera,
   window: Gl.Window.t,
@@ -29,7 +31,8 @@ type glEnv = {
   currFill: color,
   currBackground: color,
   mouse: mouseT,
-  stroke: strokeT
+  stroke: strokeT,
+  frame: frameT
 };
 
 module type ReProcessorT = {
@@ -163,7 +166,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     currFill,
     currBackground,
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
-    stroke: {color: {r: 0, g: 0, b: 0}, weight: 10}
+    stroke: {color: {r: 0, g: 0, b: 0}, weight: 10},
+    frame: {count: 1, rate: 10}
   }
 };
 
@@ -263,15 +267,13 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
     normalize::false
     stride::0
     offset::0;
-  Gl.uniformMatrix4fv
-    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
 
   /** Final call which actually does the "draw" **/
   Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4
 };
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
-  let noOfFans = (max radx rady) * 3;
+  let noOfFans = max radx rady * 3;
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   let verticesData = ref [];
@@ -329,8 +331,6 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     normalize::false
     stride::0
     offset::0;
-  Gl.uniformMatrix4fv
-    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
   Gl.drawArrays context::env.gl mode::Constants.triangle_fan first::0 count::(noOfFans + 1)
 };
 
@@ -342,6 +342,8 @@ module P = {
   let mousePressed env => (!env).mouse.pressed;
   let background (env: ref glEnv) (c: color) => env := {...!env, currBackground: c};
   let fill (env: ref glEnv) (c: color) => env := {...!env, currFill: c};
+  let frameRate (env: ref glEnv) => (!env).frame.rate;
+  let frameCount (env: ref glEnv) => (!env).frame.count;
   let size (env: ref glEnv) width height => {
     Gl.Window.setWindowSize window::(!env).window ::width ::height;
     Gl.viewport context::(!env).gl x::0 y::0 ::width ::height;
@@ -353,7 +355,9 @@ module P = {
       bottom::(float_of_int height)
       top::0.
       near::0.
-      far::100.
+      far::100.;
+    Gl.uniformMatrix4fv
+      context::(!env).gl location::(!env).pMatrixUniform value::(!env).camera.projectionMatrix
   };
   let rect (env: ref glEnv) x y width height =>
     drawRectInternal
@@ -396,8 +400,15 @@ module P = {
 
 type userCallbackT 'a = 'a => ref glState => ('a, glState);
 
-let afterDraw (env: ref glEnv) =>
-  env := {...!env, mouse: {...(!env).mouse, prevPos: (!env).mouse.pos}};
+let afterDraw f (env: ref glEnv) => {
+  let rate = int_of_float (1000. /. f);
+  print_endline ((string_of_float f) ^ " -- " ^ (string_of_int rate));
+  env := {
+    ...!env,
+    mouse: {...(!env).mouse, prevPos: (!env).mouse.pos},
+    frame: {count: (!env).frame.count + 1, rate}
+  }
+};
 
 module ReProcessor: ReProcessorT = {
   type t = ref glEnv;
@@ -411,7 +422,7 @@ module ReProcessor: ReProcessorT = {
         | Some draw => (
             fun f => {
               userState := draw !userState env;
-              afterDraw env
+              afterDraw f env
             }
           )
         | None => (fun f => ())
