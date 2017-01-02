@@ -19,6 +19,8 @@ type mouseT = {pos: (int, int), prevPos: (int, int), pressed: bool};
 
 type frameT = {count: int, rate: int};
 
+type sizeT = {height: int, width: int, resizeable: bool};
+
 type glEnv = {
   camera: glCamera,
   window: Gl.Window.t,
@@ -32,7 +34,8 @@ type glEnv = {
   currBackground: color,
   mouse: mouseT,
   stroke: strokeT,
-  frame: frameT
+  frame: frameT,
+  size: sizeT
 };
 
 module type ReProcessorT = {
@@ -147,8 +150,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   Gl.Mat4.ortho
     out::camera.projectionMatrix
     left::0.
-    right::(float_of_int (Gl.Window.getWidth window))
-    bottom::(float_of_int (Gl.Window.getHeight window))
+    right::(float_of_int width)
+    bottom::(float_of_int height)
     top::0.
     near::0.
     far::100.;
@@ -167,7 +170,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     currBackground,
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
     stroke: {color: {r: 0, g: 0, b: 0}, weight: 10},
-    frame: {count: 1, rate: 10}
+    frame: {count: 1, rate: 10},
+    size: {height, width, resizeable: true}
   }
 };
 
@@ -281,9 +285,9 @@ module PUtils = {
 };
 
 module PConstants = {
-let white = PUtils.color 255 255 255;
-let black = PUtils.color 0 0 0;
-let pi = 4.0 *. atan 1.0;
+  let white = PUtils.color 255 255 255;
+  let black = PUtils.color 0 0 0;
+  let pi = 4.0 *. atan 1.0;
 };
 
 let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
@@ -333,8 +337,7 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
   let noOfFans = max radx rady * 3;
-  let pi = 4.0 *. atan 1.0;
-  let anglePerFan = 2. *. pi /. float_of_int noOfFans;
+  let anglePerFan = 2. *. PConstants.pi /. float_of_int noOfFans;
   let verticesData = ref [];
   for i in 0 to (noOfFans - 1) {
     let angle = anglePerFan *. float_of_int (i + 1);
@@ -393,9 +396,25 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
   Gl.drawArrays context::env.gl mode::Constants.triangle_fan first::0 count::(noOfFans + 1)
 };
 
+let resetSize env width height => {
+  env := {...!env, size: {...(!env).size, width, height}};
+  Gl.viewport context::(!env).gl x::0 y::0 ::width ::height;
+  Gl.clearColor context::(!env).gl r::0. g::0. b::0. a::1.;
+  Gl.Mat4.ortho
+    out::(!env).camera.projectionMatrix
+    left::0.
+    right::(float_of_int width)
+    bottom::(float_of_int height)
+    top::0.
+    near::0.
+    far::100.;
+  Gl.uniformMatrix4fv
+    context::(!env).gl location::(!env).pMatrixUniform value::(!env).camera.projectionMatrix
+};
+
 module P = {
-  let width env => Gl.Window.getWidth (!env).window;
-  let height env => Gl.Window.getHeight (!env).window;
+  let width env => (!env).size.width;
+  let height env => (!env).size.height;
   let mouse env => (!env).mouse.pos;
   let pmouse env => (!env).mouse.prevPos;
   let mousePressed env => (!env).mouse.pressed;
@@ -405,18 +424,7 @@ module P = {
   let frameCount (env: ref glEnv) => (!env).frame.count;
   let size (env: ref glEnv) width height => {
     Gl.Window.setWindowSize window::(!env).window ::width ::height;
-    Gl.viewport context::(!env).gl x::0 y::0 ::width ::height;
-    Gl.clearColor context::(!env).gl r::0. g::0. b::0. a::1.;
-    Gl.Mat4.ortho
-      out::(!env).camera.projectionMatrix
-      left::0.
-      right::(float_of_int width)
-      bottom::(float_of_int height)
-      top::0.
-      near::0.
-      far::100.;
-    Gl.uniformMatrix4fv
-      context::(!env).gl location::(!env).pMatrixUniform value::(!env).camera.projectionMatrix
+    resetSize env width height
   };
   let rect (env: ref glEnv) x y width height =>
     drawRectInternal
@@ -426,12 +434,17 @@ module P = {
       (float_of_int x, float_of_int y)
       (!env).currFill
       !env;
+  let resizeable (env: ref glEnv) resizeable =>
+    env := {...!env, size: {...(!env).size, resizeable}};
+  let rectf (env: ref glEnv) x y width height =>
+    drawRectInternal
+      (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill !env;
   let background env color => {
-    let width = Gl.Window.getWidth (!env).window;
-    let height = Gl.Window.getHeight (!env).window;
+    let w = width env;
+    let h = height env;
     let oldEnv = !env;
     fill env color;
-    rect env 0 0 width height;
+    rect env 0 0 w h;
     env := oldEnv
   };
   let clear env => Gl.clear (!env).gl (Constants.color_buffer_bit lor Constants.depth_buffer_bit);
@@ -519,6 +532,16 @@ module ReProcessor: ReProcessorT = {
             }
           }
         }
+      )
+      windowResize::(
+        fun () =>
+          if (!env).size.resizeable {
+            let height = Gl.Window.getHeight (!env).window;
+            let width = Gl.Window.getWidth (!env).window;
+            resetSize env width height
+          } else {
+            P.size env (P.width env) (P.height env)
+          }
       )
       ()
   };
