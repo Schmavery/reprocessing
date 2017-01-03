@@ -34,8 +34,8 @@
         "engine": "bucklescript",
         "entry": "src/index.re",
         "unstable_flags": {
-          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -I _build/web/reglweb",
-          "link": "-I _build/web/reglweb -I _build/web/reglinterface",
+          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -I _build/web/reglweb -I _build/web/reglinterface",
+          "link": "-I _build/web/reglweb",
           "envvars": "GL_BACKEND=web",
           "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
         }
@@ -45,8 +45,8 @@
         "engine": "native",
         "entry": "src/index.re",
         "unstable_flags": {
-          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -package tgls.tgl3,tsdl -I _build/native/reglnative",
-          "link": "-linkpkg -package tgls.tgl3,tsdl -I _build/native/reglnative -I _build/web/reglinterface -cclib \"$(pkg-config --libs reglnative)\"",
+          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -package tgls.tgl3,tsdl -I _build/web/reglinterface -I _build/native/reglnative",
+          "link": "-linkpkg -package tgls.tgl3,tsdl -cclib \"$(pkg-config --libs reglnative)\"",
           "envvars": "GL_BACKEND=native",
           "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
         }
