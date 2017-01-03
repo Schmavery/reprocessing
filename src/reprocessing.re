@@ -1,3 +1,7 @@
+/*
+ * vim: set ft=rust:
+ * vim: set ft=reason:
+ */
 include [%matchenv
   switch GL_BACKEND {
   | "web" => Reglweb.Webgl
