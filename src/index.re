@@ -22,6 +22,8 @@ let make w => {
   }
 };
 
+type state = {lst: list dropT, img: Reprocessing.imageT};
+
 let setup env => {
   size env 640 360;
   fill env (color 255 0 0);
@@ -29,11 +31,13 @@ let setup env => {
   for i in 0 to 500 {
     lst := [make 640, ...!lst]
   };
-  !lst
+  let img = loadImage env "assets/img_test.png";
+  {lst: !lst, img}
 };
 
-let draw lst env => {
+let draw {lst, img} env => {
   background env (color 230 230 250);
+  image env img 0 0;
   let lst =
     List.map
       (
@@ -52,11 +56,12 @@ let draw lst env => {
     (
       fun drop => {
         fill env drop.color;
-        ellipse env drop.x drop.y (remap drop.z 0 20 1 5) drop.yspeed;
+        ellipse env drop.x drop.y (remap drop.z 0 20 1 5) drop.yspeed
       }
     )
     lst;
-  lst
+  image env img 50 50;
+  {lst, img}
 };
 
 ReProcessor.run ::setup ::draw ();
