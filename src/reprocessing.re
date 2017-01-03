@@ -26,8 +26,6 @@ type glEnv = {
   window: Gl.Window.t,
   gl: Gl.contextT,
   vertexBuffer: Gl.bufferT,
-  textureVertexBuffer: Gl.bufferT,
-  colorBuffer: Gl.bufferT,
   aVertexColor: Gl.attributeT,
   aTextureCoord: Gl.attributeT,
   aVertexPosition: Gl.attributeT,
@@ -138,8 +136,6 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   /** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
   let camera = {projectionMatrix: Gl.Mat4.create ()};
   let vertexBuffer = Gl.createBuffer gl;
-  let textureVertexBuffer = Gl.createBuffer gl;
-  let colorBuffer = Gl.createBuffer gl;
   let program =
     switch (getProgram ::gl vertexShader::vertexShaderSource fragmentShader::fragmentShaderSource) {
     | None => failwith "Could not create the program and/or the shaders. Aborting."
@@ -152,26 +148,20 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   Gl.enableVertexAttribArray context::gl attribute::aVertexPosition;
   let aVertexColor = Gl.getAttribLocation context::gl ::program name::"aVertexColor";
   Gl.enableVertexAttribArray context::gl attribute::aVertexColor;
-  let aTextureCoord = Gl.getAttribLocation context::gl ::program name::"aTextureCoord";
-  Gl.enableVertexAttribArray context::gl attribute::aTextureCoord;
   let pMatrixUniform = Gl.getUniformLocation gl program "uPMatrix";
   Gl.uniformMatrix4fv context::gl location::pMatrixUniform value::camera.projectionMatrix;
+
+  /** Get attribute and uniform locations for later usage in the draw code. **/
+  let aTextureCoord = Gl.getAttribLocation context::gl ::program name::"aTextureCoord";
+  Gl.enableVertexAttribArray context::gl attribute::aTextureCoord;
   let uSampler = Gl.getUniformLocation gl program "uSampler";
   let uTextureFlag = Gl.getUniformLocation gl program "uTextureFlag";
+
+  /** Generate texture buffer that we'll use to pass image data around. **/
   let texture = Gl.createTexture gl;
 
-  /** Load image here **/
+  /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
   Gl.bindTexture context::gl target::Constants.texture_2d ::texture;
-  Gl.texImage2D
-    context::gl
-    target::Constants.texture_2d
-    level::0
-    internalFormat::Constants.rgb
-    width::1
-    height::1
-    format::Constants.rgb
-    type_::Constants.unsigned_byte
-    data::(Gl.toTextureData [|0, 0, 255, 255|]);
   Gl.texParameteri
     context::gl
     target::Constants.texture_2d
@@ -182,8 +172,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     target::Constants.texture_2d
     pname::Constants.texture_min_filter
     param::Constants.linear_mipmap_nearest;
-  Gl.generateMipmap context::gl target::Constants.texture_2d;
-  /* Enable blend and tell opengl to use this "blendFunc". */
+
+  /** Enable blend and tell OpenGL how to blend. */
   Gl.enable context::gl Constants.blend;
   Gl.blendFunc context::gl Constants.src_alpha Constants.one_minus_src_alpha;
 
@@ -207,8 +197,6 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     window,
     gl,
     vertexBuffer,
-    textureVertexBuffer,
-    colorBuffer,
     aVertexPosition,
     aTextureCoord,
     aVertexColor,
@@ -280,7 +268,7 @@ module PUtils = {
       u1 := Random.float 1.0;
       u2 := Random.float 1.0
     };
-    sqrt ((-2.0) *. (log !u1)) *. cos (PConstants.two_pi *. !u2)
+    sqrt ((-2.0) *. log !u1) *. cos (PConstants.two_pi *. !u2)
   };
   let lerpf start stop amt => remapf amt 0. 1. start stop;
   let lerp start stop amt => int_of_float (lerpf (float_of_int start) (float_of_int stop) amt);
@@ -376,10 +364,27 @@ module PUtils = {
   };
 };
 
-let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} env => {
+/*
+ * This array packs all of the values that the shaders need: vertices, colors and texture coordinates.
+ * We put them all in one as an optimization, so there are less back and forths between us and the GPU.
+ *
+ * The data looks like:
+ *
+ * |<---------  9 * 4 bytes  --------->|
+ *  ------------------------------------
+ * |  x  y  z  |  r  g  b  a  |  s  t  |  x2  y2  z2 |  r2  g2  b2  a2  |  s2  t2  | ....
+ * ------------------------------------
+ * |           |              |
+ * +- offset: 0 bytes, stride: 9 * 4 bytes (because we need to move by 9*4 bytes to get to the next x)
+ *             |              |
+ *             +- offset: 3 * 4 bytes, stride: 9 * 4 bytes
+ *                            |
+ *                            +- offset: (3 + 4) * 4 bytes, stride: 9 * 4 bytes
+ */
+let makeRectVertexBuffer (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
   let toColorFloat i => float_of_int i /. 255.;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let verticesColorAndTexture = [|
+  [|
     x1,
     y1,
     0.0,
@@ -416,13 +421,23 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} env => {
     1.,
     0.0,
     0.0
-  |];
+  |]
+};
+
+let drawVertexBuffer vertexBuffer::verticesColorAndTextureCoord ::mode ::count ::textureFlag=0. env => {
+  /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
+     `array_buffer` */
   Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
+
+  /** Copy all of the data over into whatever's in `array_buffer` (so here it's `vertexBuffer`) **/
   Gl.bufferData
     context::env.gl
     target::Constants.array_buffer
-    data::(Gl.Float32 verticesColorAndTexture)
+    data::(Gl.Float32 verticesColorAndTextureCoord)
+    /* TODO: Update to be GL_STREAM_DRAW but we need the constants in reglinterface */
     usage::Constants.static_draw;
+
+  /** Tell the GPU about the shader attribute called `aVertexPosition` so it can access the data per vertex */
   Gl.vertexAttribPointer
     context::env.gl
     attribute::env.aVertexPosition
@@ -431,6 +446,8 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} env => {
     normalize::false
     stride::(9 * 4)
     offset::0;
+
+  /** Same as above but for `aVertexColor` **/
   Gl.vertexAttribPointer
     context::env.gl
     attribute::env.aVertexColor
@@ -439,6 +456,8 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} env => {
     normalize::false
     stride::(9 * 4)
     offset::(3 * 4);
+
+  /** Same as above but for `aTextureCoord` **/
   Gl.vertexAttribPointer
     context::env.gl
     attribute::env.aTextureCoord
@@ -447,15 +466,29 @@ let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} env => {
     normalize::false
     stride::(9 * 4)
     offset::(7 * 4);
+
+  /** This tells OpenGL that we're going to be using texture0. OpenGL imposes a limit on the number of
+      texture we can manipulate at the same time. That limit depends on the device. We don't care, as we'll just
+      always use texture0. **/
   Gl.activeTexture context::env.gl target::Constants.texture0;
+
+  /** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
   Gl.bindTexture context::env.gl target::Constants.texture_2d texture::env.texture;
+
+  /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
+      texture0 represent. **/
   Gl.uniform1i context::env.gl location::env.uSampler 0;
+
+  /** Tell OpenGL about what the uniform called `pMatrixUniform` is, here it's the projectionMatrix. **/
   Gl.uniformMatrix4fv
     context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
-  Gl.uniform1f context::env.gl location::env.uTextureFlag 0.0;
+
+  /** Last uniform, the `uTextureFlag` which allows us to only have one shader and flip flop between using
+      a color or a texture to fill the geometry. **/
+  Gl.uniform1f context::env.gl location::env.uTextureFlag textureFlag;
 
   /** Final call which actually does the "draw" **/
-  Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4
+  Gl.drawArrays context::env.gl ::mode first::0 ::count
 };
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
@@ -475,6 +508,7 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     let angle = anglePerFan *. float_of_int (i + 1);
     let xCoordinate = float_of_int xCenterOfCircle +. cos angle *. radxf;
     let yCoordinate = float_of_int yCenterOfCircle +. sin angle *. radyf;
+    /* Data format is the same as the one described in `drawRectInternal` but reversed */
     verticesData := [0.0, 0.0, 1.0, b, g, r, 0., yCoordinate, xCoordinate, ...!verticesData]
   };
   verticesData := [
@@ -490,45 +524,8 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     ...!verticesData
   ];
   let verticesArray = Array.of_list (List.rev !verticesData);
-
-  /** Load the vertices into the GPU **/
-  Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
-  Gl.bufferData
-    context::env.gl
-    target::Constants.array_buffer
-    data::(Gl.Float32 verticesArray)
-    usage::Constants.static_draw;
-  Gl.vertexAttribPointer
-    context::env.gl
-    attribute::env.aVertexPosition
-    size::3
-    type_::Constants.float_
-    normalize::false
-    stride::(9 * 4)
-    offset::0;
-  Gl.vertexAttribPointer
-    context::env.gl
-    attribute::env.aVertexColor
-    size::4
-    type_::Constants.float_
-    normalize::false
-    stride::(9 * 4)
-    offset::(3 * 4);
-  Gl.vertexAttribPointer
-    context::env.gl
-    attribute::env.aTextureCoord
-    size::2
-    type_::Constants.float_
-    normalize::false
-    stride::(9 * 4)
-    offset::(7 * 4);
-  Gl.activeTexture context::env.gl target::Constants.texture0;
-  Gl.bindTexture context::env.gl target::Constants.texture_2d texture::env.texture;
-  Gl.uniform1i context::env.gl location::env.uSampler 0;
-  Gl.uniform1f context::env.gl location::env.uTextureFlag 0.0;
-  Gl.uniformMatrix4fv
-    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
-  Gl.drawArrays context::env.gl mode::Constants.triangle_fan first::0 count::(noOfFans + 1)
+  drawVertexBuffer
+    vertexBuffer::verticesArray mode::Constants.triangle_fan count::(noOfFans + 1) env
 };
 
 let resetSize env width height => {
@@ -563,19 +560,24 @@ module P = {
     Gl.Window.setWindowSize window::(!env).window ::width ::height;
     resetSize env width height
   };
-  let rect (env: ref glEnv) x y width height =>
-    drawRectInternal
-      (float_of_int @@ x + width, float_of_int @@ y + height)
-      (float_of_int x, float_of_int @@ y + height)
-      (float_of_int @@ x + width, float_of_int y)
-      (float_of_int x, float_of_int y)
-      (!env).currFill
-      !env;
+  let rect (env: ref glEnv) x y width height => {
+    let vertexBuffer =
+      makeRectVertexBuffer
+        (float_of_int @@ x + width, float_of_int @@ y + height)
+        (float_of_int x, float_of_int @@ y + height)
+        (float_of_int @@ x + width, float_of_int y)
+        (float_of_int x, float_of_int y)
+        (!env).currFill;
+    drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip count::4 !env
+  };
   let resizeable (env: ref glEnv) resizeable =>
     env := {...!env, size: {...(!env).size, resizeable}};
-  let rectf (env: ref glEnv) x y width height =>
-    drawRectInternal
-      (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill !env;
+  let rectf (env: ref glEnv) x y width height => {
+    let vertexBuffer =
+      makeRectVertexBuffer
+        (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill;
+    drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip count::4 !env
+  };
   let loadImage (env: ref glEnv) filename :imageT => {
     let imageRef = ref None;
     Gl.loadImage
@@ -616,7 +618,6 @@ module P = {
       let (x2, y2) = (float_of_int x, float_of_int @@ y + height);
       let (x3, y3) = (float_of_int @@ x + width, float_of_int y);
       let (x4, y4) = (float_of_int x, float_of_int y);
-      Gl.uniform1f context::env.gl location::env.uTextureFlag 1.0;
       let verticesColorAndTexture = [|
         x1,
         y1,
@@ -655,44 +656,12 @@ module P = {
         0.0,
         0.0
       |];
-      Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
-      Gl.bufferData
-        context::env.gl
-        target::Constants.array_buffer
-        data::(Gl.Float32 verticesColorAndTexture)
-        usage::Constants.static_draw;
-      Gl.vertexAttribPointer
-        context::env.gl
-        attribute::env.aVertexPosition
-        size::3
-        type_::Constants.float_
-        normalize::false
-        stride::(9 * 4)
-        offset::0;
-      Gl.vertexAttribPointer
-        context::env.gl
-        attribute::env.aVertexColor
-        size::4
-        type_::Constants.float_
-        normalize::false
-        stride::(9 * 4)
-        offset::(3 * 4);
-      Gl.vertexAttribPointer
-        context::env.gl
-        attribute::env.aTextureCoord
-        size::2
-        type_::Constants.float_
-        normalize::false
-        stride::(9 * 4)
-        offset::(7 * 4);
-      Gl.activeTexture context::env.gl target::Constants.texture0;
-      Gl.bindTexture context::env.gl target::Constants.texture_2d texture::env.texture;
-      Gl.uniform1i context::env.gl location::env.uSampler 0;
-      Gl.uniformMatrix4fv
-        context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
-
-      /** Final call which actually does the "draw" **/
-      Gl.drawArrays context::env.gl mode::Constants.triangle_strip first::0 count::4
+      drawVertexBuffer
+        vertexBuffer::verticesColorAndTexture
+        mode::Constants.triangle_strip
+        count::4
+        textureFlag::1.0
+        env
     };
   let background env color => {
     let w = width env;
@@ -720,7 +689,9 @@ module P = {
     let y3 = float_of_int yy2 -. ything;
     let x4 = float_of_int xx1 -. xthing;
     let y4 = float_of_int yy1 -. ything;
-    drawRectInternal (x2, y2) (x3, y3) (x1, y1) (x4, y4) (!env).stroke.color !env
+    let vertexBuffer =
+      makeRectVertexBuffer (x2, y2) (x3, y3) (x1, y1) (x4, y4) (!env).stroke.color;
+    drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip !env
   };
   let ellipse env a b c d => drawEllipseInternal !env a b c d;
 };
