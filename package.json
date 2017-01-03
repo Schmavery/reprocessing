@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "description": "Simple example project for regl",
   "scripts": {
+    "postinstall": "eval $(dependencyEnv) && nopam && rebel && echo \"FLG -ppx $(pwd)/node_modules/matchenv/ppx_matchenv.exe\" >> .merlin",
     "start": "_build/native/src/app.native",
     "build": "eval $(dependencyEnv) && nopam && rebel && webpack _build/web/src/index.js _build/web/src/app.js",
+    "run": "eval $(dependencyEnv) && nopam && rebel && _build/native/src/app.native",
     "top": "eval $(dependencyEnv) && rtop",
     "env": "eval $(dependencyEnv) && env",
     "ocamldep": "eval $(dependencyEnv) && ocamldep",
