@@ -175,6 +175,16 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   }
 };
 
+module PConstants = {
+  let white = {r: 255, g: 255, b: 255};
+  let black = {r: 0, g: 0, b: 0};
+  let pi = 4.0 *. atan 1.0;
+  let two_pi = 2.0 *. pi;
+  let half_pi = 0.5 *. pi;
+  let quarter_pi = 0.25 *. pi;
+  let tau = two_pi;
+};
+
 module PUtils = {
   let lookup_table: ref (array int) = ref [||];
   let color ::r ::g ::b :color => {r, g, b};
@@ -212,6 +222,16 @@ module PUtils = {
   let norm value low high => remapf value low high 0. 1.;
   let randomf low high => Random.float (high -. low) +. low;
   let random low high => Random.int (high - low) + low;
+  let randomSeed seed => Random.init seed;
+  let randomGaussian () => {
+    let u1 = ref 0.0;
+    let u2 = ref 0.0;
+    while (!u1 <= min_float) {
+      u1 := Random.float 1.0;
+      u2 := Random.float 1.0
+    };
+    sqrt ((-2.0) *. (log !u1)) *. cos (PConstants.two_pi *. !u2)
+  };
   let lerpf start stop amt => remapf amt 0. 1. start stop;
   let lerp start stop amt => int_of_float (lerpf (float_of_int start) (float_of_int stop) amt);
   let dist (x1, y1) (x2, y2) => {
@@ -230,8 +250,8 @@ module PUtils = {
   let atan = atan;
   let atan2 = atan2;
   let cos = cos;
-  let degrees x => 180.0 /. (4.0 *. atan 1.0) *. x;
-  let radians x => 4.0 *. atan 1.0 /. 180.0 *. x;
+  let degrees x => 180.0 /. PConstants.pi *. x;
+  let radians x => PConstants.pi /. 180.0 *. x;
   let sin = sin;
   let tan = tan;
   let noise x y z => {
@@ -304,12 +324,6 @@ module PUtils = {
     lookup_table := double_array;
     Random.set_state state
   };
-};
-
-module PConstants = {
-  let white = PUtils.color 255 255 255;
-  let black = PUtils.color 0 0 0;
-  let pi = 4.0 *. atan 1.0;
 };
 
 let drawRectInternal (x1, y1) (x2, y2) (x3, y3) (x4, y4) color env => {
