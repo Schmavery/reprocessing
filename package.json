@@ -46,7 +46,7 @@
         "entry": "src/index.re",
         "unstable_flags": {
           "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -package tgls.tgl3,tsdl -I _build/native/reglnative",
-          "link": "-linkpkg -package tgls.tgl3,tsdl -I _build/native/reglnative -I _build/web/reglinterface",
+          "link": "-linkpkg -package tgls.tgl3,tsdl -I _build/native/reglnative -I _build/web/reglinterface -cclib \"$(pkg-config --libs reglnative)\"",
           "envvars": "GL_BACKEND=native",
           "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
         }
