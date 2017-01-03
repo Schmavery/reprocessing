@@ -176,6 +176,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 };
 
 module PUtils = {
+  let lookup_table: ref (array int) = ref [||];
   let color ::r ::g ::b :color => {r, g, b};
   /*Calculation Functions*/
   let round i => floor (i +. 0.5);
@@ -234,7 +235,7 @@ module PUtils = {
   let sin = sin;
   let tan = tan;
   let noise x y z => {
-    let p = Permutation.lookup_table;
+    let p = !lookup_table;
     let fade t => t *. t *. t *. (t *. (t *. 6.0 -. 15.0) +. 10.0);
     let grad hash x y z =>
       switch (hash land 15) {
@@ -281,6 +282,27 @@ module PUtils = {
       lerpf (grad abb xf (yf -. 1.0) (zf -. 1.0)) (grad bbb (xf -. 1.0) (yf -. 1.0) (zf -. 1.0)) u;
     let y2 = lerpf x1 x2 v;
     (lerpf y1 y2 w +. 1.0) /. 2.0
+  };
+  let shuffle array => {
+    let array = Array.copy array;
+    let length = Array.length array;
+    for i in 0 to (256 - 1) {
+      let j = Random.int (length - i);
+      let tmp = array.(i);
+      array.(i) = array.(i + j);
+      array.(i + j) = tmp
+    };
+    array
+  };
+  let noiseSeed seed => {
+    let state = Random.get_state ();
+    Random.init seed;
+    let array = Array.make 256 0;
+    let array = Array.mapi (fun i _ => i) array;
+    let array = shuffle array;
+    let double_array = Array.append array array;
+    lookup_table := double_array;
+    Random.set_state state
   };
 };
 
@@ -484,6 +506,8 @@ let afterDraw f (env: ref glEnv) => {
 module ReProcessor: ReProcessorT = {
   type t = ref glEnv;
   let run ::setup ::draw=? ::mouseMove=? ::mouseDragged=? ::mouseDown=? ::mouseUp=? () => {
+    Random.self_init ();
+    PUtils.noiseSeed (Random.int (PUtils.pow 2 30 - 1));
     let env = ref (createCanvas (Gl.Window.init argv::Sys.argv) 200 200);
     let userState = ref (setup env);
     Gl.render
