@@ -6,9 +6,9 @@ type glState = Gl.Window.t;
 
 type glCamera = {projectionMatrix: Gl.Mat4.t};
 
-type color = {r: int, b: int, g: int};
+type colorT = {r: int, b: int, g: int};
 
-type strokeT = {color: color, weight: int};
+type strokeT = {color: colorT, weight: int};
 
 type mouseT = {pos: (int, int), prevPos: (int, int), pressed: bool};
 
@@ -16,7 +16,9 @@ type frameT = {count: int, rate: int};
 
 type sizeT = {height: int, width: int, resizeable: bool};
 
-type imageT = ref (option Gl.imageT);
+type _imageT = {img: Gl.imageT, textureBuffer: Gl.textureT};
+
+type imageT = ref (option _imageT);
 
 type glEnv = {
   camera: glCamera,
@@ -30,8 +32,8 @@ type glEnv = {
   uSampler: Gl.uniformT,
   uTextureFlag: Gl.uniformT,
   texture: Gl.textureT,
-  currFill: color,
-  currBackground: color,
+  currFill: colorT,
+  currBackground: colorT,
   mouse: mouseT,
   stroke: strokeT,
   frame: frameT,

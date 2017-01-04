@@ -201,7 +201,18 @@ let makeRectVertexBuffer (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
   |]
 };
 
-let drawVertexBuffer vertexBuffer::verticesColorAndTextureCoord ::mode ::count ::textureFlag=0. env => {
+let drawVertexBuffer
+    vertexBuffer::verticesColorAndTextureCoord
+    ::mode
+    ::count
+    ::textureFlag=0.
+    ::textureBuffer=?
+    env => {
+  let textureBuffer =
+    switch textureBuffer {
+    | None => env.texture
+    | Some textureBuffer => textureBuffer
+    };
   /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
      `array_buffer` */
   Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
@@ -250,7 +261,7 @@ let drawVertexBuffer vertexBuffer::verticesColorAndTextureCoord ::mode ::count :
   Gl.activeTexture context::env.gl target::Constants.texture0;
 
   /** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
-  Gl.bindTexture context::env.gl target::Constants.texture_2d texture::env.texture;
+  Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
 
   /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
       texture0 represent. **/

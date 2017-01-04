@@ -12,7 +12,7 @@ module PConstants = {
 
 module PUtils = {
   let lookup_table: ref (array int) = ref [||];
-  let color ::r ::g ::b :color => {r, g, b};
+  let color ::r ::g ::b :colorT => {r, g, b};
   /*Calculation Functions*/
   let round i => floor (i +. 0.5);
   let max = max;

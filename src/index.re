@@ -8,7 +8,7 @@ open PConstants;
 
 /* https://www.youtube.com/watch?v=KkyIDI6rQJI
    Purple rain processing demo */
-type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: color};
+type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: Common.colorT};
 
 let make w => {
   let z = random 0 20;
@@ -22,7 +22,7 @@ let make w => {
   }
 };
 
-type state = {lst: list dropT, img: Reprocessing.imageT};
+type state = {lst: list dropT, img: Common.imageT};
 
 let setup env => {
   size env 640 360;

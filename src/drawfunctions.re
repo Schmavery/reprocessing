@@ -12,8 +12,8 @@ module P = {
   let mouse env => (!env).mouse.pos;
   let pmouse env => (!env).mouse.prevPos;
   let mousePressed env => (!env).mouse.pressed;
-  let background (env: ref glEnv) (c: color) => env := {...!env, currBackground: c};
-  let fill (env: ref glEnv) (c: color) => env := {...!env, currFill: c};
+  let background (env: ref glEnv) (c: colorT) => env := {...!env, currBackground: c};
+  let fill (env: ref glEnv) (c: colorT) => env := {...!env, currFill: c};
   let frameRate (env: ref glEnv) => (!env).frame.rate;
   let frameCount (env: ref glEnv) => (!env).frame.count;
   let size (env: ref glEnv) width height => {
@@ -46,11 +46,12 @@ module P = {
         fun imageData =>
           switch imageData {
           | None => assert false
-          | Some image =>
+          | Some img =>
             let env = !env;
-            imageRef := Some image;
-            Gl.bindTexture context::env.gl target::Constants.texture_2d texture::env.texture;
-            Gl.texImage2DWithImage context::env.gl target::Constants.texture_2d level::0 ::image;
+            let textureBuffer = Gl.createTexture context::env.gl;
+            imageRef := Some {img, textureBuffer};
+            Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
+            Gl.texImage2DWithImage context::env.gl target::Constants.texture_2d level::0 image::img;
             Gl.texParameteri
               context::env.gl
               target::Constants.texture_2d
@@ -60,8 +61,7 @@ module P = {
               context::env.gl
               target::Constants.texture_2d
               pname::Constants.texture_min_filter
-              param::Constants.linear_mipmap_nearest;
-            Gl.generateMipmap context::env.gl target::Constants.texture_2d
+              param::Constants.linear;
           }
       )
       ();
@@ -70,10 +70,10 @@ module P = {
   let image (env: ref glEnv) img x y =>
     switch !img {
     | None => print_endline "image not ready yet, just doing nothing :D"
-    | Some image =>
+    | Some {img, textureBuffer} =>
       let env = !env;
-      let width = Gl.getImageWidth image;
-      let height = Gl.getImageHeight image;
+      let width = Gl.getImageWidth img;
+      let height = Gl.getImageHeight img;
       let (x1, y1) = (float_of_int @@ x + width, float_of_int @@ y + height);
       let (x2, y2) = (float_of_int x, float_of_int @@ y + height);
       let (x3, y3) = (float_of_int @@ x + width, float_of_int y);
@@ -121,6 +121,7 @@ module P = {
         mode::Constants.triangle_strip
         count::4
         textureFlag::1.0
+        ::textureBuffer
         env
     };
   let background env color => {
