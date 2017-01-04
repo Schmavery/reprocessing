@@ -90,6 +90,20 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 
   /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
   Gl.bindTexture context::gl target::Constants.texture_2d ::texture;
+
+  /** Load a dummy texture. This is because we're using the same shader for things with and without a texture
+      The shader will try make lookups to get some color from the texture, but then that color will be multiplied
+      by `uTextureFlag`, which would be 0 in the case where we're rendering a colored shape. */
+  Gl.texImage2D
+    context::gl
+    target::Constants.texture_2d
+    level::0
+    internalFormat::Constants.rgba
+    width::1
+    height::1
+    format::Constants.rgba
+    type_::Constants.unsigned_byte
+    data::(Gl.toTextureData [|0, 0, 0, 0|]);
   Gl.texParameteri
     context::gl
     target::Constants.texture_2d
@@ -222,8 +236,7 @@ let drawVertexBuffer
     context::env.gl
     target::Constants.array_buffer
     data::(Gl.Float32 verticesColorAndTextureCoord)
-    /* TODO: Update to be GL_STREAM_DRAW but we need the constants in reglinterface */
-    usage::Constants.static_draw;
+    usage::Constants.stream_draw;
 
   /** Tell the GPU about the shader attribute called `aVertexPosition` so it can access the data per vertex */
   Gl.vertexAttribPointer
@@ -280,40 +293,38 @@ let drawVertexBuffer
 };
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
-  let noOfFans = max radx rady * 3;
+  let noOfFans = (radx + rady) * 2;
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   let radxf = float_of_int radx;
   let radyf = float_of_int rady;
-  let verticesData = ref [];
+  let verticesData = Array.make ((noOfFans + 1) * 9) 0.0;
   let toColorFloat i => float_of_int i /. 255.;
   let (r, g, b) = (
     toColorFloat env.currFill.r,
     toColorFloat env.currFill.g,
     toColorFloat env.currFill.b
   );
-  for i in 0 to (noOfFans - 1) {
-    let angle = anglePerFan *. float_of_int (i + 1);
-    let xCoordinate = float_of_int xCenterOfCircle +. cos angle *. radxf;
-    let yCoordinate = float_of_int yCenterOfCircle +. sin angle *. radyf;
-    /* Data format is the same as the one described in `drawRectInternal` but reversed */
-    verticesData := [0.0, 0.0, 1.0, b, g, r, 0., yCoordinate, xCoordinate, ...!verticesData]
+  let xCenterOfCirclef = float_of_int xCenterOfCircle;
+  let yCenterOfCirclef = float_of_int yCenterOfCircle;
+  let i = ref noOfFans;
+  while (!i >= 0) {
+    let angle = anglePerFan *. float_of_int (!i + 1);
+    let xCoordinate = xCenterOfCirclef +. cos angle *. radxf;
+    let yCoordinate = yCenterOfCirclef +. sin angle *. radyf;
+    verticesData.(!i * 9 + 0) = xCoordinate;
+    verticesData.(!i * 9 + 1) = yCoordinate;
+    verticesData.(!i * 9 + 2) = 0.0;
+    verticesData.(!i * 9 + 3) = r;
+    verticesData.(!i * 9 + 4) = g;
+    verticesData.(!i * 9 + 5) = b;
+    verticesData.(!i * 9 + 6) = 1.0;
+    verticesData.(!i * 9 + 7) = 0.0;
+    verticesData.(!i * 9 + 8) = 0.0;
+    i := !i - 1
   };
-  verticesData := [
-    0.0,
-    0.0,
-    1.0,
-    b,
-    g,
-    r,
-    0.,
-    float_of_int yCenterOfCircle,
-    float_of_int xCenterOfCircle,
-    ...!verticesData
-  ];
-  let verticesArray = Array.of_list (List.rev !verticesData);
   drawVertexBuffer
-    vertexBuffer::verticesArray mode::Constants.triangle_fan count::(noOfFans + 1) env
+    vertexBuffer::verticesData mode::Constants.triangle_fan count::(noOfFans + 1) env
 };
 
 let resetSize env width height => {
