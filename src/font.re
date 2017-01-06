@@ -1,3 +1,7 @@
+/*
+ * vim: set ft=rust:
+ * vim: set ft=reason:
+ */
 open Common;
 
 open Glloader;
@@ -145,26 +149,26 @@ module Font = {
       };
     switch image {
     | Some img =>
-      let batch = addImageToBatch
-        img
-        x::(x + c.xoffset + kernAmount)
-        y::(y + c.yoffset)
-        subx::c.x
-        suby::c.y
-        subw::c.width
-        subh::c.height
-        ::batch;
+      let batch =
+        addImageToBatch
+          img
+          x::(x + c.xoffset + kernAmount)
+          y::(y + c.yoffset)
+          subx::c.x
+          suby::c.y
+          subw::c.width
+          subh::c.height
+          ::batch;
       (c.xadvance + kernAmount, batch)
     | None => (c.xadvance + kernAmount, batch)
-    };
-
+    }
   };
   let drawString env fnt (str: string) x y =>
     switch !fnt.image {
     | Some img =>
       let offset = ref x;
       let lastChar = ref None;
-      let batch : ref (array float)= ref [||];
+      let batch: ref (array float) = ref [||];
       String.iter
         (
           fun c => {
@@ -179,16 +183,16 @@ module Font = {
     | None => print_endline "loading font."
     };
   /* let calcStringWidth env fnt (str: string) => {
-    let offset = ref 0;
-    let lastChar = ref None;
-    String.iter
-      (
-        fun c => {
-          offset := !offset + drawChar env fnt None c !lastChar !offset 0;
-          lastChar := Some c
-        }
-      )
-      str;
-    !offset
-  }; */
+       let offset = ref 0;
+       let lastChar = ref None;
+       String.iter
+         (
+           fun c => {
+             offset := !offset + drawChar env fnt None c !lastChar !offset 0;
+             lastChar := Some c
+           }
+         )
+         str;
+       !offset
+     }; */
 };

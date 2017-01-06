@@ -1,3 +1,7 @@
+/*
+ * vim: set ft=rust:
+ * vim: set ft=reason:
+ */
 let vertexShaderSource = {|
   attribute vec3 aVertexPosition;
   attribute vec4 aVertexColor;

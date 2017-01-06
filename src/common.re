@@ -1,3 +1,7 @@
+/*
+ * vim: set ft=rust:
+ * vim: set ft=reason:
+ */
 open Glloader;
 
 module Constants = Reglinterface.Constants;
