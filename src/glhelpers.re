@@ -327,6 +327,105 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     vertexBuffer::verticesData mode::Constants.triangle_fan count::(noOfFans + 1) env
 };
 
+let loadImage (env: ref glEnv) filename :imageT => {
+  let imageRef = ref None;
+  Gl.loadImage
+    ::filename
+    callback::(
+      fun imageData =>
+        switch imageData {
+        | None => failwith ("Could not load image '" ^ filename ^ "'.") /* TODO: handle this better? */
+        | Some img =>
+          let env = !env;
+          let textureBuffer = Gl.createTexture context::env.gl;
+          let height = Gl.getImageHeight img;
+          let width = Gl.getImageWidth img;
+          imageRef := Some {img, textureBuffer, height, width};
+          Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
+          Gl.texImage2DWithImage context::env.gl target::Constants.texture_2d level::0 image::img;
+          Gl.texParameteri
+            context::env.gl
+            target::Constants.texture_2d
+            pname::Constants.texture_mag_filter
+            param::Constants.linear;
+          Gl.texParameteri
+            context::env.gl
+            target::Constants.texture_2d
+            pname::Constants.texture_min_filter
+            param::Constants.linear
+        }
+    )
+    ();
+  imageRef
+};
+
+let drawImageInternal
+    (env: ref glEnv)
+    {img, textureBuffer, width, height}
+    ::x
+    ::y
+    ::subx
+    ::suby
+    ::subw
+    ::subh => {
+  let env = !env;
+  let (fsubx, fsuby, fsubw, fsubh) = (
+    float_of_int subx /. float_of_int width,
+    float_of_int suby /. float_of_int height,
+    float_of_int subw /. float_of_int width,
+    float_of_int subh /. float_of_int height
+  );
+  let (x1, y1) = (float_of_int @@ x + subw, float_of_int @@ y + subh);
+  let (x2, y2) = (float_of_int x, float_of_int @@ y + subh);
+  let (x3, y3) = (float_of_int @@ x + subw, float_of_int y);
+  let (x4, y4) = (float_of_int x, float_of_int y);
+  let verticesColorAndTexture = [|
+    x1,
+    y1,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx +. fsubw,
+    fsuby +. fsubh,
+    x2,
+    y2,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx,
+    fsuby +. fsubh,
+    x3,
+    y3,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx +. fsubw,
+    fsuby,
+    x4,
+    y4,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx,
+    fsuby
+  |];
+  drawVertexBuffer
+    vertexBuffer::verticesColorAndTexture
+    mode::Constants.triangle_strip
+    count::4
+    textureFlag::1.0
+    ::textureBuffer
+    env
+};
+
 let resetSize env width height => {
   env := {...!env, size: {...(!env).size, width, height}};
   Gl.viewport context::(!env).gl x::0 y::0 ::width ::height;

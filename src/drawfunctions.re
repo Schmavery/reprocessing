@@ -6,6 +6,8 @@ open Glhelpers;
 
 open Utils;
 
+open Font;
+
 module P = {
   let width env => (!env).size.width;
   let height env => (!env).size.height;
@@ -38,91 +40,12 @@ module P = {
         (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill;
     drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip count::4 !env
   };
-  let loadImage (env: ref glEnv) filename :imageT => {
-    let imageRef = ref None;
-    Gl.loadImage
-      ::filename
-      callback::(
-        fun imageData =>
-          switch imageData {
-          | None => assert false
-          | Some img =>
-            let env = !env;
-            let textureBuffer = Gl.createTexture context::env.gl;
-            imageRef := Some {img, textureBuffer};
-            Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
-            Gl.texImage2DWithImage context::env.gl target::Constants.texture_2d level::0 image::img;
-            Gl.texParameteri
-              context::env.gl
-              target::Constants.texture_2d
-              pname::Constants.texture_mag_filter
-              param::Constants.linear;
-            Gl.texParameteri
-              context::env.gl
-              target::Constants.texture_2d
-              pname::Constants.texture_min_filter
-              param::Constants.linear;
-          }
-      )
-      ();
-    imageRef
-  };
+  let loadImage = loadImage;
   let image (env: ref glEnv) img x y =>
     switch !img {
     | None => print_endline "image not ready yet, just doing nothing :D"
-    | Some {img, textureBuffer} =>
-      let env = !env;
-      let width = Gl.getImageWidth img;
-      let height = Gl.getImageHeight img;
-      let (x1, y1) = (float_of_int @@ x + width, float_of_int @@ y + height);
-      let (x2, y2) = (float_of_int x, float_of_int @@ y + height);
-      let (x3, y3) = (float_of_int @@ x + width, float_of_int y);
-      let (x4, y4) = (float_of_int x, float_of_int y);
-      let verticesColorAndTexture = [|
-        x1,
-        y1,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.,
-        1.0,
-        1.0,
-        x2,
-        y2,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.,
-        0.0,
-        1.0,
-        x3,
-        y3,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.,
-        1.0,
-        0.0,
-        x4,
-        y4,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.,
-        0.0,
-        0.0
-      |];
-      drawVertexBuffer
-        vertexBuffer::verticesColorAndTexture
-        mode::Constants.triangle_strip
-        count::4
-        textureFlag::1.0
-        ::textureBuffer
-        env
+    | Some {img, textureBuffer, width, height} =>
+      drawImageInternal env {img, textureBuffer, width, height} x y 0 0 width height
     };
   let background env color => {
     let w = width env;
@@ -155,4 +78,6 @@ module P = {
     drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip !env
   };
   let ellipse env a b c d => drawEllipseInternal !env a b c d;
+  let loadFont env filename => Font.parseFontFormat env filename;
+  let text env fnt str x y => Font.drawString env fnt str x y;
 };

@@ -22,7 +22,7 @@ let make w => {
   }
 };
 
-type state = {lst: list dropT, img: Common.imageT};
+type state = {lst: list dropT, fnt: Font.Font.t};
 
 let setup env => {
   size env 640 360;
@@ -31,13 +31,13 @@ let setup env => {
   for i in 0 to 500 {
     lst := [make 640, ...!lst]
   };
-  let img = loadImage env "assets/img_test.png";
-  {lst: !lst, img}
+  let fnt = loadFont env "assets/font/font.fnt";
+  {lst: !lst, fnt}
 };
 
-let draw {lst, img} env => {
+let draw {lst, fnt} env => {
   background env (color 230 230 250);
-  image env img 0 0;
+  text env fnt "Hello world!!" 20 20;
   let lst =
     List.map
       (
@@ -60,8 +60,7 @@ let draw {lst, img} env => {
       }
     )
     lst;
-  image env img 50 50;
-  {lst, img}
+  {lst, fnt}
 };
 
 ReProcessor.run ::setup ::draw ();

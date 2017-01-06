@@ -149,4 +149,11 @@ module PUtils = {
     lookup_table := double_array;
     Random.set_state state
   };
+  let rec split stream sep accstr acc =>
+    switch (Stream.peekch stream) {
+    | Some c when c == sep => split (Stream.popch stream) sep "" [accstr, ...acc]
+    | Some c => split (Stream.popch stream) sep (append_char accstr c) acc
+    | None => List.rev [accstr, ...acc]
+    };
+  let split str sep => split (Stream.create str) sep "" [];
 };

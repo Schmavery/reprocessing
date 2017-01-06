@@ -16,7 +16,7 @@ type frameT = {count: int, rate: int};
 
 type sizeT = {height: int, width: int, resizeable: bool};
 
-type _imageT = {img: Gl.imageT, textureBuffer: Gl.textureT};
+type _imageT = {img: Gl.imageT, textureBuffer: Gl.textureT, height: int, width: int};
 
 type imageT = ref (option _imageT);
 
@@ -52,3 +52,50 @@ module type ReProcessorT = {
     unit =>
     unit;
 };
+
+module Stream = {
+  type t = (string, int);
+  let empty = [];
+  let peekch ((str, i): t) :option char =>
+    if (i < String.length str) {
+      Some str.[i]
+    } else {
+      None
+    };
+  let popch ((str, i): t) :t => (str, i + 1);
+  let peekn (str, i) len =>
+    if (i + len < String.length str) {
+      Some (String.sub str i len)
+    } else {
+      None
+    };
+  let popn (str, i) len => (str, i + len);
+  let match stream matchstr => {
+    let len = String.length matchstr;
+    switch (peekn stream len) {
+    | Some peek when peek == matchstr => popn stream len
+    | Some peek => failwith ("Could not match '" ^ matchstr ^ "', got '" ^ peek ^ "' instead.")
+    | None => failwith ("Could not match " ^ matchstr)
+    }
+  };
+  let charsRemaining (str, i) => String.length str - i;
+  let create (str: string) :t => (str, 0);
+};
+
+let read (name: string) => {
+  let ic = open_in name;
+  let try_read () =>
+    try (Some (input_line ic)) {
+    | End_of_file => None
+    };
+  let rec loop acc =>
+    switch (try_read ()) {
+    | Some s => loop [String.make 1 '\n', s, ...acc]
+    | None =>
+      close_in ic;
+      List.rev acc
+    };
+  loop [] |> String.concat ""
+};
+
+let append_char (s: string) (c: char) :string => s ^ String.make 1 c;
