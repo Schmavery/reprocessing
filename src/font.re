@@ -131,7 +131,7 @@ module Font = {
     | _ => failwith ("Could not find character " ^ string_of_int code ^ " in font.")
     }
   };
-  let drawChar env fnt image (ch: char) (last: option char) x y :int => {
+  let drawChar env fnt image (ch: char) (last: option char) x y batch => {
     let c = getChar fnt ch;
     let kernAmount =
       switch last {
@@ -145,8 +145,7 @@ module Font = {
       };
     switch image {
     | Some img =>
-      drawImageInternal
-        env
+      let batch = addImageToBatch
         img
         x::(x + c.xoffset + kernAmount)
         y::(y + c.yoffset)
@@ -154,26 +153,32 @@ module Font = {
         suby::c.y
         subw::c.width
         subh::c.height
-    | None => ()
+        ::batch;
+      (c.xadvance + kernAmount, batch)
+    | None => (c.xadvance + kernAmount, batch)
     };
-    c.xadvance + kernAmount
+
   };
   let drawString env fnt (str: string) x y =>
     switch !fnt.image {
     | Some img =>
       let offset = ref x;
       let lastChar = ref None;
+      let batch : ref (array float)= ref [||];
       String.iter
         (
           fun c => {
-            offset := !offset + drawChar env fnt (Some img) c !lastChar !offset y;
+            let (advance, newbatch) = drawChar env fnt (Some img) c !lastChar !offset y !batch;
+            offset := !offset + advance;
+            batch := newbatch;
             lastChar := Some c
           }
         )
-        str
+        str;
+      drawImageBatch env !batch img
     | None => print_endline "loading font."
     };
-  let calcStringWidth env fnt (str: string) => {
+  /* let calcStringWidth env fnt (str: string) => {
     let offset = ref 0;
     let lastChar = ref None;
     String.iter
@@ -185,5 +190,5 @@ module Font = {
       )
       str;
     !offset
-  };
+  }; */
 };

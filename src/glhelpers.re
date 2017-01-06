@@ -359,6 +359,82 @@ let loadImage (env: ref glEnv) filename :imageT => {
   imageRef
 };
 
+let addImageToBatch {width, height} ::x ::y ::subx ::suby ::subw ::subh ::batch => {
+  let (fsubx, fsuby, fsubw, fsubh) = (
+    float_of_int subx /. float_of_int width,
+    float_of_int suby /. float_of_int height,
+    float_of_int subw /. float_of_int width,
+    float_of_int subh /. float_of_int height
+  );
+  let (x1, y1) = (float_of_int @@ x + subw, float_of_int @@ y + subh);
+  let (x2, y2) = (float_of_int x, float_of_int @@ y + subh);
+  let (x3, y3) = (float_of_int @@ x + subw, float_of_int y);
+  let (x4, y4) = (float_of_int x, float_of_int y);
+  let verticesColorAndTexture = [|
+    x1,
+    y1,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx +. fsubw,
+    fsuby +. fsubh,
+    x2,
+    y2,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx,
+    fsuby +. fsubh,
+    x3,
+    y3,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx +. fsubw,
+    fsuby,
+    x2,
+    y2,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx,
+    fsuby +. fsubh,
+    x3,
+    y3,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx +. fsubw,
+    fsuby,
+    x4,
+    y4,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx,
+    fsuby
+  |];
+  Array.append batch verticesColorAndTexture
+};
+
+let drawImageBatch env batch {textureBuffer} => {
+  let count = Array.length batch / 9;
+  drawVertexBuffer
+    vertexBuffer::batch mode::Constants.triangles ::count textureFlag::1.0 ::textureBuffer !env
+};
+
 let drawImageInternal
     (env: ref glEnv)
     {img, textureBuffer, width, height}
@@ -407,6 +483,24 @@ let drawImageInternal
     1.,
     fsubx +. fsubw,
     fsuby,
+    x2,
+    y2,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx,
+    fsuby +. fsubh,
+    x3,
+    y3,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.,
+    fsubx +. fsubw,
+    fsuby,
     x4,
     y4,
     0.0,
@@ -419,8 +513,8 @@ let drawImageInternal
   |];
   drawVertexBuffer
     vertexBuffer::verticesColorAndTexture
-    mode::Constants.triangle_strip
-    count::4
+    mode::Constants.triangles
+    count::6
     textureFlag::1.0
     ::textureBuffer
     env
