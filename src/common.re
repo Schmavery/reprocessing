@@ -29,6 +29,7 @@ type glEnv = {
   window: Gl.Window.t,
   gl: Gl.contextT,
   vertexBuffer: Gl.bufferT,
+  elementBuffer: Gl.bufferT,
   aVertexColor: Gl.attributeT,
   aTextureCoord: Gl.attributeT,
   aVertexPosition: Gl.attributeT,

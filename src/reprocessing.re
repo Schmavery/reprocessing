@@ -10,13 +10,11 @@ open Glhelpers;
 
 open Utils;
 
-open Drawfunctions;
-
 module PUtils = PUtils;
 
 module PConstants = PConstants;
 
-module P = P;
+module P = Drawfunctions.P;
 
 type userCallbackT 'a = 'a => ref glState => ('a, glState);
 
@@ -26,7 +24,9 @@ let afterDraw f (env: ref glEnv) => {
     ...!env,
     mouse: {...(!env).mouse, prevPos: (!env).mouse.pos},
     frame: {count: (!env).frame.count + 1, rate}
-  }
+  };
+  /* Flush the batching buffer at the end of every frame. */
+  flushGlobalBatch env
 };
 
 module ReProcessor: ReProcessorT = {
@@ -122,10 +122,11 @@ module ReProcessor: ReProcessorT = {
           0.0,
           0.0
         |];
-        drawVertexBuffer
-          vertexBuffer::verticesColorAndTexture
-          mode::Constants.triangle_strip
-          count::4
+        drawGeometry
+          vertexArray::(Gl.Bigarray.of_array Gl.Bigarray.Float32 verticesColorAndTexture)
+          elementArray::(Gl.Bigarray.of_array Gl.Bigarray.Uint16 [|0, 1, 2, 1, 2, 3|])
+          mode::Constants.triangles
+          count::6
           textureFlag::1.0
           ::textureBuffer
           !env

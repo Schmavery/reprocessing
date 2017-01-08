@@ -135,7 +135,7 @@ module Font = {
     | _ => failwith ("Could not find character " ^ string_of_int code ^ " in font.")
     }
   };
-  let drawChar env fnt image (ch: char) (last: option char) x y batch => {
+  let drawChar env fnt image (ch: char) (last: option char) x y => {
     let c = getChar fnt ch;
     let kernAmount =
       switch last {
@@ -149,18 +149,16 @@ module Font = {
       };
     switch image {
     | Some img =>
-      let batch =
-        addImageToBatch
-          img
-          x::(x + c.xoffset + kernAmount)
-          y::(y + c.yoffset)
-          subx::c.x
-          suby::c.y
-          subw::c.width
-          subh::c.height
-          ::batch;
-      (c.xadvance + kernAmount, batch)
-    | None => (c.xadvance + kernAmount, batch)
+      addTextureToGlobalBatch
+        img
+        x::(x + c.xoffset + kernAmount)
+        y::(y + c.yoffset)
+        subx::c.x
+        suby::c.y
+        subw::c.width
+        subh::c.height;
+      c.xadvance + kernAmount
+    | None => c.xadvance + kernAmount
     }
   };
   let drawString env fnt (str: string) x y =>
@@ -168,18 +166,19 @@ module Font = {
     | Some img =>
       let offset = ref x;
       let lastChar = ref None;
-      let batch: ref (array float) = ref [||];
+      /* We flush the buffer here because we're about to draw a texture which, in theory, needs this to be
+         empty. */
+      flushGlobalBatch env;
       String.iter
         (
           fun c => {
-            let (advance, newbatch) = drawChar env fnt (Some img) c !lastChar !offset y !batch;
+            let advance = drawChar env fnt (Some img) c !lastChar !offset y;
             offset := !offset + advance;
-            batch := newbatch;
             lastChar := Some c
           }
         )
         str;
-      drawImageBatch env !batch img
+      flushGlobalBatchWithTexture env img
     | None => print_endline "loading font."
     };
   /* let calcStringWidth env fnt (str: string) => {

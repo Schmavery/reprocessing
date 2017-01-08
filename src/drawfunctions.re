@@ -27,22 +27,24 @@ module P = {
     resetSize env width height
   };
   let rect (env: ref glEnv) x y width height => {
-    let vertexBuffer =
-      makeRectVertexBuffer
-        (float_of_int @@ x + width, float_of_int @@ y + height)
-        (float_of_int x, float_of_int @@ y + height)
-        (float_of_int @@ x + width, float_of_int y)
-        (float_of_int x, float_of_int y)
-        (!env).currFill;
-    drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip count::4 !env
+    if (!elementArrayPtr === circularBufferSize) {
+      flushGlobalBatch env
+    };
+    addRectToGlobalBatch
+      (float_of_int @@ x + width, float_of_int @@ y + height)
+      (float_of_int x, float_of_int @@ y + height)
+      (float_of_int @@ x + width, float_of_int y)
+      (float_of_int x, float_of_int y)
+      (!env).currFill
   };
   let resizeable (env: ref glEnv) resizeable =>
     env := {...!env, size: {...(!env).size, resizeable}};
   let rectf (env: ref glEnv) x y width height => {
-    let vertexBuffer =
-      makeRectVertexBuffer
-        (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill;
-    drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip count::4 !env
+    if (!elementArrayPtr === circularBufferSize) {
+      flushGlobalBatch env
+    };
+    addRectToGlobalBatch
+      (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill
   };
   let loadImage = loadImage;
   let image (env: ref glEnv) img x y =>
@@ -77,11 +79,12 @@ module P = {
     let y3 = float_of_int yy2 -. ything;
     let x4 = float_of_int xx1 -. xthing;
     let y4 = float_of_int yy1 -. ything;
-    let vertexBuffer =
-      makeRectVertexBuffer (x2, y2) (x3, y3) (x1, y1) (x4, y4) (!env).stroke.color;
-    drawVertexBuffer ::vertexBuffer mode::Constants.triangle_strip !env
+    addRectToGlobalBatch (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill;
+    if (!elementArrayPtr === circularBufferSize) {
+      flushGlobalBatch env
+    }
   };
-  let ellipse env a b c d => drawEllipseInternal !env a b c d;
+  let ellipse env a b c d => drawEllipseInternal env a b c d;
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;
 };
