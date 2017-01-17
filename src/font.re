@@ -1,7 +1,3 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Common;
 
 open Glloader;
@@ -135,7 +131,7 @@ module Font = {
     | _ => failwith ("Could not find character " ^ string_of_int code ^ " in font.")
     }
   };
-  let drawChar env fnt image (ch: char) (last: option char) x y => {
+  let drawChar (env: ref glEnv) fnt image (ch: char) (last: option char) x y => {
     let c = getChar fnt ch;
     let kernAmount =
       switch last {
@@ -149,7 +145,8 @@ module Font = {
       };
     switch image {
     | Some img =>
-      addTextureToGlobalBatch
+      drawImageInternal
+        env
         img
         x::(x + c.xoffset + kernAmount)
         y::(y + c.yoffset)
@@ -161,14 +158,11 @@ module Font = {
     | None => c.xadvance + kernAmount
     }
   };
-  let drawString env fnt (str: string) x y =>
+  let drawString (env: ref glEnv) fnt (str: string) x y =>
     switch !fnt.image {
     | Some img =>
       let offset = ref x;
       let lastChar = ref None;
-      /* We flush the buffer here because we're about to draw a texture which, in theory, needs this to be
-         empty. */
-      flushGlobalBatch env;
       String.iter
         (
           fun c => {
@@ -177,11 +171,10 @@ module Font = {
             lastChar := Some c
           }
         )
-        str;
-      flushGlobalBatchWithTexture env img
+        str
     | None => print_endline "loading font."
     };
-  /* let calcStringWidth env fnt (str: string) => {
+  let calcStringWidth env fnt (str: string) => {
        let offset = ref 0;
        let lastChar = ref None;
        String.iter
@@ -193,5 +186,5 @@ module Font = {
          )
          str;
        !offset
-     }; */
+     };
 };

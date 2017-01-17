@@ -8,16 +8,6 @@ open Glloader;
 
 open Utils;
 
-let circularBufferSize = 6 * 10000;
-
-let globalVertexArray = ref (Gl.Bigarray.create Gl.Bigarray.Float32 (circularBufferSize * 9));
-
-let globalElementArray = ref (Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize);
-
-let vertexArrayPtr = ref 0;
-
-let elementArrayPtr = ref 0;
-
 let getProgram
     gl::(gl: Gl.contextT)
     vertexShader::(vertexShaderSource: string)
@@ -149,6 +139,12 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     camera,
     window,
     gl,
+    batch: {
+      vertexArray: Gl.Bigarray.create Gl.Bigarray.Float32 (circularBufferSize * 9),
+      elementArray: Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize,
+      vertexPtr: ref 0,
+      elementPtr: ref 0
+    },
     vertexBuffer,
     elementBuffer,
     aVertexPosition,
@@ -190,12 +186,12 @@ let createCanvas window (height: int) (width: int) :glEnv => {
  * triangles: one with the vertices 0, 1 and 2 from the vertex array, and one with the vertices 1, 2 and 3.
  * We can "point" to duplicated vertices in our geometry to avoid sending those vertices.
  */
-let addRectToGlobalBatch (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
+let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
   let set = Gl.Bigarray.set;
   let toColorFloat i => float_of_int i /. 255.;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let i = !vertexArrayPtr;
-  let vertexArrayToMutate = !globalVertexArray;
+  let i = !(!env).batch.vertexPtr;
+  let vertexArrayToMutate = (!env).batch.vertexArray;
   set vertexArrayToMutate (i + 0) x1;
   set vertexArrayToMutate (i + 1) y1;
   set vertexArrayToMutate (i + 2) 0.0;
@@ -232,17 +228,17 @@ let addRectToGlobalBatch (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
   set vertexArrayToMutate (i + 33) 1.;
   set vertexArrayToMutate (i + 34) 0.0;
   set vertexArrayToMutate (i + 35) 0.0;
-  vertexArrayPtr := i + 36;
+  (!env).batch.vertexPtr := i + 36;
   let ii = i / 9;
-  let j = !elementArrayPtr;
-  let elementArrayToMutate = !globalElementArray;
+  let j = !(!env).batch.elementPtr;
+  let elementArrayToMutate = (!env).batch.elementArray;
   set elementArrayToMutate (j + 0) ii;
   set elementArrayToMutate (j + 1) (ii + 1);
   set elementArrayToMutate (j + 2) (ii + 2);
   set elementArrayToMutate (j + 3) (ii + 1);
   set elementArrayToMutate (j + 4) (ii + 2);
   set elementArrayToMutate (j + 5) (ii + 3);
-  elementArrayPtr := j + 6
+  (!env).batch.elementPtr := j + 6
 };
 
 let drawGeometry
@@ -339,15 +335,19 @@ let drawGeometry
  * underlying array of memory. So mutation done to that sub array will be reflected in the original one.
  */
 let flushGlobalBatch env =>
-  if (!elementArrayPtr > 0) {
+  if (!(!env).batch.elementPtr > 0) {
     drawGeometry
-      vertexArray::(Gl.Bigarray.sub !globalVertexArray offset::0 len::!vertexArrayPtr)
-      elementArray::(Gl.Bigarray.sub !globalElementArray offset::0 len::!elementArrayPtr)
+      vertexArray::(
+        Gl.Bigarray.sub (!env).batch.vertexArray offset::0 len::!(!env).batch.vertexPtr
+      )
+      elementArray::(
+        Gl.Bigarray.sub (!env).batch.elementArray offset::0 len::!(!env).batch.elementPtr
+      )
       mode::Constants.triangles
-      count::!elementArrayPtr
+      count::!(!env).batch.elementPtr
       !env;
-    vertexArrayPtr := 0;
-    elementArrayPtr := 0
+    (!env).batch.vertexPtr := 0;
+    (!env).batch.elementPtr := 0
   };
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
@@ -366,15 +366,15 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
   let xCenterOfCirclef = float_of_int xCenterOfCircle;
   let yCenterOfCirclef = float_of_int yCenterOfCircle;
   /* If there isn't enough space to add the ellipse, we flush the global buffer. */
-  if (circularBufferSize - !elementArrayPtr < (noOfFans - 2) * 3) {
+  if (circularBufferSize - !(!env).batch.elementPtr < (noOfFans - 2) * 3) {
     flushGlobalBatch env
   };
-  let verticesData = !globalVertexArray;
-  let elementData = !globalElementArray;
+  let verticesData = (!env).batch.vertexArray;
+  let elementData = (!env).batch.elementArray;
   let set = Gl.Bigarray.set;
   let get = Gl.Bigarray.get;
-  let vertexArrayOffset = !vertexArrayPtr;
-  let elementArrayOffset = !elementArrayPtr;
+  let vertexArrayOffset = !(!env).batch.vertexPtr;
+  let elementArrayOffset = !(!env).batch.elementPtr;
   for i in 0 to (noOfFans - 1) {
     let angle = anglePerFan *. float_of_int (i + 1);
     let xCoordinate = xCenterOfCirclef +. cos angle *. radxf;
@@ -406,8 +406,8 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
       set elementData (jj + 2) (ii / 9)
     }
   };
-  vertexArrayPtr := !vertexArrayPtr + noOfFans * 9;
-  elementArrayPtr := !elementArrayPtr + (noOfFans - 3) * 3 + 3
+  (!env).batch.vertexPtr := !(!env).batch.vertexPtr + noOfFans * 9;
+  (!env).batch.elementPtr := !(!env).batch.elementPtr + (noOfFans - 3) * 3 + 3
 };
 
 let loadImage (env: ref glEnv) filename :imageT => {
@@ -442,7 +442,7 @@ let loadImage (env: ref glEnv) filename :imageT => {
   imageRef
 };
 
-let addTextureToGlobalBatch {width, height} ::x ::y ::subx ::suby ::subw ::subh => {
+let addTextureToGlobalBatch {width, height} ::x ::y ::subx ::suby ::subw ::subh env => {
   let (fsubx, fsuby, fsubw, fsubh) = (
     float_of_int subx /. float_of_int width,
     float_of_int suby /. float_of_int height,
@@ -454,8 +454,8 @@ let addTextureToGlobalBatch {width, height} ::x ::y ::subx ::suby ::subw ::subh 
   let (x3, y3) = (float_of_int @@ x + subw, float_of_int y);
   let (x4, y4) = (float_of_int x, float_of_int y);
   let set = Gl.Bigarray.set;
-  let ii = !vertexArrayPtr;
-  let vertexArray = !globalVertexArray;
+  let ii = !(!env).batch.vertexPtr;
+  let vertexArray = (!env).batch.vertexArray;
   set vertexArray (ii + 0) x1;
   set vertexArray (ii + 1) y1;
   set vertexArray (ii + 2) 0.0;
@@ -492,29 +492,29 @@ let addTextureToGlobalBatch {width, height} ::x ::y ::subx ::suby ::subw ::subh 
   set vertexArray (ii + 33) 1.;
   set vertexArray (ii + 34) fsubx;
   set vertexArray (ii + 35) fsuby;
-  vertexArrayPtr := ii + 36;
-  let jj = !elementArrayPtr;
-  let elementArray = !globalElementArray;
+  (!env).batch.vertexPtr := ii + 36;
+  let jj = !(!env).batch.elementPtr;
+  let elementArray = (!env).batch.elementArray;
   set elementArray jj (ii / 9);
   set elementArray (jj + 1) (ii / 9 + 1);
   set elementArray (jj + 2) (ii / 9 + 2);
   set elementArray (jj + 3) (ii / 9 + 1);
   set elementArray (jj + 4) (ii / 9 + 2);
   set elementArray (jj + 5) (ii / 9 + 3);
-  elementArrayPtr := jj + 6
+  (!env).batch.elementPtr := jj + 6
 };
 
 let flushGlobalBatchWithTexture (env: ref glEnv) {textureBuffer} => {
   drawGeometry
-    vertexArray::(Gl.Bigarray.sub !globalVertexArray offset::0 len::!vertexArrayPtr)
-    elementArray::(Gl.Bigarray.sub !globalElementArray offset::0 len::!elementArrayPtr)
+    vertexArray::(Gl.Bigarray.sub (!env).batch.vertexArray offset::0 len::!(!env).batch.vertexPtr)
+    elementArray::(Gl.Bigarray.sub (!env).batch.elementArray offset::0 len::!(!env).batch.elementPtr)
     mode::Constants.triangles
-    count::!elementArrayPtr
+    count::!(!env).batch.elementPtr
     textureFlag::1.0
     ::textureBuffer
     !env;
-  vertexArrayPtr := 0;
-  elementArrayPtr := 0
+  (!env).batch.vertexPtr := 0;
+  (!env).batch.elementPtr := 0
 };
 
 let drawImageInternal

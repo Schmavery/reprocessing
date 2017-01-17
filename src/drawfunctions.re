@@ -27,10 +27,11 @@ module P = {
     resetSize env width height
   };
   let rect (env: ref glEnv) x y width height => {
-    if (!elementArrayPtr === circularBufferSize) {
+    if (!(!env).batch.elementPtr === circularBufferSize) {
       flushGlobalBatch env
     };
     addRectToGlobalBatch
+      env
       (float_of_int @@ x + width, float_of_int @@ y + height)
       (float_of_int x, float_of_int @@ y + height)
       (float_of_int @@ x + width, float_of_int y)
@@ -40,11 +41,11 @@ module P = {
   let resizeable (env: ref glEnv) resizeable =>
     env := {...!env, size: {...(!env).size, resizeable}};
   let rectf (env: ref glEnv) x y width height => {
-    if (!elementArrayPtr === circularBufferSize) {
+    if (!(!env).batch.elementPtr === circularBufferSize) {
       flushGlobalBatch env
     };
     addRectToGlobalBatch
-      (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill
+      env (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill
   };
   let loadImage = loadImage;
   let image (env: ref glEnv) img x y =>
@@ -79,11 +80,19 @@ module P = {
     let y3 = float_of_int yy2 -. ything;
     let x4 = float_of_int xx1 -. xthing;
     let y4 = float_of_int yy1 -. ything;
-    addRectToGlobalBatch (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill;
-    if (!elementArrayPtr === circularBufferSize) {
+    addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill;
+    if (!(!env).batch.elementPtr === circularBufferSize) {
       flushGlobalBatch env
     }
   };
+  let pixel env x y color =>
+    addRectToGlobalBatch
+      env
+      (float_of_int @@ x + 1, float_of_int @@ y + 1)
+      (float_of_int x, float_of_int @@ y + 1)
+      (float_of_int @@ x + 1, float_of_int y)
+      (float_of_int x, float_of_int y)
+      color;
   let ellipse env a b c d => drawEllipseInternal env a b c d;
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;
