@@ -2,3 +2,4 @@ _build
 node_modules
 .jenga
 .merlin
+npm-debug.log
