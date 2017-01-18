@@ -20,18 +20,20 @@ type frameT = {count: int, rate: int};
 
 type sizeT = {height: int, width: int, resizeable: bool};
 
+let circularBufferSize = 6 * 10000;
+
+type _imageT = {textureBuffer: Gl.textureT, img: Gl.imageT, height: int, width: int};
+
+type imageT = ref (option _imageT);
+
 type batchT = {
   vertexArray: Gl.Bigarray.t float Gl.Bigarray.float32_elt,
   elementArray: Gl.Bigarray.t int Gl.Bigarray.int16_unsigned_elt,
-  vertexPtr: ref int,
-  elementPtr: ref int
+  mutable vertexPtr: int,
+  mutable elementPtr: int,
+  mutable currTex: Gl.textureT,
+  nullTex: Gl.textureT
 };
-
-let circularBufferSize = 6 * 10000;
-
-type _imageT = {img: Gl.imageT, textureBuffer: Gl.textureT, height: int, width: int};
-
-type imageT = ref (option _imageT);
 
 type glEnv = {
   camera: glCamera,
@@ -46,7 +48,6 @@ type glEnv = {
   uSampler: Gl.uniformT,
   uTextureFlag: Gl.uniformT,
   batch: batchT,
-  texture: Gl.textureT,
   currFill: colorT,
   currBackground: colorT,
   mouse: mouseT,

@@ -27,9 +27,7 @@ module P = {
     resetSize env width height
   };
   let rect (env: ref glEnv) x y width height => {
-    if (!(!env).batch.elementPtr === circularBufferSize) {
-      flushGlobalBatch env
-    };
+    maybeFlushBatch env (!env).batch.nullTex;
     addRectToGlobalBatch
       env
       (float_of_int @@ x + width, float_of_int @@ y + height)
@@ -41,9 +39,7 @@ module P = {
   let resizeable (env: ref glEnv) resizeable =>
     env := {...!env, size: {...(!env).size, resizeable}};
   let rectf (env: ref glEnv) x y width height => {
-    if (!(!env).batch.elementPtr === circularBufferSize) {
-      flushGlobalBatch env
-    };
+    maybeFlushBatch env (!env).batch.nullTex;
     addRectToGlobalBatch
       env (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill
   };
@@ -51,8 +47,8 @@ module P = {
   let image (env: ref glEnv) img x y =>
     switch !img {
     | None => print_endline "image not ready yet, just doing nothing :D"
-    | Some {img, textureBuffer, width, height} =>
-      drawImageInternal env {img, textureBuffer, width, height} x y 0 0 width height
+    | Some ({width, height} as i) =>
+      drawImageInternal i x y 0 0 width height env
     };
   let background env color => {
     let w = width env;
@@ -66,6 +62,7 @@ module P = {
   let stroke env color => env := {...!env, stroke: {...(!env).stroke, color}};
   let strokeWeight env weight => env := {...!env, stroke: {...(!env).stroke, weight}};
   let line env (xx1, yy1) (xx2, yy2) => {
+    maybeFlushBatch env (!env).batch.nullTex;
     let dx = xx2 - xx1;
     let dy = yy2 - yy1;
     let mag = PUtils.dist (xx1, yy1) (xx2, yy2);
@@ -80,19 +77,18 @@ module P = {
     let y3 = float_of_int yy2 -. ything;
     let x4 = float_of_int xx1 -. xthing;
     let y4 = float_of_int yy1 -. ything;
-    addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill;
-    if (!(!env).batch.elementPtr === circularBufferSize) {
-      flushGlobalBatch env
-    }
+    addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill
   };
-  let pixel env x y color =>
+  let pixel env x y color => {
+    maybeFlushBatch env (!env).batch.nullTex;
     addRectToGlobalBatch
       env
       (float_of_int @@ x + 1, float_of_int @@ y + 1)
       (float_of_int x, float_of_int @@ y + 1)
       (float_of_int @@ x + 1, float_of_int y)
       (float_of_int x, float_of_int y)
-      color;
+      color
+  };
   let ellipse env a b c d => drawEllipseInternal env a b c d;
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;

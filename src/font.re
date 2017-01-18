@@ -146,14 +146,14 @@ module Font = {
     switch image {
     | Some img =>
       drawImageInternal
-        env
         img
         x::(x + c.xoffset + kernAmount)
         y::(y + c.yoffset)
         subx::c.x
         suby::c.y
         subw::c.width
-        subh::c.height;
+        subh::c.height
+        env;
       c.xadvance + kernAmount
     | None => c.xadvance + kernAmount
     }
