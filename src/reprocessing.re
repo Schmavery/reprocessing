@@ -127,7 +127,6 @@ module ReProcessor: ReProcessorT = {
           elementArray::(Gl.Bigarray.of_array Gl.Bigarray.Uint16 [|0, 1, 2, 1, 2, 3|])
           mode::Constants.triangles
           count::6
-          textureFlag::1.0
           ::textureBuffer
           !env
       }

@@ -10,7 +10,7 @@ type glState = Gl.Window.t;
 
 type glCamera = {projectionMatrix: Gl.Mat4.t};
 
-type colorT = {r: int, b: int, g: int};
+type colorT = {r: int, g: int, b: int};
 
 type strokeT = {color: colorT, weight: int};
 
@@ -31,7 +31,7 @@ type batchT = {
   elementArray: Gl.Bigarray.t int Gl.Bigarray.int16_unsigned_elt,
   mutable vertexPtr: int,
   mutable elementPtr: int,
-  mutable currTex: Gl.textureT,
+  mutable currTex: option Gl.textureT,
   nullTex: Gl.textureT
 };
 

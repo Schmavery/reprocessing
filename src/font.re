@@ -121,8 +121,6 @@ module Font = {
     let stream = pop_line stream;
     let (_, kern_map) = parse_kern_fmt stream num_kerns IntPairMap.empty;
     let img_filename = replaceFilename path filename;
-    print_endline path;
-    print_endline img_filename;
     {chars: char_map, kerning: kern_map, image: loadImage env img_filename}
   };
   let getChar fnt ch => {

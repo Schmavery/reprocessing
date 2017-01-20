@@ -144,7 +144,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
       elementArray: Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize,
       vertexPtr: 0,
       elementPtr: 0,
-      currTex: texture,
+      currTex: None,
       nullTex: texture
     },
     vertexBuffer,
@@ -239,6 +239,7 @@ let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
   set elementArrayToMutate (j + 3) (ii + 1);
   set elementArrayToMutate (j + 4) (ii + 2);
   set elementArrayToMutate (j + 5) (ii + 3);
+  (!env).batch.currTex = Some (!env).batch.nullTex;
   (!env).batch.elementPtr = j + 6
 };
 
@@ -247,14 +248,13 @@ let drawGeometry
     elementArray::(elementArray: Gl.Bigarray.t int Gl.Bigarray.int16_unsigned_elt)
     ::mode
     ::count
-    ::textureFlag=0.
-    ::textureBuffer=?
+    ::textureBuffer
     env => {
-  let textureBuffer =
-    switch textureBuffer {
-    | None => env.batch.nullTex
-    | Some textureBuffer => textureBuffer
-    };
+  /* let textureBuffer =
+     switch texture {
+     | None => env.batch.nullTex
+     | Some textureBuffer => textureBuffer
+     }; */
   /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
      `array_buffer` */
   Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
@@ -322,6 +322,7 @@ let drawGeometry
 
   /** Last uniform, the `uTextureFlag` which allows us to only have one shader and flip flop between using
       a color or a texture to fill the geometry. **/
+  let textureFlag = 0.;
   Gl.uniform1f context::env.gl location::env.uTextureFlag textureFlag;
 
   /** Final call which actually tells the GPU to draw. **/
@@ -337,6 +338,11 @@ let drawGeometry
  */
 let flushGlobalBatch env =>
   if ((!env).batch.elementPtr > 0) {
+    let textureBuffer =
+      switch (!env).batch.currTex {
+      | None => print_endline "This shouldn't be happening"; (!env).batch.nullTex
+      | Some textureBuffer => textureBuffer
+      };
     drawGeometry
       vertexArray::(Gl.Bigarray.sub (!env).batch.vertexArray offset::0 len::(!env).batch.vertexPtr)
       elementArray::(
@@ -395,7 +401,7 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
       set elementData (i + elementArrayOffset) (ii / 9)
     } else {
       /* We've already added 3 elements, for i = 0, 1 and 2. From now on, we'll add 3 elements _per_ i.
-         To caculate the correct offset in `elementData` we remove 3 from i as if we're starting from 0 (the
+         To calculate the correct offset in `elementData` we remove 3 from i as if we're starting from 0 (the
          first time we enter this loop i = 3), then for each i we'll add 3 elements (so multiply by 3) BUT for
          i = 3 we want `jj` to be 3 so we shift everything by 3 (so add 3). Everything's also shifted by
          `elementArrayOffset` */
@@ -406,6 +412,7 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     }
   };
   (!env).batch.vertexPtr = (!env).batch.vertexPtr + noOfFans * 9;
+  (!env).batch.currTex = Some (!env).batch.nullTex;
   (!env).batch.elementPtr = (!env).batch.elementPtr + (noOfFans - 3) * 3 + 3
 };
 
@@ -501,23 +508,9 @@ let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::sub
   set elementArray (jj + 4) (ii / 9 + 2);
   set elementArray (jj + 5) (ii / 9 + 3);
   (!env).batch.elementPtr = jj + 6;
-  (!env).batch.currTex = textureBuffer
+  (!env).batch.currTex = Some textureBuffer;
 };
 
-let flushGlobalBatchWithTexture (env: ref glEnv) {textureBuffer} => {
-  drawGeometry
-    vertexArray::(Gl.Bigarray.sub (!env).batch.vertexArray offset::0 len::(!env).batch.vertexPtr)
-    elementArray::(
-      Gl.Bigarray.sub (!env).batch.elementArray offset::0 len::(!env).batch.elementPtr
-    )
-    mode::Constants.triangles
-    count::(!env).batch.elementPtr
-    textureFlag::1.0
-    ::textureBuffer
-    !env;
-  (!env).batch.vertexPtr = 0;
-  (!env).batch.elementPtr = 0
-};
 
 /** Recomputes matrices while resetting size of window */
 let resetSize env width height => {
@@ -537,6 +530,9 @@ let resetSize env width height => {
 };
 
 let maybeFlushBatch env texture =>
-  if ((!env).batch.elementPtr === circularBufferSize || (!env).batch.currTex !== texture) {
+  if (
+    (!env).batch.elementPtr === circularBufferSize ||
+    (!env).batch.currTex != None && (!env).batch.currTex !== texture
+  ) {
     flushGlobalBatch env
   };
