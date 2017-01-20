@@ -84,7 +84,6 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   let aTextureCoord = Gl.getAttribLocation context::gl ::program name::"aTextureCoord";
   Gl.enableVertexAttribArray context::gl attribute::aTextureCoord;
   let uSampler = Gl.getUniformLocation gl program "uSampler";
-  let uTextureFlag = Gl.getUniformLocation gl program "uTextureFlag";
 
   /** Generate texture buffer that we'll use to pass image data around. **/
   let texture = Gl.createTexture gl;
@@ -92,9 +91,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
   Gl.bindTexture context::gl target::Constants.texture_2d ::texture;
 
-  /** Load a dummy texture. This is because we're using the same shader for things with and without a texture
-      The shader will try make lookups to get some color from the texture, but then that color will be multiplied
-      by `uTextureFlag`, which would be 0 in the case where we're rendering a colored shape. */
+  /** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
   Gl.texImage2D
     context::gl
     target::Constants.texture_2d
@@ -154,7 +151,6 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     aVertexColor,
     pMatrixUniform,
     uSampler,
-    uTextureFlag,
     currFill,
     currBackground,
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
@@ -250,11 +246,6 @@ let drawGeometry
     ::count
     ::textureBuffer
     env => {
-  /* let textureBuffer =
-     switch texture {
-     | None => env.batch.nullTex
-     | Some textureBuffer => textureBuffer
-     }; */
   /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
      `array_buffer` */
   Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
@@ -320,11 +311,6 @@ let drawGeometry
   Gl.uniformMatrix4fv
     context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
 
-  /** Last uniform, the `uTextureFlag` which allows us to only have one shader and flip flop between using
-      a color or a texture to fill the geometry. **/
-  let textureFlag = 0.;
-  Gl.uniform1f context::env.gl location::env.uTextureFlag textureFlag;
-
   /** Final call which actually tells the GPU to draw. **/
   Gl.drawElements context::env.gl ::mode ::count type_::Constants.unsigned_short offset::0
 };
@@ -350,6 +336,7 @@ let flushGlobalBatch env =>
       )
       mode::Constants.triangles
       count::(!env).batch.elementPtr
+      ::textureBuffer
       !env;
     (!env).batch.vertexPtr = 0;
     (!env).batch.elementPtr = 0

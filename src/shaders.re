@@ -21,12 +21,11 @@ let vertexShaderSource = {|
 
 let fragmentShaderSource = {|
   varying vec4 vColor;
-  uniform float uTextureFlag;
   varying vec2 vTextureCoord;
 
   uniform sampler2D uSampler;
 
   void main(void) {
-    gl_FragColor = uTextureFlag * texture2D(uSampler, vTextureCoord) + (1.0 - uTextureFlag) * vColor;
+    gl_FragColor = texture2D(uSampler, vTextureCoord) + vColor;
   }
 |};

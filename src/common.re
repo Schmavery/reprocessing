@@ -46,7 +46,6 @@ type glEnv = {
   aVertexPosition: Gl.attributeT,
   pMatrixUniform: Gl.uniformT,
   uSampler: Gl.uniformT,
-  uTextureFlag: Gl.uniformT,
   batch: batchT,
   currFill: colorT,
   currBackground: colorT,
