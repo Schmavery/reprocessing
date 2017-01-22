@@ -22,6 +22,8 @@ type sizeT = {height: int, width: int, resizeable: bool};
 
 let circularBufferSize = 6 * 10000;
 
+let vertexSize = 8;
+
 type _imageT = {textureBuffer: Gl.textureT, img: Gl.imageT, height: int, width: int};
 
 type imageT = ref (option _imageT);
@@ -100,8 +102,9 @@ module Stream = {
 let read (name: string) => {
   let ic = open_in name;
   let try_read () =>
-    try (Some (input_line ic)) {
-    | End_of_file => None
+    switch (input_line ic) {
+      | exception End_of_file => None
+      | x => Some x
     };
   let rec loop acc =>
     switch (try_read ()) {

@@ -1,7 +1,3 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Reprocessing;
 
 open P;

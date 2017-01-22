@@ -18,7 +18,6 @@ module P = {
   let mouse env => (!env).mouse.pos;
   let pmouse env => (!env).mouse.prevPos;
   let mousePressed env => (!env).mouse.pressed;
-  let background (env: ref glEnv) (c: colorT) => env := {...!env, currBackground: c};
   let fill (env: ref glEnv) (c: colorT) => env := {...!env, currFill: c};
   let frameRate (env: ref glEnv) => (!env).frame.rate;
   let frameCount (env: ref glEnv) => (!env).frame.count;
@@ -27,7 +26,7 @@ module P = {
     resetSize env width height
   };
   let rect (env: ref glEnv) x y width height => {
-    maybeFlushBatch env (Some (!env).batch.nullTex);
+    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     addRectToGlobalBatch
       env
       (float_of_int @@ x + width, float_of_int @@ y + height)
@@ -39,7 +38,7 @@ module P = {
   let resizeable (env: ref glEnv) resizeable =>
     env := {...!env, size: {...(!env).size, resizeable}};
   let rectf (env: ref glEnv) x y width height => {
-    maybeFlushBatch env (Some (!env).batch.nullTex);
+    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     addRectToGlobalBatch
       env (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill
   };
@@ -47,8 +46,7 @@ module P = {
   let image (env: ref glEnv) img x y =>
     switch !img {
     | None => print_endline "image not ready yet, just doing nothing :D"
-    | Some ({width, height} as i) =>
-      drawImageInternal i x y 0 0 width height env
+    | Some ({width, height} as i) => drawImageInternal i x y 0 0 width height env
     };
   let background env color => {
     let w = width env;
@@ -62,7 +60,7 @@ module P = {
   let stroke env color => env := {...!env, stroke: {...(!env).stroke, color}};
   let strokeWeight env weight => env := {...!env, stroke: {...(!env).stroke, weight}};
   let line env (xx1, yy1) (xx2, yy2) => {
-    maybeFlushBatch env (Some (!env).batch.nullTex);
+    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     let dx = xx2 - xx1;
     let dy = yy2 - yy1;
     let mag = PUtils.dist (xx1, yy1) (xx2, yy2);
@@ -80,12 +78,12 @@ module P = {
     addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill
   };
   let pixel env x y color => {
-    maybeFlushBatch env (Some (!env).batch.nullTex);
+    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     addRectToGlobalBatch
       env
-      (float_of_int @@ x + 1, float_of_int @@ y + 1)
-      (float_of_int x, float_of_int @@ y + 1)
-      (float_of_int @@ x + 1, float_of_int y)
+      (float_of_int @@ x + (!env).stroke.weight, float_of_int @@ y + (!env).stroke.weight)
+      (float_of_int x, float_of_int @@ y + (!env).stroke.weight)
+      (float_of_int @@ x + (!env).stroke.weight, float_of_int y)
       (float_of_int x, float_of_int y)
       color
   };

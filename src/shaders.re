@@ -3,7 +3,7 @@
  * vim: set ft=reason:
  */
 let vertexShaderSource = {|
-  attribute vec3 aVertexPosition;
+  attribute vec2 aVertexPosition;
   attribute vec4 aVertexColor;
   attribute vec2 aTextureCoord;
 
@@ -13,7 +13,7 @@ let vertexShaderSource = {|
   varying vec2 vTextureCoord;
 
   void main(void) {
-    gl_Position = uPMatrix * vec4(aVertexPosition, 1.0);
+    gl_Position = uPMatrix * vec4(aVertexPosition, 0.0, 1.0);
     vColor = aVertexColor;
     vTextureCoord = aTextureCoord;
   }
