@@ -160,81 +160,6 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   }
 };
 
-/*
- * This array packs all of the values that the shaders need: vertices, colors and texture coordinates.
- * We put them all in one as an optimization, so there are less back and forths between us and the GPU.
- *
- * The vertex array looks like:
- *
- * |<--------  8 * 4 bytes  ------->|
- *  --------------------------------
- * |  x  y  |  r  g  b  a  |  s  t  |  x2  y2  |  r2  g2  b2  a2  |  s2  t2  | ....
- *  --------------------------------
- * |           |              |
- * +- offset: 0 bytes, stride: 8 * 4 bytes (because we need to move by 8*4 bytes to get to the next x)
- *             |              |
- *             +- offset: 3 * 4 bytes, stride: 8 * 4 bytes
- *                            |
- *                            +- offset: (3 + 4) * 4 bytes, stride: 8 * 4 bytes
- *
- *
- * The element array is just an array of indices of vertices given that each vertex takes 8 * 4 bytes.
- * For example, if the element array looks like [|0, 1, 2, 1, 2, 3|], we're telling the GPU to draw 2
- * triangles: one with the vertices 0, 1 and 2 from the vertex array, and one with the vertices 1, 2 and 3.
- * We can "point" to duplicated vertices in our geometry to avoid sending those vertices.
- */
-let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
-  let set = Gl.Bigarray.set;
-  let toColorFloat i => float_of_int i /. 255.;
-  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let i = (!env).batch.vertexPtr;
-  let vertexArrayToMutate = (!env).batch.vertexArray;
-  set vertexArrayToMutate (i + 0) x1;
-  set vertexArrayToMutate (i + 1) y1;
-  set vertexArrayToMutate (i + 2) r;
-  set vertexArrayToMutate (i + 3) g;
-  set vertexArrayToMutate (i + 4) b;
-  set vertexArrayToMutate (i + 5) 1.;
-  set vertexArrayToMutate (i + 6) 0.0;
-  set vertexArrayToMutate (i + 7) 0.0;
-  set vertexArrayToMutate (i + 8) x2;
-  set vertexArrayToMutate (i + 9) y2;
-  set vertexArrayToMutate (i + 10) r;
-  set vertexArrayToMutate (i + 11) g;
-  set vertexArrayToMutate (i + 12) b;
-  set vertexArrayToMutate (i + 13) 1.;
-  set vertexArrayToMutate (i + 14) 0.0;
-  set vertexArrayToMutate (i + 15) 0.0;
-  set vertexArrayToMutate (i + 16) x3;
-  set vertexArrayToMutate (i + 17) y3;
-  set vertexArrayToMutate (i + 18) r;
-  set vertexArrayToMutate (i + 19) g;
-  set vertexArrayToMutate (i + 20) b;
-  set vertexArrayToMutate (i + 21) 1.;
-  set vertexArrayToMutate (i + 22) 0.0;
-  set vertexArrayToMutate (i + 23) 0.0;
-  set vertexArrayToMutate (i + 24) x4;
-  set vertexArrayToMutate (i + 25) y4;
-  set vertexArrayToMutate (i + 26) r;
-  set vertexArrayToMutate (i + 27) g;
-  set vertexArrayToMutate (i + 28) b;
-  set vertexArrayToMutate (i + 29) 1.;
-  set vertexArrayToMutate (i + 30) 0.0;
-  set vertexArrayToMutate (i + 31) 0.0;
-  let ii = i / vertexSize;
-  let j = (!env).batch.elementPtr;
-  let elementArrayToMutate = (!env).batch.elementArray;
-  set elementArrayToMutate (j + 0) ii;
-  set elementArrayToMutate (j + 1) (ii + 1);
-  set elementArrayToMutate (j + 2) (ii + 2);
-  set elementArrayToMutate (j + 3) (ii + 1);
-  set elementArrayToMutate (j + 4) (ii + 2);
-  set elementArrayToMutate (j + 5) (ii + 3);
-  (!env).batch.vertexPtr = i + 4 * vertexSize;
-  (!env).batch.currTex = Some (!env).batch.nullTex;
-  (!env).batch.elementPtr = j + 6
-};
-
 let drawGeometry
     vertexArray::(vertexArray: Gl.Bigarray.t float Gl.Bigarray.float32_elt)
     elementArray::(elementArray: Gl.Bigarray.t int Gl.Bigarray.int16_unsigned_elt)
@@ -322,7 +247,7 @@ let flushGlobalBatch env =>
   if ((!env).batch.elementPtr > 0) {
     let textureBuffer =
       switch (!env).batch.currTex {
-      | None => failwith "Trying to draw an empty texture"
+      | None => (!env).batch.nullTex
       | Some textureBuffer => textureBuffer
       };
     drawGeometry
@@ -342,10 +267,85 @@ let flushGlobalBatch env =>
 let maybeFlushBatch env texture adding =>
   if (
     (!env).batch.elementPtr + adding >= circularBufferSize ||
-    (!env).batch.currTex != None && (!env).batch.currTex !== texture
+    (!env).batch.elementPtr > 0 && (!env).batch.currTex !== texture
   ) {
     flushGlobalBatch env
   };
+
+/*
+ * This array packs all of the values that the shaders need: vertices, colors and texture coordinates.
+ * We put them all in one as an optimization, so there are less back and forths between us and the GPU.
+ *
+ * The vertex array looks like:
+ *
+ * |<--------  8 * 4 bytes  ------->|
+ *  --------------------------------
+ * |  x  y  |  r  g  b  a  |  s  t  |  x2  y2  |  r2  g2  b2  a2  |  s2  t2  | ....
+ *  --------------------------------
+ * |           |              |
+ * +- offset: 0 bytes, stride: 8 * 4 bytes (because we need to move by 8*4 bytes to get to the next x)
+ *             |              |
+ *             +- offset: 3 * 4 bytes, stride: 8 * 4 bytes
+ *                            |
+ *                            +- offset: (3 + 4) * 4 bytes, stride: 8 * 4 bytes
+ *
+ *
+ * The element array is just an array of indices of vertices given that each vertex takes 8 * 4 bytes.
+ * For example, if the element array looks like [|0, 1, 2, 1, 2, 3|], we're telling the GPU to draw 2
+ * triangles: one with the vertices 0, 1 and 2 from the vertex array, and one with the vertices 1, 2 and 3.
+ * We can "point" to duplicated vertices in our geometry to avoid sending those vertices.
+ */
+let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
+  maybeFlushBatch env None 6;
+  let set = Gl.Bigarray.set;
+  let toColorFloat i => float_of_int i /. 255.;
+  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
+  let i = (!env).batch.vertexPtr;
+  let vertexArrayToMutate = (!env).batch.vertexArray;
+  set vertexArrayToMutate (i + 0) x1;
+  set vertexArrayToMutate (i + 1) y1;
+  set vertexArrayToMutate (i + 2) r;
+  set vertexArrayToMutate (i + 3) g;
+  set vertexArrayToMutate (i + 4) b;
+  set vertexArrayToMutate (i + 5) 1.;
+  set vertexArrayToMutate (i + 6) 0.0;
+  set vertexArrayToMutate (i + 7) 0.0;
+  set vertexArrayToMutate (i + 8) x2;
+  set vertexArrayToMutate (i + 9) y2;
+  set vertexArrayToMutate (i + 10) r;
+  set vertexArrayToMutate (i + 11) g;
+  set vertexArrayToMutate (i + 12) b;
+  set vertexArrayToMutate (i + 13) 1.;
+  set vertexArrayToMutate (i + 14) 0.0;
+  set vertexArrayToMutate (i + 15) 0.0;
+  set vertexArrayToMutate (i + 16) x3;
+  set vertexArrayToMutate (i + 17) y3;
+  set vertexArrayToMutate (i + 18) r;
+  set vertexArrayToMutate (i + 19) g;
+  set vertexArrayToMutate (i + 20) b;
+  set vertexArrayToMutate (i + 21) 1.;
+  set vertexArrayToMutate (i + 22) 0.0;
+  set vertexArrayToMutate (i + 23) 0.0;
+  set vertexArrayToMutate (i + 24) x4;
+  set vertexArrayToMutate (i + 25) y4;
+  set vertexArrayToMutate (i + 26) r;
+  set vertexArrayToMutate (i + 27) g;
+  set vertexArrayToMutate (i + 28) b;
+  set vertexArrayToMutate (i + 29) 1.;
+  set vertexArrayToMutate (i + 30) 0.0;
+  set vertexArrayToMutate (i + 31) 0.0;
+  let ii = i / vertexSize;
+  let j = (!env).batch.elementPtr;
+  let elementArrayToMutate = (!env).batch.elementArray;
+  set elementArrayToMutate (j + 0) ii;
+  set elementArrayToMutate (j + 1) (ii + 1);
+  set elementArrayToMutate (j + 2) (ii + 2);
+  set elementArrayToMutate (j + 3) (ii + 1);
+  set elementArrayToMutate (j + 4) (ii + 2);
+  set elementArrayToMutate (j + 5) (ii + 3);
+  (!env).batch.vertexPtr = i + 4 * vertexSize;
+  (!env).batch.elementPtr = j + 6
+};
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
   let noOfFans = (radx + rady) * 2;
@@ -382,7 +382,7 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     set verticesData (ii + 6) 0.0;
     set verticesData (ii + 7) 0.0;
     /* For the first three vertices, we don't do any deduping. Then for the subsequent ones, we'll actually
-       have 3 elements, one pointing at the first vertex, one poiting at the previously added vertex and one
+       have 3 elements, one pointing at the first vertex, one pointing at the previously added vertex and one
        pointing at the current vertex. This mimicks the behavior of triangle_fan. */
     if (i < 3) {
       set elementData (i + elementArrayOffset) (ii / vertexSize)
@@ -399,7 +399,6 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
     }
   };
   (!env).batch.vertexPtr = (!env).batch.vertexPtr + noOfFans * vertexSize;
-  (!env).batch.currTex = Some (!env).batch.nullTex;
   (!env).batch.elementPtr = (!env).batch.elementPtr + (noOfFans - 3) * 3 + 3
 };
 

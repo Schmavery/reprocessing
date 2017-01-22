@@ -26,7 +26,6 @@ module P = {
     resetSize env width height
   };
   let rect (env: ref glEnv) x y width height => {
-    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     addRectToGlobalBatch
       env
       (float_of_int @@ x + width, float_of_int @@ y + height)
@@ -38,7 +37,6 @@ module P = {
   let resizeable (env: ref glEnv) resizeable =>
     env := {...!env, size: {...(!env).size, resizeable}};
   let rectf (env: ref glEnv) x y width height => {
-    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     addRectToGlobalBatch
       env (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) (!env).currFill
   };
@@ -60,7 +58,6 @@ module P = {
   let stroke env color => env := {...!env, stroke: {...(!env).stroke, color}};
   let strokeWeight env weight => env := {...!env, stroke: {...(!env).stroke, weight}};
   let line env (xx1, yy1) (xx2, yy2) => {
-    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
     let dx = xx2 - xx1;
     let dy = yy2 - yy1;
     let mag = PUtils.dist (xx1, yy1) (xx2, yy2);
@@ -78,7 +75,7 @@ module P = {
     addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) (!env).currFill
   };
   let pixel env x y color => {
-    maybeFlushBatch env (Some (!env).batch.nullTex) 6;
+
     addRectToGlobalBatch
       env
       (float_of_int @@ x + (!env).stroke.weight, float_of_int @@ y + (!env).stroke.weight)
