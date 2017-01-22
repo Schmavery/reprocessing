@@ -345,7 +345,7 @@ let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
 
 let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
   let noOfFans = (radx + rady) * 2;
-  maybeFlushBatch env (Some (!env).batch.nullTex) ((noOfFans - 3) * 3 + 3);
+  maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   let radxf = float_of_int radx;

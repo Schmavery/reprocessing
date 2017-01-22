@@ -26,7 +26,9 @@ let afterDraw f (env: ref glEnv) => {
     frame: {count: (!env).frame.count + 1, rate}
   };
   /* Flush the batching buffer at the end of every frame. */
-  maybeFlushBatch env None 0;
+  if ((!env).batch.elementPtr > 0) {
+    flushGlobalBatch env
+  }
 };
 
 module ReProcessor: ReProcessorT = {
