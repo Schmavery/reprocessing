@@ -103,8 +103,8 @@ let read (name: string) => {
   let ic = open_in name;
   let try_read () =>
     switch (input_line ic) {
-      | exception End_of_file => None
-      | x => Some x
+    | exception End_of_file => None
+    | x => Some x
     };
   let rec loop acc =>
     switch (try_read ()) {

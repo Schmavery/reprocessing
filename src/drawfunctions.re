@@ -76,10 +76,11 @@ module P = {
     linef env (x, y +. height) (x, y);
     let r = float_of_int (!env).stroke.weight /. 2.;
     let c = (!env).stroke.color;
+    ()
     /* drawEllipseInternal env x y r r c;
-    drawEllipseInternal env (x +. width) y r r c;
-    drawEllipseInternal env (x +. width) (y +. height) r r c;
-    drawEllipseInternal env x (y +. height) r r c */
+       drawEllipseInternal env (x +. width) y r r c;
+       drawEllipseInternal env (x +. width) (y +. height) r r c;
+       drawEllipseInternal env x (y +. height) r r c */
   };
   let rect (env: ref glEnv) x y width height =>
     rectf env (float_of_int x) (float_of_int y) (float_of_int width) (float_of_int height);
