@@ -1915,7 +1915,7 @@ function onEditChanges(cm, change) {
   var raw = compile_code(predefinedStuff + document.refmt(myCode1Mirror.getValue()).c);
   errorMirror.setValue(get_error_output());
   console.error = original_err;
-  console.log(raw);
+  // console.log(raw);
   var rsp = JSON.parse(raw); // can we save this from parsing?
   if (rsp.js_code !== undefined) {
     // jsCode1Mirror.setValue(rsp.js_code);
