@@ -33,7 +33,8 @@ module Font = {
     yoffset: int,
     xadvance: int
   };
-  type t = {chars: IntMap.t charT, kerning: IntPairMap.t int, image: imageT};
+  type internalType = {chars: IntMap.t charT, kerning: IntPairMap.t int, image: imageT};
+  type t = ref (option internalType);
   let rec parse_num (stream: Stream.t) acc :(Stream.t, int) =>
     switch (Stream.peekch stream) {
     | Some ('-' as c)
@@ -107,21 +108,29 @@ module Font = {
     String.concat "/" newLst
   };
   let parseFontFormat env path => {
-    let stream = read path |> Stream.create;
-    let stream = stream |> pop_line |> pop_line;
-    let stream = Stream.match stream "page id=0 file=\"";
-    let (stream, filename) = parse_string stream;
-    let stream = pop_line stream;
-    let stream = Stream.match stream "chars count=";
-    let (stream, num_chars) = parse_num stream;
-    let stream = pop_line stream;
-    let (stream, char_map) = parse_char_fmt stream num_chars IntMap.empty;
-    let stream = Stream.match stream "kernings count=";
-    let (stream, num_kerns) = parse_num stream;
-    let stream = pop_line stream;
-    let (_, kern_map) = parse_kern_fmt stream num_kerns IntPairMap.empty;
-    let img_filename = replaceFilename path filename;
-    {chars: char_map, kerning: kern_map, image: loadImage env img_filename}
+    let ret = ref None;
+    Gl.File.readFile
+      path
+      (
+        fun str => {
+          let stream = Stream.create (str ^ "\n");
+          let stream = stream |> pop_line |> pop_line;
+          let stream = Stream.match stream "page id=0 file=\"";
+          let (stream, filename) = parse_string stream;
+          let stream = pop_line stream;
+          let stream = Stream.match stream "chars count=";
+          let (stream, num_chars) = parse_num stream;
+          let stream = pop_line stream;
+          let (stream, char_map) = parse_char_fmt stream num_chars IntMap.empty;
+          let stream = Stream.match stream "kernings count=";
+          let (stream, num_kerns) = parse_num stream;
+          let stream = pop_line stream;
+          let (_, kern_map) = parse_kern_fmt stream num_kerns IntPairMap.empty;
+          let img_filename = replaceFilename path filename;
+          ret := Some {chars: char_map, kerning: kern_map, image: loadImage env img_filename}
+        }
+      );
+    ret
   };
   let getChar fnt ch => {
     let code = Char.code ch;
@@ -157,32 +166,36 @@ module Font = {
     }
   };
   let drawString (env: ref glEnv) fnt (str: string) x y =>
-    switch !fnt.image {
-    | Some img =>
-      let offset = ref x;
-      let lastChar = ref None;
-      String.iter
-        (
-          fun c => {
-            let advance = drawChar env fnt (Some img) c !lastChar !offset y;
-            offset := !offset + advance;
-            lastChar := Some c
-          }
-        )
-        str
-    | None => print_endline "loading font."
+    switch !fnt {
+    | None => ()
+    | Some fnt =>
+      switch !fnt.image {
+      | Some img =>
+        let offset = ref x;
+        let lastChar = ref None;
+        String.iter
+          (
+            fun c => {
+              let advance = drawChar env fnt (Some img) c !lastChar !offset y;
+              offset := !offset + advance;
+              lastChar := Some c
+            }
+          )
+          str
+      | None => print_endline "loading font."
+      }
     };
   let calcStringWidth env fnt (str: string) => {
-       let offset = ref 0;
-       let lastChar = ref None;
-       String.iter
-         (
-           fun c => {
-             offset := !offset + drawChar env fnt None c !lastChar !offset 0;
-             lastChar := Some c
-           }
-         )
-         str;
-       !offset
-     };
+    let offset = ref 0;
+    let lastChar = ref None;
+    String.iter
+      (
+        fun c => {
+          offset := !offset + drawChar env fnt None c !lastChar !offset 0;
+          lastChar := Some c
+        }
+      )
+      str;
+    !offset
+  };
 };
