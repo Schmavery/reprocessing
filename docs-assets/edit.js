@@ -167,8 +167,214 @@ function clickHandler(e) {
 }
 
 var predefinedStuff = `
-module Reglinterface = struct
-module Constants = struct
+module Gl
+= struct
+#1 "gl.ml"
+module type t  =
+  sig
+    val target : string
+    type contextT
+    module type FileT  =
+      sig
+        type t
+        val readFile : filename:string -> cb:(string -> unit) -> unit
+      end
+    module File : FileT
+    module type WindowT  =
+      sig
+        type t
+        val getWidth : t -> int
+        val getHeight : t -> int
+        val init : argv:string array -> t
+        val setWindowSize : window:t -> width:int -> height:int -> unit
+        val initDisplayMode : window:t -> double_buffer:bool -> unit -> unit
+        val getContext : t -> contextT
+      end
+    module Window : WindowT
+    module type EventsT  =
+      sig
+        type buttonStateT =
+          | LEFT_BUTTON
+          | MIDDLE_BUTTON
+          | RIGHT_BUTTON
+        type stateT =
+          | DOWN
+          | UP
+      end
+    module Events : EventsT
+    val render :
+      window:Window.t ->
+        ?mouseDown:(button:Events.buttonStateT ->
+                      state:Events.stateT -> x:int -> y:int -> unit)
+          ->
+          ?mouseUp:(button:Events.buttonStateT ->
+                      state:Events.stateT -> x:int -> y:int -> unit)
+            ->
+            ?mouseMove:(x:int -> y:int -> unit) ->
+              ?windowResize:(unit -> unit) ->
+                displayFunc:(float -> unit) -> unit -> unit
+    type programT
+    type shaderT
+    val clearColor :
+      context:contextT -> r:float -> g:float -> b:float -> a:float -> unit
+    val createProgram : context:contextT -> programT
+    val createShader : context:contextT -> shaderType:int -> shaderT
+    val attachShader :
+      context:contextT -> program:programT -> shader:shaderT -> unit
+    val deleteShader : context:contextT -> shader:shaderT -> unit
+    val shaderSource :
+      context:contextT -> shader:shaderT -> source:string -> unit
+    val compileShader : context:contextT -> shader:shaderT -> unit
+    val linkProgram : context:contextT -> program:programT -> unit
+    val useProgram : context:contextT -> program:programT -> unit
+    type bufferT
+    type attributeT
+    type uniformT
+    val createBuffer : context:contextT -> bufferT
+    val bindBuffer : context:contextT -> target:int -> buffer:bufferT -> unit
+    type textureT
+    val createTexture : context:contextT -> textureT
+    val activeTexture : context:contextT -> target:int -> unit
+    val bindTexture :
+      context:contextT -> target:int -> texture:textureT -> unit
+    val texParameteri :
+      context:contextT -> target:int -> pname:int -> param:int -> unit
+    type rawTextureDataT
+    val toTextureData : int array -> rawTextureDataT
+    val enable : context:contextT -> int -> unit
+    val disable : context:contextT -> int -> unit
+    val blendFunc : context:contextT -> int -> int -> unit
+    type frameBufferT
+    val createFrameBuffer : context:contextT -> frameBufferT
+    val bindFrameBuffer :
+      context:contextT ->
+        target:int -> frameBuffer:frameBufferT option -> unit
+    val framebufferTexture2d :
+      context:contextT ->
+        target:int ->
+          attachment:int ->
+            texTarget:int -> texture:textureT -> level:int -> unit
+    val readPixelsRGBA :
+      context:contextT ->
+        x:int -> y:int -> width:int -> height:int -> rawTextureDataT
+    type imageT
+    val getImageWidth : imageT -> int
+    val getImageHeight : imageT -> int
+    type loadOptionT =
+      | LoadAuto
+      | LoadL
+      | LoadLA
+      | LoadRGB
+      | LoadRGBA
+    val loadImage :
+      filename:string ->
+        ?loadOption:loadOptionT ->
+          callback:(imageT option -> unit) -> unit -> unit
+    val texImage2DWithImage :
+      context:contextT -> target:int -> level:int -> image:imageT -> unit
+    val texImage2D :
+      context:contextT ->
+        target:int ->
+          level:int ->
+            internalFormat:int ->
+              width:int ->
+                height:int ->
+                  format:int -> type_:int -> data:rawTextureDataT -> unit
+    val uniform1i : context:contextT -> location:uniformT -> int -> unit
+    val uniform1f : context:contextT -> location:uniformT -> float -> unit
+    val generateMipmap : context:contextT -> target:int -> unit
+    module type Bigarray  =
+      sig
+        type ('a,'b) t
+        type float64_elt
+        type float32_elt
+        type int16_unsigned_elt
+        type int16_signed_elt
+        type int8_unsigned_elt
+        type int8_signed_elt
+        type int_elt
+        type int32_elt
+        type int64_elt
+        type ('a,'b) kind =
+          | Float64: (float,float64_elt) kind
+          | Float32: (float,float32_elt) kind
+          | Int16: (int,int16_signed_elt) kind
+          | Uint16: (int,int16_unsigned_elt) kind
+          | Int8: (int,int8_signed_elt) kind
+          | Uint8: (int,int8_unsigned_elt) kind
+          | Char: (char,int8_unsigned_elt) kind
+          | Int: (int,int_elt) kind
+          | Int64: (int64,int64_elt) kind
+          | Int32: (int32,int32_elt) kind
+        val create : ('a,'b) kind -> int -> ('a,'b) t
+        val of_array : ('a,'b) kind -> 'a array -> ('a,'b) t
+        val dim : ('a,'b) t -> int
+        val get : ('a,'b) t -> int -> 'a
+        val set : ('a,'b) t -> int -> 'a -> unit
+        val sub : ('a,'b) t -> offset:int -> len:int -> ('a,'b) t
+      end
+    module Bigarray : Bigarray
+    val bufferData :
+      context:contextT ->
+        target:int -> data:('a,'b) Bigarray.t -> usage:int -> unit
+    val viewport :
+      context:contextT -> x:int -> y:int -> width:int -> height:int -> unit
+    val clear : context:contextT -> mask:int -> unit
+    val getUniformLocation :
+      context:contextT -> program:programT -> name:string -> uniformT
+    val getAttribLocation :
+      context:contextT -> program:programT -> name:string -> attributeT
+    val enableVertexAttribArray :
+      context:contextT -> attribute:attributeT -> unit
+    val vertexAttribPointer :
+      context:contextT ->
+        attribute:attributeT ->
+          size:int ->
+            type_:int -> normalize:bool -> stride:int -> offset:int -> unit
+    module type Mat4T  =
+      sig
+        type t
+        val to_array : t -> float array
+        val create : unit -> t
+        val identity : out:t -> unit
+        val translate : out:t -> matrix:t -> vec:float array -> unit
+        val scale : out:t -> matrix:t -> vec:float array -> unit
+        val rotate :
+          out:t -> matrix:t -> rad:float -> vec:float array -> unit
+        val ortho :
+          out:t ->
+            left:float ->
+              right:float ->
+                bottom:float -> top:float -> near:float -> far:float -> unit
+      end
+    module Mat4 : Mat4T
+    val uniformMatrix4fv :
+      context:contextT -> location:uniformT -> value:Mat4.t -> unit
+    type shaderParamsT =
+      | Shader_delete_status
+      | Compile_status
+      | Shader_type
+    type programParamsT =
+      | Program_delete_status
+      | Link_status
+      | Validate_status
+    val getProgramParameter :
+      context:contextT -> program:programT -> paramName:programParamsT -> int
+    val getShaderParameter :
+      context:contextT -> shader:shaderT -> paramName:shaderParamsT -> int
+    val getShaderInfoLog : context:contextT -> shader:shaderT -> string
+    val getProgramInfoLog : context:contextT -> program:programT -> string
+    val getShaderSource : context:contextT -> shader:shaderT -> string
+    val drawArrays :
+      context:contextT -> mode:int -> first:int -> count:int -> unit
+    val drawElements :
+      context:contextT ->
+        mode:int -> count:int -> type_:int -> offset:int -> unit
+  end
+end
+module Constants
+= struct
+#1 "constants.ml"
 let triangles = 4
 let triangle_strip = 5
 let texture0 = 33984
@@ -257,6 +463,14 @@ let texture_min_filter = 10241
 let linear = 9729
 let linear_mipmap_nearest = 9985
 end
+module Reglinterface
+= struct
+#1 "reglinterface.ml"
+module Constants = Constants
+
+module Gl = Gl
+
+
 end
 module Glloader
 = struct
@@ -283,14 +497,15 @@ external getButton : 'eventT -> int = "button"[@@bs.get ]
 external getClientX : 'eventT -> int = "clientX"[@@bs.get ]
 external getClientY : 'eventT -> int = "clientY"[@@bs.get ]
 external getBoundingClientRect :
-  'canvas -> < left :int ;top :int  > Js.t = "getBoundingClientRect"[@@bs.send
-                                                                    ]
+  'canvas -> 'leftAndTop = "getBoundingClientRect"[@@bs.send ]
+external getTop : 'a -> int = "top"[@@bs.get ]
+external getLeft : 'a -> int = "left"[@@bs.get ]
 external getWidth : 'canvas -> int = "width"[@@bs.get ]
 external getHeight : 'canvas -> int = "height"[@@bs.get ]
 external setWidth : 'canvas -> int -> unit = "width"[@@bs.set ]
 external setHeight : 'canvas -> int -> unit = "height"[@@bs.set ]
-external createElement : string -> 'canvas = "document.createElement"[@@bs.val
-                                                                    ]
+external createElement : string -> 'canvas = "document.createElement"
+[@@bs.val ]
 let createCanvas () = createElement "canvas"
 external addToBody : 'canvas -> unit = "document.body.appendChild"[@@bs.val ]
 external getContext :
@@ -313,7 +528,7 @@ external getStatus : httpRequestT -> int = "status"[@@bs.get ]
 external getResponseText : httpRequestT -> string = "responseText"[@@bs.get ]
 external sendRequest : httpRequestT -> 'a Js.null -> unit = "send"[@@bs.send
                                                                     ]
-module Gl =
+module Gl : Reglinterface.Gl.t =
   struct
     let target = "web"
     type contextT
@@ -406,8 +621,8 @@ module Gl =
                   | _ -> assert false in
                 let state = Events.DOWN in
                 let rect = getBoundingClientRect window in
-                let x = (getClientX e) - (rect##left) in
-                let y = (getClientY e) - (rect##top) in
+                let x = (getClientX e) - (getLeft rect) in
+                let y = (getClientY e) - (getTop rect) in
                 cb ~button ~state ~x ~y));
       (match mouseUp with
        | None  -> ()
@@ -422,8 +637,8 @@ module Gl =
                   | _ -> assert false in
                 let state = Events.UP in
                 let rect = getBoundingClientRect window in
-                let x = (getClientX e) - (rect##left) in
-                let y = (getClientY e) - (rect##top) in
+                let x = (getClientX e) - (getLeft rect) in
+                let y = (getClientY e) - (getTop rect) in
                 cb ~button ~state ~x ~y));
       (match mouseMove with
        | None  -> ()
@@ -431,8 +646,8 @@ module Gl =
            Document.addEventListener window "mousemove"
              (fun e  ->
                 let rect = getBoundingClientRect window in
-                let x = (getClientX e) - (rect##left) in
-                let y = (getClientY e) - (rect##top) in cb ~x ~y));
+                let x = (getClientX e) - (getLeft rect) in
+                let y = (getClientY e) - (getTop rect) in cb ~x ~y));
       (let rec tick prev () =
          let now = Document.now () in
          displayFunc (now -. prev); Document.requestAnimationFrame (tick now) in
@@ -452,7 +667,7 @@ module Gl =
         "shaderSource"[@@bs.send ]
     let shaderSource ~context  ~shader  ~source  =
       _shaderSource ~context ~shader
-        ~source:("#version 100 \n precision highp float; \n" ^ source)
+        ~source:("#version 100 \\n precision highp float; \\n" ^ source)
     external compileShader :
       context:contextT -> shader:shaderT -> unit = "compileShader"[@@bs.send
                                                                     ]
@@ -857,7 +1072,6 @@ module Gl =
         mode:int -> count:int -> type_:int -> offset:int -> unit =
         "drawElements"[@@bs.send ]
   end
-
 end
 module Common
 = struct
@@ -964,7 +1178,7 @@ let read (name : string) =
   let rec loop acc =
     match try_read () with
     | ((Some (s))[@explicit_arity ]) ->
-        loop ((String.make 1 '\n') :: s :: acc)
+        loop ((String.make 1 '\\n') :: s :: acc)
     | None  -> (close_in ic; List.rev acc) in
   (loop []) |> (String.concat "")
 let append_char (s : string) (c : char) = (s ^ (String.make 1 c) : string)
@@ -1818,26 +2032,25 @@ let afterDraw f (env : glEnv ref) =
       frame = { count = (((!env).frame).count + 1); rate }
     };
   if ((!env).batch).elementPtr > 0 then flushGlobalBatch env
+  external removeFromDOM : 'a -> unit = "remove" [@@bs.send]
+  external setID : 'a -> string -> unit = "id" [@@bs.set]
+  external appendChild : 'a -> 'b -> unit = "appendChild" [@@bs.send]
 
-external removeFromDOM : 'a -> unit = "remove" [@@bs.send]
-external setID : 'a -> string -> unit = "id" [@@bs.set]
-external appendChild : 'a -> 'b -> unit = "appendChild" [@@bs.send]
-
-module ReProcessor : ReProcessorT =
-  struct
-    type t = glEnv ref
-    let run ~setup  ?draw  ?mouseMove  ?mouseDragged  ?mouseDown  ?mouseUp
-      () =
-      Random.self_init ();
-      PUtils.noiseSeed (Random.int ((PUtils.pow 2 30) - 1));
-      removeFromDOM (Document.getElementById "main-canvas");
-      let canvas = createElement "canvas" in
-      setBackgroundColor (getStyle canvas) "black";
-      setID canvas "main-canvas";
-      appendChild (Document.getElementById "canvas-wrapper") canvas;
-      (
-        let env = ref (createCanvas canvas 200 200) in
-        let userState = ref (setup env) in
+  module ReProcessor : ReProcessorT =
+    struct
+      type t = glEnv ref
+      let run ~setup  ?draw  ?mouseMove  ?mouseDragged  ?mouseDown  ?mouseUp
+        () =
+        Random.self_init ();
+        PUtils.noiseSeed (Random.int ((PUtils.pow 2 30) - 1));
+        removeFromDOM (Document.getElementById "main-canvas");
+        let canvas = createElement "canvas" in
+        setBackgroundColor (getStyle canvas) "black";
+        setID canvas "main-canvas";
+        appendChild (Document.getElementById "canvas-wrapper") canvas;
+        (
+          let env = ref (createCanvas canvas 200 200) in
+          let userState = ref (setup env) in
        let reDrawPreviousBufferOnSecondFrame =
          let width = Gl.Window.getWidth (!env).window in
          let height = Gl.Window.getHeight (!env).window in
@@ -1949,7 +2162,6 @@ end
 `;
 
 // var myWorker = new Worker("worker.js");
-//
 // myWorker.onmessage = function(e) {
 //   let rsp = JSON.parse(e.data);
 //   console.log(rsp);
@@ -1957,7 +2169,6 @@ end
 //      evalCode(rsp.js_code);
 //   }
 // };
-//
 // function runCompiler() {
 //   myWorker.postMessage(predefinedStuff + document.refmt(myCode1Mirror.getValue()).c);
 // }
