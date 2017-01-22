@@ -83,13 +83,22 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   /** Get attribute and uniform locations for later usage in the draw code. **/
   let aTextureCoord = Gl.getAttribLocation context::gl ::program name::"aTextureCoord";
   Gl.enableVertexAttribArray context::gl attribute::aTextureCoord;
-  let uSampler = Gl.getUniformLocation gl program "uSampler";
 
   /** Generate texture buffer that we'll use to pass image data around. **/
   let texture = Gl.createTexture gl;
 
+  /** This tells OpenGL that we're going to be using texture0. OpenGL imposes a limit on the number of
+      texture we can manipulate at the same time. That limit depends on the device. We don't care as we'll just
+      always use texture0. **/
+  Gl.activeTexture context::gl target::Constants.texture0;
+
   /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
   Gl.bindTexture context::gl target::Constants.texture_2d ::texture;
+
+  /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
+      texture0 represent.  uSampler is set once here and never changed.  **/
+  let uSampler = Gl.getUniformLocation gl program "uSampler";
+  Gl.uniform1i context::gl location::uSampler 0;
 
   /** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
   Gl.texImage2D
@@ -216,21 +225,8 @@ let drawGeometry
     data::elementArray
     usage::Constants.stream_draw;
 
-  /** This tells OpenGL that we're going to be using texture0. OpenGL imposes a limit on the number of
-      texture we can manipulate at the same time. That limit depends on the device. We don't care as we'll just
-      always use texture0. **/
-  Gl.activeTexture context::env.gl target::Constants.texture0;
-
   /** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
   Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
-
-  /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
-      texture0 represent. **/
-  Gl.uniform1i context::env.gl location::env.uSampler 0;
-
-  /** Tell OpenGL about what the uniform called `pMatrixUniform` is, here it's the projectionMatrix. **/
-  Gl.uniformMatrix4fv
-    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix;
 
   /** Final call which actually tells the GPU to draw. **/
   Gl.drawElements context::env.gl ::mode ::count type_::Constants.unsigned_short offset::0
@@ -508,6 +504,8 @@ let resetSize env width height => {
     top::0.
     near::0.
     far::1.;
+
+  /** Tell OpenGL about what the uniform called `pMatrixUniform` is, here it's the projectionMatrix. **/
   Gl.uniformMatrix4fv
     context::(!env).gl location::(!env).pMatrixUniform value::(!env).camera.projectionMatrix
 };
