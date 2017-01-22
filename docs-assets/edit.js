@@ -167,9 +167,7 @@ function clickHandler(e) {
 }
 
 var predefinedStuff = `
-module Reglinterface =
-struct
-#1 "reglinterface.ml"
+module Reglinterface = struct
 module Constants = struct
 let triangles = 4
 let triangle_strip = 5
@@ -284,6 +282,9 @@ module Document =
 external getButton : 'eventT -> int = "button"[@@bs.get ]
 external getClientX : 'eventT -> int = "clientX"[@@bs.get ]
 external getClientY : 'eventT -> int = "clientY"[@@bs.get ]
+external getBoundingClientRect :
+  'canvas -> < left :int ;top :int  > Js.t = "getBoundingClientRect"[@@bs.send
+                                                                    ]
 external getWidth : 'canvas -> int = "width"[@@bs.get ]
 external getHeight : 'canvas -> int = "height"[@@bs.get ]
 external setWidth : 'canvas -> int -> unit = "width"[@@bs.set ]
@@ -298,15 +299,49 @@ type styleT
 external getStyle : 'canvas -> styleT = "style"[@@bs.get ]
 external setBackgroundColor : styleT -> string -> unit = "backgroundColor"
 [@@bs.set ]
-module Gl = struct
+type httpRequestT
+external makeXMLHttpRequest : unit -> httpRequestT = "XMLHttpRequest"
+[@@bs.new ]
+external openFile :
+  httpRequestT ->
+    kind:string -> filename:string -> whatIsThis:Js.boolean -> unit = "open"
+[@@bs.send ]
+external onreadystatechange :
+  httpRequestT -> (unit -> unit) -> unit = "onreadystatechange"[@@bs.set ]
+external getReadyState : httpRequestT -> int = "readyState"[@@bs.get ]
+external getStatus : httpRequestT -> int = "status"[@@bs.get ]
+external getResponseText : httpRequestT -> string = "responseText"[@@bs.get ]
+external sendRequest : httpRequestT -> 'a Js.null -> unit = "send"[@@bs.send
+                                                                    ]
+module Gl =
+  struct
     let target = "web"
     type contextT
+    module type FileT  =
+      sig
+        type t
+        val readFile : filename:string -> cb:(string -> unit) -> unit
+      end
+    module File =
+      struct
+        type t
+        let readFile ~filename  ~cb  =
+          let rawFile = makeXMLHttpRequest () in
+          openFile rawFile ~kind:"GET" ~filename ~whatIsThis:Js.false_;
+          onreadystatechange rawFile
+            (fun ()  ->
+               if
+                 ((getReadyState rawFile) == 4) &&
+                   (((getStatus rawFile) == 200) ||
+                      ((getStatus rawFile) == 0))
+               then cb (getResponseText rawFile));
+          sendRequest rawFile Js.null
+      end
     module type WindowT  =
       sig
         type t
         val getWidth : t -> int
         val getHeight : t -> int
-        val initWithCanvasID : string -> t
         val init : argv:string array -> t
         val setWindowSize : window:t -> width:int -> height:int -> unit
         val initDisplayMode : window:t -> double_buffer:bool -> unit -> unit
@@ -315,10 +350,8 @@ module Gl = struct
     module Window =
       struct
         type t
-        external getElementByIdForCanvasGosh : string -> t = "document.getElementById" [@@bs.val]
         let getWidth = getWidth
         let getHeight = getHeight
-        let initWithCanvasID canvasID = getElementByIdForCanvasGosh canvasID
         let init ~argv:_  =
           let canvas: t = createCanvas () in
           setBackgroundColor (getStyle canvas) "black";
@@ -372,8 +405,10 @@ module Gl = struct
                   | 2 -> Events.RIGHT_BUTTON
                   | _ -> assert false in
                 let state = Events.DOWN in
-                let x = getClientX e in
-                let y = getClientY e in cb ~button ~state ~x ~y));
+                let rect = getBoundingClientRect window in
+                let x = (getClientX e) - (rect##left) in
+                let y = (getClientY e) - (rect##top) in
+                cb ~button ~state ~x ~y));
       (match mouseUp with
        | None  -> ()
        | ((Some (cb))[@explicit_arity ]) ->
@@ -386,14 +421,18 @@ module Gl = struct
                   | 2 -> Events.RIGHT_BUTTON
                   | _ -> assert false in
                 let state = Events.UP in
-                let x = getClientX e in
-                let y = getClientY e in cb ~button ~state ~x ~y));
+                let rect = getBoundingClientRect window in
+                let x = (getClientX e) - (rect##left) in
+                let y = (getClientY e) - (rect##top) in
+                cb ~button ~state ~x ~y));
       (match mouseMove with
        | None  -> ()
        | ((Some (cb))[@explicit_arity ]) ->
            Document.addEventListener window "mousemove"
              (fun e  ->
-                let x = getClientX e in let y = getClientY e in cb ~x ~y));
+                let rect = getBoundingClientRect window in
+                let x = (getClientX e) - (rect##left) in
+                let y = (getClientY e) - (rect##top) in cb ~x ~y));
       (let rec tick prev () =
          let now = Document.now () in
          displayFunc (now -. prev); Document.requestAnimationFrame (tick now) in
@@ -413,7 +452,7 @@ module Gl = struct
         "shaderSource"[@@bs.send ]
     let shaderSource ~context  ~shader  ~source  =
       _shaderSource ~context ~shader
-        ~source:("#version 100 \\n precision highp float; \\n" ^ source)
+        ~source:("#version 100 \n precision highp float; \n" ^ source)
     external compileShader :
       context:contextT -> shader:shaderT -> unit = "compileShader"[@@bs.send
                                                                     ]
@@ -818,6 +857,7 @@ module Gl = struct
         mode:int -> count:int -> type_:int -> offset:int -> unit =
         "drawElements"[@@bs.send ]
   end
+
 end
 module Common
 = struct
@@ -829,8 +869,8 @@ type glCamera = {
   projectionMatrix: Gl.Mat4.t;}
 type colorT = {
   r: int;
-  b: int;
-  g: int;}
+  g: int;
+  b: int;}
 type strokeT = {
   color: colorT;
   weight: int;}
@@ -845,13 +885,23 @@ type sizeT = {
   height: int;
   width: int;
   resizeable: bool;}
+let circularBufferSize = 6 * 10000
+let vertexSize = 8
 type _imageT =
   {
-  img: Gl.imageT;
   textureBuffer: Gl.textureT;
+  img: Gl.imageT;
   height: int;
   width: int;}
 type imageT = _imageT option ref
+type batchT =
+  {
+  vertexArray: (float,Gl.Bigarray.float32_elt) Gl.Bigarray.t;
+  elementArray: (int,Gl.Bigarray.int16_unsigned_elt) Gl.Bigarray.t;
+  mutable vertexPtr: int;
+  mutable elementPtr: int;
+  mutable currTex: Gl.textureT option;
+  nullTex: Gl.textureT;}
 type glEnv =
   {
   camera: glCamera;
@@ -864,9 +914,8 @@ type glEnv =
   aVertexPosition: Gl.attributeT;
   pMatrixUniform: Gl.uniformT;
   uSampler: Gl.uniformT;
-  uTextureFlag: Gl.uniformT;
-  texture: Gl.textureT;
-  currFill: colorT;
+  batch: batchT;
+  currFill: colorT option;
   currBackground: colorT;
   mouse: mouseT;
   stroke: strokeT;
@@ -910,11 +959,12 @@ module Stream =
   end
 let read (name : string) =
   let ic = open_in name in
-  let try_read () = try Some (input_line ic) with | End_of_file  -> None in
+  let try_read () =
+    match input_line ic with | exception End_of_file  -> None | x -> Some x in
   let rec loop acc =
     match try_read () with
     | ((Some (s))[@explicit_arity ]) ->
-        loop ((String.make 1 '\\n') :: s :: acc)
+        loop ((String.make 1 '\n') :: s :: acc)
     | None  -> (close_in ic; List.rev acc) in
   (loop []) |> (String.concat "")
 let append_char (s : string) (c : char) = (s ^ (String.make 1 c) : string)
@@ -924,7 +974,7 @@ module Shaders
 #1 "shaders.ml"
 let vertexShaderSource =
   {|
-  attribute vec3 aVertexPosition;
+  attribute vec2 aVertexPosition;
   attribute vec4 aVertexColor;
   attribute vec2 aTextureCoord;
 
@@ -934,7 +984,7 @@ let vertexShaderSource =
   varying vec2 vTextureCoord;
 
   void main(void) {
-    gl_Position = uPMatrix * vec4(aVertexPosition, 1.0);
+    gl_Position = uPMatrix * vec4(aVertexPosition, 0.0, 1.0);
     vColor = aVertexColor;
     vTextureCoord = aTextureCoord;
   }
@@ -942,13 +992,12 @@ let vertexShaderSource =
 let fragmentShaderSource =
   {|
   varying vec4 vColor;
-  uniform float uTextureFlag;
   varying vec2 vTextureCoord;
 
   uniform sampler2D uSampler;
 
   void main(void) {
-    gl_FragColor = uTextureFlag * texture2D(uSampler, vTextureCoord) + (1.0 - uTextureFlag) * vColor;
+    gl_FragColor = texture2D(uSampler, vTextureCoord) + vColor;
   }
 |}
 end
@@ -1006,9 +1055,12 @@ module PUtils =
     let lerpf start stop amt = remapf amt 0. 1. start stop
     let lerp start stop amt =
       int_of_float (lerpf (float_of_int start) (float_of_int stop) amt)
+    let distf ((x1 : float),(y1 : float)) ((x2 : float),(y2 : float)) =
+      let dx = x2 -. x1 in
+      let dy = y2 -. y1 in sqrt ((dx *. dx) +. (dy *. dy))
     let dist (x1,y1) (x2,y2) =
-      let dx = float_of_int (x2 - x1) in
-      let dy = float_of_int (y2 - y1) in sqrt ((dx *. dx) +. (dy *. dy))
+      distf ((float_of_int x1), (float_of_int y1))
+        ((float_of_int x2), (float_of_int y2))
     let mag vec = dist (0, 0) vec
     let lerpColor low high amt =
       {
@@ -1109,15 +1161,8 @@ module Glhelpers
 open Common
 open Glloader
 open Utils
-let circularBufferSize = 6 * 10000
-let globalVertexArray =
-  ref (Gl.Bigarray.create Gl.Bigarray.Float32 (circularBufferSize * 9))
-let globalElementArray =
-  ref (Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize)
-let vertexArrayPtr = ref 0
-let elementArrayPtr = ref 0
-let getProgram ~gl:(gl : Gl.contextT) 
-  ~vertexShader:(vertexShaderSource : string) 
+let getProgram ~gl:(gl : Gl.contextT)
+  ~vertexShader:(vertexShaderSource : string)
   ~fragmentShader:(fragmentShaderSource : string)  =
   (let vertexShader = Gl.createShader gl Constants.vertex_shader in
    Gl.shaderSource gl vertexShader vertexShaderSource;
@@ -1195,191 +1240,195 @@ let createCanvas window (height : int) (width : int) =
         (let aTextureCoord =
            Gl.getAttribLocation ~context:gl ~program ~name:"aTextureCoord" in
          Gl.enableVertexAttribArray ~context:gl ~attribute:aTextureCoord;
-         (let uSampler = Gl.getUniformLocation gl program "uSampler" in
-          let uTextureFlag = Gl.getUniformLocation gl program "uTextureFlag" in
-          let texture = Gl.createTexture gl in
+         (let texture = Gl.createTexture gl in
+          Gl.activeTexture ~context:gl ~target:Constants.texture0;
           Gl.bindTexture ~context:gl ~target:Constants.texture_2d ~texture;
-          Gl.texImage2D ~context:gl ~target:Constants.texture_2d ~level:0
-            ~internalFormat:Constants.rgba ~width:1 ~height:1
-            ~format:Constants.rgba ~type_:Constants.unsigned_byte
-            ~data:(Gl.toTextureData [|0;0;0;0|]);
-          Gl.texParameteri ~context:gl ~target:Constants.texture_2d
-            ~pname:Constants.texture_mag_filter ~param:Constants.linear;
-          Gl.texParameteri ~context:gl ~target:Constants.texture_2d
-            ~pname:Constants.texture_min_filter
-            ~param:Constants.linear_mipmap_nearest;
-          Gl.enable ~context:gl Constants.blend;
-          Gl.blendFunc ~context:gl Constants.src_alpha
-            Constants.one_minus_src_alpha;
-          Gl.Mat4.ortho ~out:(camera.projectionMatrix) ~left:0.
-            ~right:(float_of_int width) ~bottom:(float_of_int height) ~top:0.
-            ~near:0. ~far:100.;
-          (let currFill = { r = 0; g = 0; b = 0 } in
-           let currBackground = { r = 0; g = 0; b = 0 } in
-           {
-             camera;
-             window;
-             gl;
-             vertexBuffer;
-             elementBuffer;
-             aVertexPosition;
-             aTextureCoord;
-             aVertexColor;
-             pMatrixUniform;
-             uSampler;
-             uTextureFlag;
-             texture;
-             currFill;
-             currBackground;
-             mouse = { pos = (0, 0); prevPos = (0, 0); pressed = false };
-             stroke = { color = { r = 0; g = 0; b = 0 }; weight = 10 };
-             frame = { count = 1; rate = 10 };
-             size = { height; width; resizeable = true }
-           })))))))) : glEnv)
-let addRectToGlobalBatch (x1,y1) (x2,y2) (x3,y3) (x4,y4) { r; g; b } =
-  let set = Gl.Bigarray.set in
-  let toColorFloat i = (float_of_int i) /. 255. in
-  let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
-  let i = !vertexArrayPtr in
-  let vertexArrayToMutate = !globalVertexArray in
-  set vertexArrayToMutate (i + 0) x1;
-  set vertexArrayToMutate (i + 1) y1;
-  set vertexArrayToMutate (i + 2) 0.0;
-  set vertexArrayToMutate (i + 3) r;
-  set vertexArrayToMutate (i + 4) g;
-  set vertexArrayToMutate (i + 5) b;
-  set vertexArrayToMutate (i + 6) 1.;
-  set vertexArrayToMutate (i + 7) 0.0;
-  set vertexArrayToMutate (i + 8) 0.0;
-  set vertexArrayToMutate (i + 9) x2;
-  set vertexArrayToMutate (i + 10) y2;
-  set vertexArrayToMutate (i + 11) 0.0;
-  set vertexArrayToMutate (i + 12) r;
-  set vertexArrayToMutate (i + 13) g;
-  set vertexArrayToMutate (i + 14) b;
-  set vertexArrayToMutate (i + 15) 1.;
-  set vertexArrayToMutate (i + 16) 0.0;
-  set vertexArrayToMutate (i + 17) 0.0;
-  set vertexArrayToMutate (i + 18) x3;
-  set vertexArrayToMutate (i + 19) y3;
-  set vertexArrayToMutate (i + 20) 0.0;
-  set vertexArrayToMutate (i + 21) r;
-  set vertexArrayToMutate (i + 22) g;
-  set vertexArrayToMutate (i + 23) b;
-  set vertexArrayToMutate (i + 24) 1.;
-  set vertexArrayToMutate (i + 25) 0.0;
-  set vertexArrayToMutate (i + 26) 0.0;
-  set vertexArrayToMutate (i + 27) x4;
-  set vertexArrayToMutate (i + 28) y4;
-  set vertexArrayToMutate (i + 29) 0.0;
-  set vertexArrayToMutate (i + 30) r;
-  set vertexArrayToMutate (i + 31) g;
-  set vertexArrayToMutate (i + 32) b;
-  set vertexArrayToMutate (i + 33) 1.;
-  set vertexArrayToMutate (i + 34) 0.0;
-  set vertexArrayToMutate (i + 35) 0.0;
-  vertexArrayPtr := (i + 36);
-  (let ii = i / 9 in
-   let j = !elementArrayPtr in
-   let elementArrayToMutate = !globalElementArray in
-   set elementArrayToMutate (j + 0) ii;
-   set elementArrayToMutate (j + 1) (ii + 1);
-   set elementArrayToMutate (j + 2) (ii + 2);
-   set elementArrayToMutate (j + 3) (ii + 1);
-   set elementArrayToMutate (j + 4) (ii + 2);
-   set elementArrayToMutate (j + 5) (ii + 3);
-   elementArrayPtr := (j + 6))
+          (let uSampler = Gl.getUniformLocation gl program "uSampler" in
+           Gl.texImage2D ~context:gl ~target:Constants.texture_2d ~level:0
+             ~internalFormat:Constants.rgba ~width:1 ~height:1
+             ~format:Constants.rgba ~type_:Constants.unsigned_byte
+             ~data:(Gl.toTextureData [|0;0;0;0|]);
+           Gl.texParameteri ~context:gl ~target:Constants.texture_2d
+             ~pname:Constants.texture_mag_filter ~param:Constants.linear;
+           Gl.texParameteri ~context:gl ~target:Constants.texture_2d
+             ~pname:Constants.texture_min_filter
+             ~param:Constants.linear_mipmap_nearest;
+           Gl.enable ~context:gl Constants.blend;
+           Gl.blendFunc ~context:gl Constants.src_alpha
+             Constants.one_minus_src_alpha;
+           Gl.Mat4.ortho ~out:(camera.projectionMatrix) ~left:0.
+             ~right:(float_of_int width) ~bottom:(float_of_int height)
+             ~top:0. ~near:0. ~far:1.;
+           (let currFill = Some { r = 0; g = 0; b = 0 } in
+            let currBackground = { r = 0; g = 0; b = 0 } in
+            {
+              camera;
+              window;
+              gl;
+              batch =
+                {
+                  vertexArray =
+                    (Gl.Bigarray.create Gl.Bigarray.Float32
+                       (circularBufferSize * vertexSize));
+                  elementArray =
+                    (Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize);
+                  vertexPtr = 0;
+                  elementPtr = 0;
+                  currTex = None;
+                  nullTex = texture
+                };
+              vertexBuffer;
+              elementBuffer;
+              aVertexPosition;
+              aTextureCoord;
+              aVertexColor;
+              pMatrixUniform;
+              uSampler;
+              currFill;
+              currBackground;
+              mouse = { pos = (0, 0); prevPos = (0, 0); pressed = false };
+              stroke = { color = { r = 0; g = 0; b = 0 }; weight = 10 };
+              frame = { count = 1; rate = 10 };
+              size = { height; width; resizeable = true }
+            }))))))))) : glEnv)
 let drawGeometry
-  ~vertexArray:(vertexArray : (float,Gl.Bigarray.float32_elt) Gl.Bigarray.t) 
+  ~vertexArray:(vertexArray : (float,Gl.Bigarray.float32_elt) Gl.Bigarray.t)
   ~elementArray:(elementArray :
                   (int,Gl.Bigarray.int16_unsigned_elt) Gl.Bigarray.t)
-   ~mode  ~count  ?(textureFlag= 0.)  ?textureBuffer  env =
-  let textureBuffer =
-    match textureBuffer with
-    | None  -> env.texture
-    | ((Some (textureBuffer))[@explicit_arity ]) -> textureBuffer in
+   ~mode  ~count  ~textureBuffer  env =
   Gl.bindBuffer ~context:(env.gl) ~target:Constants.array_buffer
     ~buffer:(env.vertexBuffer);
   Gl.bufferData ~context:(env.gl) ~target:Constants.array_buffer
     ~data:vertexArray ~usage:Constants.stream_draw;
   Gl.vertexAttribPointer ~context:(env.gl) ~attribute:(env.aVertexPosition)
-    ~size:3 ~type_:Constants.float_ ~normalize:false ~stride:(9 * 4)
+    ~size:2 ~type_:Constants.float_ ~normalize:false ~stride:(vertexSize * 4)
     ~offset:0;
   Gl.vertexAttribPointer ~context:(env.gl) ~attribute:(env.aVertexColor)
-    ~size:4 ~type_:Constants.float_ ~normalize:false ~stride:(9 * 4)
-    ~offset:(3 * 4);
+    ~size:4 ~type_:Constants.float_ ~normalize:false ~stride:(vertexSize * 4)
+    ~offset:(2 * 4);
   Gl.vertexAttribPointer ~context:(env.gl) ~attribute:(env.aTextureCoord)
-    ~size:2 ~type_:Constants.float_ ~normalize:false ~stride:(9 * 4)
-    ~offset:(7 * 4);
+    ~size:2 ~type_:Constants.float_ ~normalize:false ~stride:(vertexSize * 4)
+    ~offset:(6 * 4);
+  Gl.uniform1i ~context:(env.gl) ~location:(env.uSampler) 0;
   Gl.bindBuffer ~context:(env.gl) ~target:Constants.element_array_buffer
     ~buffer:(env.elementBuffer);
   Gl.bufferData ~context:(env.gl) ~target:Constants.element_array_buffer
     ~data:elementArray ~usage:Constants.stream_draw;
-  Gl.activeTexture ~context:(env.gl) ~target:Constants.texture0;
   Gl.bindTexture ~context:(env.gl) ~target:Constants.texture_2d
     ~texture:textureBuffer;
-  Gl.uniform1i ~context:(env.gl) ~location:(env.uSampler) 0;
-  Gl.uniformMatrix4fv ~context:(env.gl) ~location:(env.pMatrixUniform)
-    ~value:((env.camera).projectionMatrix);
-  Gl.uniform1f ~context:(env.gl) ~location:(env.uTextureFlag) textureFlag;
   Gl.drawElements ~context:(env.gl) ~mode ~count
     ~type_:Constants.unsigned_short ~offset:0
 let flushGlobalBatch env =
-  if (!elementArrayPtr) > 0
+  if ((!env).batch).elementPtr > 0
   then
+    let textureBuffer =
+      match ((!env).batch).currTex with
+      | None  -> ((!env).batch).nullTex
+      | ((Some (textureBuffer))[@explicit_arity ]) -> textureBuffer in
     (drawGeometry
-       ~vertexArray:(Gl.Bigarray.sub (!globalVertexArray) ~offset:0
-                       ~len:(!vertexArrayPtr))
-       ~elementArray:(Gl.Bigarray.sub (!globalElementArray) ~offset:0
-                        ~len:(!elementArrayPtr)) ~mode:Constants.triangles
-       ~count:(!elementArrayPtr) (!env);
-     vertexArrayPtr := 0;
-     elementArrayPtr := 0)
-let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady =
-  let noOfFans = (radx + rady) * 2 in
-  assert (((noOfFans - 2) * 3) < circularBufferSize);
+       ~vertexArray:(Gl.Bigarray.sub ((!env).batch).vertexArray ~offset:0
+                       ~len:(((!env).batch).vertexPtr))
+       ~elementArray:(Gl.Bigarray.sub ((!env).batch).elementArray ~offset:0
+                        ~len:(((!env).batch).elementPtr))
+       ~mode:Constants.triangles ~count:(((!env).batch).elementPtr)
+       ~textureBuffer (!env);
+     ((!env).batch).currTex <- None;
+     ((!env).batch).vertexPtr <- 0;
+     ((!env).batch).elementPtr <- 0)
+let maybeFlushBatch env texture adding =
+  if
+    ((((!env).batch).elementPtr + adding) >= circularBufferSize) ||
+      ((((!env).batch).elementPtr > 0) && (((!env).batch).currTex != texture))
+  then flushGlobalBatch env
+let addRectToGlobalBatch env (x1,y1) (x2,y2) (x3,y3) (x4,y4) { r; g; b } =
+  maybeFlushBatch env None 6;
+  (let set = Gl.Bigarray.set in
+   let toColorFloat i = (float_of_int i) /. 255. in
+   let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
+   let i = ((!env).batch).vertexPtr in
+   let vertexArrayToMutate = ((!env).batch).vertexArray in
+   set vertexArrayToMutate (i + 0) x1;
+   set vertexArrayToMutate (i + 1) y1;
+   set vertexArrayToMutate (i + 2) r;
+   set vertexArrayToMutate (i + 3) g;
+   set vertexArrayToMutate (i + 4) b;
+   set vertexArrayToMutate (i + 5) 1.;
+   set vertexArrayToMutate (i + 6) 0.0;
+   set vertexArrayToMutate (i + 7) 0.0;
+   set vertexArrayToMutate (i + 8) x2;
+   set vertexArrayToMutate (i + 9) y2;
+   set vertexArrayToMutate (i + 10) r;
+   set vertexArrayToMutate (i + 11) g;
+   set vertexArrayToMutate (i + 12) b;
+   set vertexArrayToMutate (i + 13) 1.;
+   set vertexArrayToMutate (i + 14) 0.0;
+   set vertexArrayToMutate (i + 15) 0.0;
+   set vertexArrayToMutate (i + 16) x3;
+   set vertexArrayToMutate (i + 17) y3;
+   set vertexArrayToMutate (i + 18) r;
+   set vertexArrayToMutate (i + 19) g;
+   set vertexArrayToMutate (i + 20) b;
+   set vertexArrayToMutate (i + 21) 1.;
+   set vertexArrayToMutate (i + 22) 0.0;
+   set vertexArrayToMutate (i + 23) 0.0;
+   set vertexArrayToMutate (i + 24) x4;
+   set vertexArrayToMutate (i + 25) y4;
+   set vertexArrayToMutate (i + 26) r;
+   set vertexArrayToMutate (i + 27) g;
+   set vertexArrayToMutate (i + 28) b;
+   set vertexArrayToMutate (i + 29) 1.;
+   set vertexArrayToMutate (i + 30) 0.0;
+   set vertexArrayToMutate (i + 31) 0.0;
+   (let ii = i / vertexSize in
+    let j = ((!env).batch).elementPtr in
+    let elementArrayToMutate = ((!env).batch).elementArray in
+    set elementArrayToMutate (j + 0) ii;
+    set elementArrayToMutate (j + 1) (ii + 1);
+    set elementArrayToMutate (j + 2) (ii + 2);
+    set elementArrayToMutate (j + 3) (ii + 1);
+    set elementArrayToMutate (j + 4) (ii + 2);
+    set elementArrayToMutate (j + 5) (ii + 3);
+    ((!env).batch).vertexPtr <- i + (4 * vertexSize);
+    ((!env).batch).elementPtr <- j + 6))
+let drawEllipseInternal env (xCenterOfCircle : float)
+  (yCenterOfCircle : float) (radx : float) (rady : float) { r; g; b } =
+  let noOfFans = ((int_of_float (radx +. rady)) * 2) + 10 in
+  maybeFlushBatch env None (((noOfFans - 3) * 3) + 3);
   (let pi = 4.0 *. (atan 1.0) in
    let anglePerFan = (2. *. pi) /. (float_of_int noOfFans) in
-   let radxf = float_of_int radx in
-   let radyf = float_of_int rady in
    let toColorFloat i = (float_of_int i) /. 255. in
-   let (r,g,b) =
-     ((toColorFloat ((!env).currFill).r), (toColorFloat ((!env).currFill).g),
-       (toColorFloat ((!env).currFill).b)) in
-   let xCenterOfCirclef = float_of_int xCenterOfCircle in
-   let yCenterOfCirclef = float_of_int yCenterOfCircle in
-   if (circularBufferSize - (!elementArrayPtr)) < ((noOfFans - 2) * 3)
-   then flushGlobalBatch env;
-   (let verticesData = !globalVertexArray in
-    let elementData = !globalElementArray in
-    let set = Gl.Bigarray.set in
-    let get = Gl.Bigarray.get in
-    let vertexArrayOffset = !vertexArrayPtr in
-    let elementArrayOffset = !elementArrayPtr in
-    for i = 0 to noOfFans - 1 do
-      (let angle = anglePerFan *. (float_of_int (i + 1)) in
-       let xCoordinate = xCenterOfCirclef +. ((cos angle) *. radxf) in
-       let yCoordinate = yCenterOfCirclef +. ((sin angle) *. radyf) in
-       let ii = (i * 9) + vertexArrayOffset in
-       set verticesData (ii + 0) xCoordinate;
-       set verticesData (ii + 1) yCoordinate;
-       set verticesData (ii + 2) 0.0;
-       set verticesData (ii + 3) r;
-       set verticesData (ii + 4) g;
-       set verticesData (ii + 5) b;
-       set verticesData (ii + 6) 1.0;
-       set verticesData (ii + 7) 0.0;
-       set verticesData (ii + 8) 0.0;
-       if i < 3
-       then set elementData (i + elementArrayOffset) (ii / 9)
-       else
-         (let jj = (((i - 3) * 3) + elementArrayOffset) + 3 in
-          set elementData jj (vertexArrayOffset / 9);
-          set elementData (jj + 1) (get elementData (jj - 1));
-          set elementData (jj + 2) (ii / 9)))
-    done;
-    vertexArrayPtr := ((!vertexArrayPtr) + (noOfFans * 9));
-    elementArrayPtr := (((!elementArrayPtr) + ((noOfFans - 3) * 3)) + 3)))
+   let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
+   let verticesData = ((!env).batch).vertexArray in
+   let elementData = ((!env).batch).elementArray in
+   let set = Gl.Bigarray.set in
+   let get = Gl.Bigarray.get in
+   let vertexArrayOffset = ((!env).batch).vertexPtr in
+   let elementArrayOffset = ((!env).batch).elementPtr in
+   for i = 0 to noOfFans - 1 do
+     (let angle = anglePerFan *. (float_of_int (i + 1)) in
+      let xCoordinate = xCenterOfCircle +. ((cos angle) *. radx) in
+      let yCoordinate = yCenterOfCircle +. ((sin angle) *. rady) in
+      let ii = (i * vertexSize) + vertexArrayOffset in
+      set verticesData (ii + 0) xCoordinate;
+      set verticesData (ii + 1) yCoordinate;
+      set verticesData (ii + 2) r;
+      set verticesData (ii + 3) g;
+      set verticesData (ii + 4) b;
+      set verticesData (ii + 5) 1.0;
+      set verticesData (ii + 6) 0.0;
+      set verticesData (ii + 7) 0.0;
+      if i < 3
+      then set elementData (i + elementArrayOffset) (ii / vertexSize)
+      else
+        (let jj = (((i - 3) * 3) + elementArrayOffset) + 3 in
+         set elementData jj (vertexArrayOffset / vertexSize);
+         set elementData (jj + 1) (get elementData (jj - 1));
+         set elementData (jj + 2) (ii / vertexSize)))
+   done;
+   ((!env).batch).vertexPtr <-
+     ((!env).batch).vertexPtr + (noOfFans * vertexSize);
+   ((!env).batch).elementPtr <-
+     (((!env).batch).elementPtr + ((noOfFans - 3) * 3)) + 3)
 let loadImage (env : glEnv ref) filename =
   (let imageRef = ref None in
    Gl.loadImage ~filename
@@ -1407,102 +1456,71 @@ let loadImage (env : glEnv ref) filename =
                          ~pname:Constants.texture_min_filter
                          ~param:Constants.linear)) ();
    imageRef : imageT)
-let addTextureToGlobalBatch { width; height } ~x  ~y  ~subx  ~suby  ~subw 
-  ~subh  =
-  let (fsubx,fsuby,fsubw,fsubh) =
-    (((float_of_int subx) /. (float_of_int width)),
-      ((float_of_int suby) /. (float_of_int height)),
-      ((float_of_int subw) /. (float_of_int width)),
-      ((float_of_int subh) /. (float_of_int height))) in
-  let (x1,y1) = ((float_of_int @@ (x + subw)), (float_of_int @@ (y + subh))) in
-  let (x2,y2) = ((float_of_int x), (float_of_int @@ (y + subh))) in
-  let (x3,y3) = ((float_of_int @@ (x + subw)), (float_of_int y)) in
-  let (x4,y4) = ((float_of_int x), (float_of_int y)) in
-  let set = Gl.Bigarray.set in
-  let ii = !vertexArrayPtr in
-  let vertexArray = !globalVertexArray in
-  set vertexArray (ii + 0) x1;
-  set vertexArray (ii + 1) y1;
-  set vertexArray (ii + 2) 0.0;
-  set vertexArray (ii + 3) 0.0;
-  set vertexArray (ii + 4) 0.0;
-  set vertexArray (ii + 5) 0.0;
-  set vertexArray (ii + 6) 1.;
-  set vertexArray (ii + 7) (fsubx +. fsubw);
-  set vertexArray (ii + 8) (fsuby +. fsubh);
-  set vertexArray (ii + 9) x2;
-  set vertexArray (ii + 10) y2;
-  set vertexArray (ii + 11) 0.0;
-  set vertexArray (ii + 12) 0.0;
-  set vertexArray (ii + 13) 0.0;
-  set vertexArray (ii + 14) 0.0;
-  set vertexArray (ii + 15) 1.;
-  set vertexArray (ii + 16) fsubx;
-  set vertexArray (ii + 17) (fsuby +. fsubh);
-  set vertexArray (ii + 18) x3;
-  set vertexArray (ii + 19) y3;
-  set vertexArray (ii + 20) 0.0;
-  set vertexArray (ii + 21) 0.0;
-  set vertexArray (ii + 22) 0.0;
-  set vertexArray (ii + 23) 0.0;
-  set vertexArray (ii + 24) 1.;
-  set vertexArray (ii + 25) (fsubx +. fsubw);
-  set vertexArray (ii + 26) fsuby;
-  set vertexArray (ii + 27) x4;
-  set vertexArray (ii + 28) y4;
-  set vertexArray (ii + 29) 0.0;
-  set vertexArray (ii + 30) 0.0;
-  set vertexArray (ii + 31) 0.0;
-  set vertexArray (ii + 32) 0.0;
-  set vertexArray (ii + 33) 1.;
-  set vertexArray (ii + 34) fsubx;
-  set vertexArray (ii + 35) fsuby;
-  vertexArrayPtr := (ii + 36);
-  (let jj = !elementArrayPtr in
-   let elementArray = !globalElementArray in
-   set elementArray jj (ii / 9);
-   set elementArray (jj + 1) ((ii / 9) + 1);
-   set elementArray (jj + 2) ((ii / 9) + 2);
-   set elementArray (jj + 3) ((ii / 9) + 1);
-   set elementArray (jj + 4) ((ii / 9) + 2);
-   set elementArray (jj + 5) ((ii / 9) + 3);
-   elementArrayPtr := (jj + 6))
-let flushGlobalBatchWithTexture (env : glEnv ref) { textureBuffer } =
-  drawGeometry
-    ~vertexArray:(Gl.Bigarray.sub (!globalVertexArray) ~offset:0
-                    ~len:(!vertexArrayPtr))
-    ~elementArray:(Gl.Bigarray.sub (!globalElementArray) ~offset:0
-                     ~len:(!elementArrayPtr)) ~mode:Constants.triangles
-    ~count:(!elementArrayPtr) ~textureFlag:1.0 ~textureBuffer (!env);
-  vertexArrayPtr := 0;
-  elementArrayPtr := 0
-let drawImageInternal (env : glEnv ref) { img; textureBuffer; width; height }
-  ~x  ~y  ~subx  ~suby  ~subw  ~subh  =
-  let env = !env in
-  let (fsubx,fsuby,fsubw,fsubh) =
-    (((float_of_int subx) /. (float_of_int width)),
-      ((float_of_int suby) /. (float_of_int height)),
-      ((float_of_int subw) /. (float_of_int width)),
-      ((float_of_int subh) /. (float_of_int height))) in
-  let (x1,y1) = ((float_of_int @@ (x + subw)), (float_of_int @@ (y + subh))) in
-  let (x2,y2) = ((float_of_int x), (float_of_int @@ (y + subh))) in
-  let (x3,y3) = ((float_of_int @@ (x + subw)), (float_of_int y)) in
-  let (x4,y4) = ((float_of_int x), (float_of_int y)) in
-  let verticesColorAndTexture =
-    [|x1;y1;0.0;0.0;0.0;0.0;1.;(fsubx +. fsubw);(fsuby +. fsubh);x2;y2;0.0;0.0;0.0;0.0;1.;fsubx;(
-      fsuby +. fsubh);x3;y3;0.0;0.0;0.0;0.0;1.;(fsubx +. fsubw);fsuby;x4;y4;0.0;0.0;0.0;0.0;1.;fsubx;fsuby|] in
-  drawGeometry
-    ~vertexArray:(Gl.Bigarray.of_array Gl.Bigarray.Float32
-                    verticesColorAndTexture)
-    ~elementArray:(Gl.Bigarray.of_array Gl.Bigarray.Uint16 [|0;1;2;1;2;3|])
-    ~mode:Constants.triangles ~count:6 ~textureFlag:1.0 ~textureBuffer env
+let drawImageInternal { width; height; textureBuffer } ~x  ~y  ~subx  ~suby
+  ~subw  ~subh  env =
+  maybeFlushBatch env (Some textureBuffer) 6;
+  (let (fsubx,fsuby,fsubw,fsubh) =
+     (((float_of_int subx) /. (float_of_int width)),
+       ((float_of_int suby) /. (float_of_int height)),
+       ((float_of_int subw) /. (float_of_int width)),
+       ((float_of_int subh) /. (float_of_int height))) in
+   let (x1,y1) = ((float_of_int @@ (x + subw)), (float_of_int @@ (y + subh))) in
+   let (x2,y2) = ((float_of_int x), (float_of_int @@ (y + subh))) in
+   let (x3,y3) = ((float_of_int @@ (x + subw)), (float_of_int y)) in
+   let (x4,y4) = ((float_of_int x), (float_of_int y)) in
+   let set = Gl.Bigarray.set in
+   let ii = ((!env).batch).vertexPtr in
+   let vertexArray = ((!env).batch).vertexArray in
+   set vertexArray (ii + 0) x1;
+   set vertexArray (ii + 1) y1;
+   set vertexArray (ii + 2) 0.0;
+   set vertexArray (ii + 3) 0.0;
+   set vertexArray (ii + 4) 0.0;
+   set vertexArray (ii + 5) 0.0;
+   set vertexArray (ii + 6) (fsubx +. fsubw);
+   set vertexArray (ii + 7) (fsuby +. fsubh);
+   set vertexArray (ii + 8) x2;
+   set vertexArray (ii + 9) y2;
+   set vertexArray (ii + 10) 0.0;
+   set vertexArray (ii + 11) 0.0;
+   set vertexArray (ii + 12) 0.0;
+   set vertexArray (ii + 13) 0.0;
+   set vertexArray (ii + 14) fsubx;
+   set vertexArray (ii + 15) (fsuby +. fsubh);
+   set vertexArray (ii + 16) x3;
+   set vertexArray (ii + 17) y3;
+   set vertexArray (ii + 18) 0.0;
+   set vertexArray (ii + 19) 0.0;
+   set vertexArray (ii + 20) 0.0;
+   set vertexArray (ii + 21) 0.0;
+   set vertexArray (ii + 22) (fsubx +. fsubw);
+   set vertexArray (ii + 23) fsuby;
+   set vertexArray (ii + 24) x4;
+   set vertexArray (ii + 25) y4;
+   set vertexArray (ii + 26) 0.0;
+   set vertexArray (ii + 27) 0.0;
+   set vertexArray (ii + 28) 0.0;
+   set vertexArray (ii + 29) 0.0;
+   set vertexArray (ii + 30) fsubx;
+   set vertexArray (ii + 31) fsuby;
+   (let jj = ((!env).batch).elementPtr in
+    let elementArray = ((!env).batch).elementArray in
+    set elementArray jj (ii / vertexSize);
+    set elementArray (jj + 1) ((ii / vertexSize) + 1);
+    set elementArray (jj + 2) ((ii / vertexSize) + 2);
+    set elementArray (jj + 3) ((ii / vertexSize) + 1);
+    set elementArray (jj + 4) ((ii / vertexSize) + 2);
+    set elementArray (jj + 5) ((ii / vertexSize) + 3);
+    ((!env).batch).vertexPtr <- ii + (4 * vertexSize);
+    ((!env).batch).elementPtr <- jj + 6;
+    ((!env).batch).currTex <- Some textureBuffer))
 let resetSize env width height =
   env := { (!env) with size = { ((!env).size) with width; height } };
   Gl.viewport ~context:((!env).gl) ~x:0 ~y:0 ~width ~height;
   Gl.clearColor ~context:((!env).gl) ~r:0. ~g:0. ~b:0. ~a:1.;
   Gl.Mat4.ortho ~out:(((!env).camera).projectionMatrix) ~left:0.
     ~right:(float_of_int width) ~bottom:(float_of_int height) ~top:0.
-    ~near:0. ~far:100.;
+    ~near:0. ~far:1.;
   Gl.uniformMatrix4fv ~context:((!env).gl) ~location:((!env).pMatrixUniform)
     ~value:(((!env).camera).projectionMatrix)
 end
@@ -1533,10 +1551,12 @@ module Font =
       xoffset: int;
       yoffset: int;
       xadvance: int;}
-    type t = {
+    type internalType =
+      {
       chars: charT IntMap.t;
       kerning: int IntPairMap.t;
       image: imageT;}
+    type t = internalType option ref
     let rec parse_num (stream : Stream.t) acc =
       (match Stream.peekch stream with
        | ((Some (('-' as c)))[@explicit_arity ])|((Some
@@ -1544,7 +1564,7 @@ module Font =
            parse_num (Stream.popch stream) (append_char acc c)
        | _ ->
            (try (stream, (int_of_string acc))
-            with | _ -> failwith ("Could not parse number [" ^ (acc ^ "]."))) : 
+            with | _ -> failwith ("Could not parse number [" ^ (acc ^ "]."))) :
       (Stream.t* int))
     let parse_num stream = parse_num stream ""
     let rec parse_string (stream : Stream.t) (acc : string) =
@@ -1603,27 +1623,33 @@ module Font =
       let newRevLst = match revLst with | hd::tl -> filename :: tl | [] -> [] in
       let newLst = List.rev newRevLst in String.concat "/" newLst
     let parseFontFormat env path =
-      let stream = (read path) |> Stream.create in
-      let stream = (stream |> pop_line) |> pop_line in
-      let stream = Stream.switch stream "page id=0 file=\\"" in
-      let (stream,filename) = parse_string stream in
-      let stream = pop_line stream in
-      let stream = Stream.switch stream "chars count=" in
-      let (stream,num_chars) = parse_num stream in
-      let stream = pop_line stream in
-      let (stream,char_map) = parse_char_fmt stream num_chars IntMap.empty in
-      let stream = Stream.switch stream "kernings count=" in
-      let (stream,num_kerns) = parse_num stream in
-      let stream = pop_line stream in
-      let (_,kern_map) = parse_kern_fmt stream num_kerns IntPairMap.empty in
-      let img_filename = replaceFilename path filename in
-      print_endline path;
-      print_endline img_filename;
-      {
-        chars = char_map;
-        kerning = kern_map;
-        image = (loadImage env img_filename)
-      }
+      let ret = ref None in
+      Gl.File.readFile path
+        (fun str  ->
+           let stream = Stream.create (str ^ "\\n") in
+           let stream = (stream |> pop_line) |> pop_line in
+           let stream = Stream.switch stream "page id=0 file=\\"" in
+           let (stream,filename) = parse_string stream in
+           let stream = pop_line stream in
+           let stream = Stream.switch stream "chars count=" in
+           let (stream,num_chars) = parse_num stream in
+           let stream = pop_line stream in
+           let (stream,char_map) =
+             parse_char_fmt stream num_chars IntMap.empty in
+           let stream = Stream.switch stream "kernings count=" in
+           let (stream,num_kerns) = parse_num stream in
+           let stream = pop_line stream in
+           let (_,kern_map) =
+             parse_kern_fmt stream num_kerns IntPairMap.empty in
+           let img_filename = replaceFilename path filename in
+           ret :=
+             (Some
+                {
+                  chars = char_map;
+                  kerning = kern_map;
+                  image = (loadImage env img_filename)
+                }));
+      ret
     let getChar fnt ch =
       let code = Char.code ch in
       try IntMap.find code fnt.chars
@@ -1632,7 +1658,8 @@ module Font =
           failwith
             ("Could not find character " ^
                ((string_of_int code) ^ " in font."))
-    let drawChar env fnt image (ch : char) (last : char option) x y =
+    let drawChar (env : glEnv ref) fnt image (ch : char) (last : char option)
+      x y =
       let c = getChar fnt ch in
       let kernAmount =
         match last with
@@ -1643,24 +1670,35 @@ module Font =
         | None  -> 0 in
       match image with
       | ((Some (img))[@explicit_arity ]) ->
-          (addTextureToGlobalBatch img ~x:((x + c.xoffset) + kernAmount)
+          (drawImageInternal img ~x:((x + c.xoffset) + kernAmount)
              ~y:(y + c.yoffset) ~subx:(c.x) ~suby:(c.y) ~subw:(c.width)
-             ~subh:(c.height);
+             ~subh:(c.height) env;
            c.xadvance + kernAmount)
       | None  -> c.xadvance + kernAmount
-    let drawString env fnt (str : string) x y =
-      match !(fnt.image) with
-      | ((Some (img))[@explicit_arity ]) ->
-          let offset = ref x in
-          let lastChar = ref None in
-          (flushGlobalBatch env;
-           String.iter
-             (fun c  ->
-                let advance =
-                  drawChar env fnt (Some img) c (!lastChar) (!offset) y in
-                offset := ((!offset) + advance); lastChar := (Some c)) str;
-           flushGlobalBatchWithTexture env img)
-      | None  -> print_endline "loading font."
+    let drawString (env : glEnv ref) fnt (str : string) x y =
+      match !fnt with
+      | None  -> ()
+      | ((Some (fnt))[@explicit_arity ]) ->
+          (match !(fnt.image) with
+           | ((Some (img))[@explicit_arity ]) ->
+               let offset = ref x in
+               let lastChar = ref None in
+               String.iter
+                 (fun c  ->
+                    let advance =
+                      drawChar env fnt (Some img) c (!lastChar) (!offset) y in
+                    offset := ((!offset) + advance); lastChar := (Some c))
+                 str
+           | None  -> print_endline "loading font.")
+    let calcStringWidth env fnt (str : string) =
+      let offset = ref 0 in
+      let lastChar = ref None in
+      String.iter
+        (fun c  ->
+           offset :=
+             ((!offset) + (drawChar env fnt None c (!lastChar) (!offset) 0));
+           lastChar := (Some c)) str;
+      !offset
   end
 end
 module Drawfunctions
@@ -1678,39 +1716,22 @@ module P =
     let mouse env = ((!env).mouse).pos
     let pmouse env = ((!env).mouse).prevPos
     let mousePressed env = ((!env).mouse).pressed
-    let background (env : glEnv ref) (c : colorT) =
-      env := { (!env) with currBackground = c }
     let fill (env : glEnv ref) (c : colorT) =
-      env := { (!env) with currFill = c }
+      env := { (!env) with currFill = (Some c) }
+    let noFill (env : glEnv ref) = env := { (!env) with currFill = None }
     let frameRate (env : glEnv ref) = ((!env).frame).rate
     let frameCount (env : glEnv ref) = ((!env).frame).count
     let size (env : glEnv ref) width height =
       Gl.Window.setWindowSize ~window:((!env).window) ~width ~height;
       resetSize env width height
-    let rect (env : glEnv ref) x y width height =
-      if (!elementArrayPtr) == circularBufferSize then flushGlobalBatch env;
-      addRectToGlobalBatch
-        ((float_of_int @@ (x + width)), (float_of_int @@ (y + height)))
-        ((float_of_int x), (float_of_int @@ (y + height)))
-        ((float_of_int @@ (x + width)), (float_of_int y))
-        ((float_of_int x), (float_of_int y)) (!env).currFill
     let resizeable (env : glEnv ref) resizeable =
       env := { (!env) with size = { ((!env).size) with resizeable } }
-    let rectf (env : glEnv ref) x y width height =
-      if (!elementArrayPtr) == circularBufferSize then flushGlobalBatch env;
-      addRectToGlobalBatch ((x +. width), (y +. height)) (x, (y +. height))
-        ((x +. width), y) (x, y) (!env).currFill
     let loadImage = loadImage
     let image (env : glEnv ref) img x y =
       match !img with
       | None  -> print_endline "image not ready yet, just doing nothing :D"
-      | ((Some ({ img; textureBuffer; width; height }))[@explicit_arity ]) ->
-          drawImageInternal env { img; textureBuffer; width; height } x y 0 0
-            width height
-    let background env color =
-      let w = width env in
-      let h = height env in
-      let oldEnv = !env in fill env color; rect env 0 0 w h; env := oldEnv
+      | ((Some (({ width; height } as i)))[@explicit_arity ]) ->
+          drawImageInternal i x y 0 0 width height env
     let clear env =
       Gl.clear (!env).gl
         (Constants.color_buffer_bit lor Constants.depth_buffer_bit)
@@ -1718,27 +1739,63 @@ module P =
       env := { (!env) with stroke = { ((!env).stroke) with color } }
     let strokeWeight env weight =
       env := { (!env) with stroke = { ((!env).stroke) with weight } }
-    let line env (xx1,yy1) (xx2,yy2) =
-      let dx = xx2 - xx1 in
-      let dy = yy2 - yy1 in
-      let mag = PUtils.dist (xx1, yy1) (xx2, yy2) in
+    let linef env ((xx1 : float),(yy1 : float)) ((xx2 : float),(yy2 : float))
+      =
+      let dx = xx2 -. xx1 in
+      let dy = yy2 -. yy1 in
+      let mag = PUtils.distf (xx1, yy1) (xx2, yy2) in
       let radius = (float_of_int ((!env).stroke).weight) /. 2. in
-      let xthing = PUtils.round (((float_of_int dy) /. mag) *. radius) in
-      let ything = PUtils.round (((-. (float_of_int dx)) /. mag) *. radius) in
-      let x1 = (float_of_int xx1) +. xthing in
-      let y1 = (float_of_int yy1) +. ything in
-      let x2 = (float_of_int xx2) +. xthing in
-      let y2 = (float_of_int yy2) +. ything in
-      let x3 = (float_of_int xx2) -. xthing in
-      let y3 = (float_of_int yy2) -. ything in
-      let x4 = (float_of_int xx1) -. xthing in
-      let y4 = (float_of_int yy1) -. ything in
-      addRectToGlobalBatch (x1, y1) (x2, y2) (x3, y3) (x4, y4)
-        (!env).currFill;
-      if (!elementArrayPtr) == circularBufferSize then flushGlobalBatch env
-    let ellipse env a b c d = drawEllipseInternal env a b c d
+      let xthing = (dy /. mag) *. radius in
+      let ything = ((-. dx) /. mag) *. radius in
+      let x1 = xx2 +. xthing in
+      let y1 = yy2 +. ything in
+      let x2 = xx1 +. xthing in
+      let y2 = yy1 +. ything in
+      let x3 = xx2 -. xthing in
+      let y3 = yy2 -. ything in
+      let x4 = xx1 -. xthing in
+      let y4 = yy1 -. ything in
+      addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4)
+        ((!env).stroke).color
+    let line env (x1,y1) (x2,y2) =
+      linef env ((float_of_int x1), (float_of_int y1))
+        ((float_of_int x2), (float_of_int y2))
+    let ellipsef env (a : float) (b : float) (c : float) (d : float) =
+      match (!env).currFill with
+      | ((Some (fill))[@explicit_arity ]) ->
+          drawEllipseInternal env a b c d fill
+      | None  -> ()
+    let ellipse env a b c d =
+      ellipsef env (float_of_int a) (float_of_int b) (float_of_int c)
+        (float_of_int d)
+    let rectf (env : glEnv ref) x y width height =
+      (match (!env).currFill with
+       | ((Some (fill))[@explicit_arity ]) ->
+           addRectToGlobalBatch env ((x +. width), (y +. height))
+             (x, (y +. height)) ((x +. width), y) (x, y) fill
+       | None  -> ());
+      linef env ((x +. width), y) (x, y);
+      linef env ((x +. width), y) ((x +. width), (y +. height));
+      linef env ((x +. width), (y +. height)) (x, (y +. width));
+      linef env (x, (y +. height)) (x, y);
+      (let r = (float_of_int ((!env).stroke).weight) /. 2. in
+       let c = ((!env).stroke).color in ())
+    let rect (env : glEnv ref) x y width height =
+      rectf env (float_of_int x) (float_of_int y) (float_of_int width)
+        (float_of_int height)
+    let pixel env x y color =
+      addRectToGlobalBatch env
+        ((float_of_int @@ (x + ((!env).stroke).weight)),
+          (float_of_int @@ (y + ((!env).stroke).weight)))
+        ((float_of_int x), (float_of_int @@ (y + ((!env).stroke).weight)))
+        ((float_of_int @@ (x + ((!env).stroke).weight)), (float_of_int y))
+        ((float_of_int x), (float_of_int y)) color
     let loadFont env filename = Font.parseFontFormat env filename
     let text env fnt str x y = Font.drawString env fnt str x y
+    let background env color =
+      let w = float_of_int (width env) in
+      let h = float_of_int (height env) in
+      addRectToGlobalBatch env (w, h) (0., h) (w, 0.) (0., 0.) color
   end
 end
 module Reprocessing
@@ -1760,17 +1817,16 @@ let afterDraw f (env : glEnv ref) =
       mouse = { ((!env).mouse) with prevPos = (((!env).mouse).pos) };
       frame = { count = (((!env).frame).count + 1); rate }
     };
-  flushGlobalBatch env
+  if ((!env).batch).elementPtr > 0 then flushGlobalBatch env
 
 external removeFromDOM : 'a -> unit = "remove" [@@bs.send]
 external setID : 'a -> string -> unit = "id" [@@bs.set]
 external appendChild : 'a -> 'b -> unit = "appendChild" [@@bs.send]
 
-let canvas = (Gl.Window.initWithCanvasID "main-canvas");
 module ReProcessor : ReProcessorT =
   struct
     type t = glEnv ref
-    let run ~setup  ?draw  ?mouseMove  ?mouseDragged  ?mouseDown  ?mouseUp 
+    let run ~setup  ?draw  ?mouseMove  ?mouseDragged  ?mouseDown  ?mouseUp
       () =
       Random.self_init ();
       PUtils.noiseSeed (Random.int ((PUtils.pow 2 30) - 1));
@@ -1782,7 +1838,7 @@ module ReProcessor : ReProcessorT =
       (
         let env = ref (createCanvas canvas 200 200) in
         let userState = ref (setup env) in
-        let reDrawPreviousBufferOnSecondFrame =
+       let reDrawPreviousBufferOnSecondFrame =
          let width = Gl.Window.getWidth (!env).window in
          let height = Gl.Window.getHeight (!env).window in
          let data =
@@ -1816,7 +1872,7 @@ module ReProcessor : ReProcessorT =
                               verticesColorAndTexture)
               ~elementArray:(Gl.Bigarray.of_array Gl.Bigarray.Uint16
                                [|0;1;2;1;2;3|]) ~mode:Constants.triangles
-              ~count:6 ~textureFlag:1.0 ~textureBuffer (!env)) in
+              ~count:6 ~textureBuffer (!env)) in
        Gl.render ~window:((!env).window)
          ~displayFunc:(fun f  ->
                          if ((!env).frame).count == 2
@@ -1887,13 +1943,13 @@ module ReProcessor : ReProcessorT =
                             let width = Gl.Window.getWidth (!env).window in
                             resetSize env width height
                           else P.size env (P.width env) (P.height env)) ())
-  end 
+  end
 end
 
 `;
 
 // var myWorker = new Worker("worker.js");
-// 
+//
 // myWorker.onmessage = function(e) {
 //   let rsp = JSON.parse(e.data);
 //   console.log(rsp);
@@ -1901,7 +1957,7 @@ end
 //      evalCode(rsp.js_code);
 //   }
 // };
-// 
+//
 // function runCompiler() {
 //   myWorker.postMessage(predefinedStuff + document.refmt(myCode1Mirror.getValue()).c);
 // }
