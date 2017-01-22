@@ -94,11 +94,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 
   /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
   Gl.bindTexture context::gl target::Constants.texture_2d ::texture;
-
-  /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
-      texture0 represent.  uSampler is set once here and never changed.  **/
   let uSampler = Gl.getUniformLocation gl program "uSampler";
-  Gl.uniform1i context::gl location::uSampler 0;
 
   /** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
   Gl.texImage2D
@@ -213,6 +209,10 @@ let drawGeometry
     normalize::false
     stride::(vertexSize * 4)
     offset::(6 * 4);
+
+  /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
+      texture0 represent.  **/
+  Gl.uniform1i context::env.gl location::env.uSampler 0;
 
   /** Bind `elementBuffer`, a pointer to GPU memory to `element_array_buffer`. That "register" is used for
       the data representing the indices of the vertex. **/
