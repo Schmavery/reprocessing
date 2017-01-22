@@ -1,10 +1,188 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>ReGl Example Project</title>
-  </head>
-  <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.3.2/gl-matrix-min.js"></script>
-    <script src="_build/web/src/app.js"></script>
-  </body>
-</html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/codemirror.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/codemirror.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/mode/mllike/mllike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="theme.css">
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+   crossorigin="anonymous"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.3.2/gl-matrix-min.js"></script>
+   <title>OCaml to Javascript transpiler playground</title>
+</head>
+
+<body style="background-color: #272822; font-family: 'Open Sans', sans-serif;">
+
+<nav class="navbar navbar-inverse navbar-static-top" style="margin-bottom: 0px">
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse navbar-header"> <!-- Hides brand on small width -->
+      <div class="navbar-brand" style="color: white"><a href="https://github.com/bloomberg/bucklescript" target="_blank">BuckleScript on GitHub</a></div>
+    </div>
+
+    <div>
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" id = "examplesLabel" class="dropdown-toggle" data-toggle="dropdown">Default_Example<span class="caret"></span></a>
+          <ul id="examplesDropdown" class="dropdown-menu">
+          </ul>
+        </li>
+        <li><button class="btn navbar-btn navbar-button" data-loading-text="Getting link..."type="button" id="share">Share</button></li>
+        <li><button class="btn navbar-btn navbar-button" onclick="onEditChanges()">Compile</button></li>
+      </ul>
+
+      <div class="checkbox navbar-btn navbar-right">
+        <label class="navbar-link repl-toolbar" >
+          <input type="checkbox" id="option-non-export" checked>
+          Remove unused code
+        </label>
+        <label class="navbar-link repl-toolbar">
+          <input type="checkbox" id="option-eval" checked>
+          Eval
+        </label>
+      </div>
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<div id="shareModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Share</h4>
+        <h4 class="modal-title" onclick="onEditChanges()">Compile</h4>
+      </div>
+      <div class="modal-body">
+        <div class = "row">
+          <div class = "col-sm-10" id="shareModalBody">
+          </div>
+          <div class="col-sm-2">
+           <button class="btn" id="copyButton" data-clipboard-target="#shareModalBody">
+            <span class="glyphicon glyphicon-copy"  id="copyGlyph" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div style="height: 10000px">
+
+  <div class="tab-full">
+    <div class="tab" style="width: 50%">
+    <h3>OCaml</h2>
+    </div>
+    <div class="tab" style="width: 25%">
+      <h3>JavaScript</h2>
+    </div>
+  </div>
+
+    <div class = "right-border" style="width: 50%;float:left">
+        <textarea id="ocamlcode#1">
+open Reprocessing;
+
+open P;
+
+open PUtils;
+
+open PConstants;
+
+type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: Common.colorT};
+
+let make w => {
+  let z = random 0 20;
+  {
+    x: random 0 w,
+    y: random (-500) (-50),
+    z,
+    len: remap z 0 20 10 20,
+    yspeed: remap z 0 20 5 15,
+    color: lerpColor white (color 138 43 226) (randomf 0.3 1.)
+  }
+};
+
+type state = {lst: list dropT, fnt: Font.Font.t};
+
+let rec init n f acc =>
+  switch n {
+  | 0 => List.rev acc
+  | n => init (n - 1) f [f n, ...acc]
+  };
+
+let init n f => init n f [];
+
+let setup env => {
+  size env 640 360;
+  fill env (color 255 0 0);
+  let lst = init 500 (fun v => make (width env));
+  lst
+};
+
+let draw lst env => {
+  background env (color 230 230 250);
+  fill env (color 255 0 0);
+  let lst =
+    List.map
+      (
+        fun drop =>
+          switch (drop.y + drop.yspeed) {
+          | y when y > height env => make (width env)
+          | y => {...drop, y}
+          }
+      )
+      lst;
+  List.iter
+    (
+      fun drop => {
+        fill env drop.color;
+        ellipse env drop.x drop.y (remap drop.z 0 20 1 3) drop.yspeed
+      }
+    )
+    lst;
+  lst
+};
+
+ReProcessor.run ::setup ::draw ()
+        </textarea>
+    </div>
+    <div style="width: 50%; float:right">
+        <textarea id="error" style="background-color: #e0e0e0">
+
+        </textarea>
+    </div>
+    <div style="width: 50%; float:right">
+        <textarea id="output" style="background-color: #e0e0e0">
+
+        </textarea>
+    </div>
+
+    <div style="width: 50%;float:right" id="canvas-wrapper">
+       <canvas id="main-canvas" /> 
+        <textarea id="jscode#1" style="background-color: #008803">
+</textarea>
+    </div>
+</div>
+<!--<p> can you  see me</p>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
+<script src="./docs-assets/refmt.js" ></script>
+<script src="./docs-assets/edit.js" ></script>
+
+<script src="./docs-assets/exports.js">    </script>
+<script src="./docs-assets/pre_load.js"></script>
+<!-- <script src="./require.js"></script> -->
+<script src="./docs-assets/init.js"></script>
+</body>
