@@ -135,7 +135,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     top::0.
     near::0.
     far::1.;
-  let currFill = {r: 0, g: 0, b: 0};
+  let currFill = Some {r: 0, g: 0, b: 0};
   let currBackground = {r: 0, g: 0, b: 0};
   {
     camera,
@@ -343,21 +343,19 @@ let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
   (!env).batch.elementPtr = j + 6
 };
 
-let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
-  let noOfFans = (radx + rady) * 2;
+let drawEllipseInternal
+    env
+    (xCenterOfCircle: float)
+    (yCenterOfCircle: float)
+    (radx: float)
+    (rady: float)
+    {r, g, b} => {
+  let noOfFans = int_of_float (radx +. rady) * 2 + 10;
   maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
-  let radxf = float_of_int radx;
-  let radyf = float_of_int rady;
   let toColorFloat i => float_of_int i /. 255.;
-  let (r, g, b) = (
-    toColorFloat (!env).currFill.r,
-    toColorFloat (!env).currFill.g,
-    toColorFloat (!env).currFill.b
-  );
-  let xCenterOfCirclef = float_of_int xCenterOfCircle;
-  let yCenterOfCirclef = float_of_int yCenterOfCircle;
+  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let verticesData = (!env).batch.vertexArray;
   let elementData = (!env).batch.elementArray;
   let set = Gl.Bigarray.set;
@@ -366,8 +364,8 @@ let drawEllipseInternal env xCenterOfCircle yCenterOfCircle radx rady => {
   let elementArrayOffset = (!env).batch.elementPtr;
   for i in 0 to (noOfFans - 1) {
     let angle = anglePerFan *. float_of_int (i + 1);
-    let xCoordinate = xCenterOfCirclef +. cos angle *. radxf;
-    let yCoordinate = yCenterOfCirclef +. sin angle *. radyf;
+    let xCoordinate = xCenterOfCircle +. cos angle *. radx;
+    let yCoordinate = yCenterOfCircle +. sin angle *. rady;
     let ii = i * vertexSize + vertexArrayOffset;
     set verticesData (ii + 0) xCoordinate;
     set verticesData (ii + 1) yCoordinate;

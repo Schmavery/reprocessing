@@ -1,74 +1,39 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Reprocessing;
 
 open P;
 
 open PUtils;
 
-open PConstants;
+type state = {squarePos: (int, int)};
 
-/* https://www.youtube.com/watch?v=KkyIDI6rQJI
-   Purple rain processing demo */
-type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: Common.colorT};
+let squareWidth = 300;
 
-let make w => {
-  let z = random 0 20;
-  {
-    x: random 0 w,
-    y: random (-500) (-50),
-    z,
-    len: remap z 0 20 10 20,
-    yspeed: remap z 0 20 5 15,
-    color: lerpColor white (color 138 43 226) (randomf 0.3 1.)
-  }
-};
-
-type state = {lst: list dropT, fnt: Font.Font.t};
-
-let rec init n f acc =>
-  switch n {
-  | 0 => List.rev acc
-  | n => init (n - 1) f [f n, ...acc]
-  };
-
-let init n f => init n f [];
+let squareHeight = 300;
 
 let setup env => {
-  size env 640 360;
+  size env 600 600;
   fill env (color 255 0 0);
-  let lst = init 500 (fun v => make (width env));
-  /* let fnt = loadFont env "assets/font/font.fnt"; */
-  lst
+  strokeWeight env 10;
+  stroke env (color 0 0 0);
+  {squarePos: (0, 0)}
 };
 
-let draw lst env => {
-  background env (color 230 230 250);
-  fill env (color 255 0 0);
-  /* ellipse env 200 200 20 30; */
-  /* text env fnt "Hello world!!" 20 20; */
-  let lst =
-    List.map
-      (
-        fun drop =>
-          switch (drop.y + drop.yspeed) {
-          | y when y > height env => make (width env)
-          | y => {...drop, y}
-          }
-      )
-      lst;
-  List.iter
-    (
-      fun drop => {
-        fill env drop.color;
-        ellipse env drop.x drop.y (remap drop.z 0 20 1 3) drop.yspeed
-      }
-    )
-    lst;
-  /* text env fnt "Hello222 world!!" 20 200; */
-  lst
+let draw state env => {
+  background env (color 150 255 255);
+  linef env (10., 10.) (50., 50.);
+  let (sx, sy) = state.squarePos;
+  let (px, py) = pmouse env;
+  let (x, y) as squarePos =
+    if (mousePressed env && px > sx && px < sx + squareHeight && py > sy && py < sy + squareWidth) {
+      let (mx, my) = mouse env;
+      let dx = mx - px;
+      let dy = my - py;
+      (sx + dx, sy + dy)
+    } else {
+      state.squarePos
+    };
+  rect env x y squareWidth squareHeight;
+  {...state, squarePos}
 };
 
 ReProcessor.run ::setup ::draw ();

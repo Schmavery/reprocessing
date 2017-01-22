@@ -49,7 +49,7 @@ type glEnv = {
   pMatrixUniform: Gl.uniformT,
   uSampler: Gl.uniformT,
   batch: batchT,
-  currFill: colorT,
+  currFill: option colorT,
   currBackground: colorT,
   mouse: mouseT,
   stroke: strokeT,

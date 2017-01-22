@@ -63,11 +63,13 @@ module PUtils = {
   };
   let lerpf start stop amt => remapf amt 0. 1. start stop;
   let lerp start stop amt => int_of_float (lerpf (float_of_int start) (float_of_int stop) amt);
-  let dist (x1, y1) (x2, y2) => {
-    let dx = float_of_int (x2 - x1);
-    let dy = float_of_int (y2 - y1);
+  let distf (x1: float, y1: float) (x2: float, y2: float) => {
+    let dx = x2 -. x1;
+    let dy = y2 -. y1;
     sqrt (dx *. dx +. dy *. dy)
   };
+  let dist (x1, y1) (x2, y2) =>
+    distf (float_of_int x1, float_of_int y1) (float_of_int x2, float_of_int y2);
   let mag vec => dist (0, 0) vec;
   let lerpColor low high amt => {
     r: lerp low.r high.r amt,
