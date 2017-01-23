@@ -13,6 +13,9 @@ done
 echo "module Constants = Constants\n" > reglinterface.ml
 echo "module Gl = Gl\n" >> reglinterface.ml
 
-./node_modules/bs-platform/bin/bspack.exe -I src -I . -bs-main Reprocessing -o reprocessing.ml
+sed -i -e 's/Gl.Window.init/ClientWrapper.init/g' src/reprocessing.ml
+rm src/reprocessing.ml\-e
 
-sed -i -e 's/\\/\\\\/g' reprocessing.ml
+./node_modules/bs-platform/bin/bspack.exe -I src -I . -bs-main Reprocessing -o mainBundle.ml
+
+sed -i -e '1s/^/'"$clientWrapper"'/' mainBundle.ml
