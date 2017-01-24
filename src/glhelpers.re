@@ -269,6 +269,8 @@ let maybeFlushBatch env texture adding =>
     flushGlobalBatch env
   };
 
+let toColorFloat i => float_of_int i /. 255.;
+
 /*
  * This array packs all of the values that the shaders need: vertices, colors and texture coordinates.
  * We put them all in one as an optimization, so there are less back and forths between us and the GPU.
@@ -301,7 +303,6 @@ let addRectToGlobalBatch
     color::{r, g, b} => {
   maybeFlushBatch env None 6;
   let set = Gl.Bigarray.set;
-  let toColorFloat i => float_of_int i /. 255.;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let i = (!env).batch.vertexPtr;
   let vertexArrayToMutate = (!env).batch.vertexArray;
@@ -350,10 +351,49 @@ let addRectToGlobalBatch
   (!env).batch.elementPtr = j + 6
 };
 
+let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
+  maybeFlushBatch env None 3;
+  let set = Gl.Bigarray.set;
+  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
+  let i = (!env).batch.vertexPtr;
+  let vertexArrayToMutate = (!env).batch.vertexArray;
+  set vertexArrayToMutate (i + 0) x1;
+  set vertexArrayToMutate (i + 1) y1;
+  set vertexArrayToMutate (i + 2) r;
+  set vertexArrayToMutate (i + 3) g;
+  set vertexArrayToMutate (i + 4) b;
+  set vertexArrayToMutate (i + 5) 1.;
+  set vertexArrayToMutate (i + 6) 0.0;
+  set vertexArrayToMutate (i + 7) 0.0;
+  set vertexArrayToMutate (i + 8) x2;
+  set vertexArrayToMutate (i + 9) y2;
+  set vertexArrayToMutate (i + 10) r;
+  set vertexArrayToMutate (i + 11) g;
+  set vertexArrayToMutate (i + 12) b;
+  set vertexArrayToMutate (i + 13) 1.;
+  set vertexArrayToMutate (i + 14) 0.0;
+  set vertexArrayToMutate (i + 15) 0.0;
+  set vertexArrayToMutate (i + 16) x3;
+  set vertexArrayToMutate (i + 17) y3;
+  set vertexArrayToMutate (i + 18) r;
+  set vertexArrayToMutate (i + 19) g;
+  set vertexArrayToMutate (i + 20) b;
+  set vertexArrayToMutate (i + 21) 1.;
+  set vertexArrayToMutate (i + 22) 0.0;
+  set vertexArrayToMutate (i + 23) 0.0;
+  let ii = i / vertexSize;
+  let j = (!env).batch.elementPtr;
+  let elementArrayToMutate = (!env).batch.elementArray;
+  set elementArrayToMutate (j + 0) ii;
+  set elementArrayToMutate (j + 1) (ii + 1);
+  set elementArrayToMutate (j + 2) (ii + 2);
+  (!env).batch.vertexPtr = i + 3 * vertexSize;
+  (!env).batch.elementPtr = j + 3
+};
+
 let drawEllipseInternal
     env
-    (xCenterOfCircle: float)
-    (yCenterOfCircle: float)
+    (xCenterOfCircle: float, yCenterOfCircle: float)
     (radx: float)
     (rady: float)
     {r, g, b} => {
@@ -361,7 +401,6 @@ let drawEllipseInternal
   maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
-  let toColorFloat i => float_of_int i /. 255.;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let verticesData = (!env).batch.vertexArray;
   let elementData = (!env).batch.elementArray;

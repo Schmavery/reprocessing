@@ -69,37 +69,31 @@ module P = {
     };
   let line env (x1, y1) (x2, y2) =>
     linef env (float_of_int x1, float_of_int y1) (float_of_int x2, float_of_int y2);
-  let ellipsef env (a: float) (b: float) (c: float) (d: float) =>
+  let ellipsef env (center: (float, float)) (rx: float) (ry: float) =>
     switch (!env).style.fillColor {
     | None => () /* Don't draw fill */
-    | Some fill => drawEllipseInternal env a b c d fill
+    | Some fill => drawEllipseInternal env center rx ry fill
     };
-  let ellipse env a b c d =>
-    ellipsef env (float_of_int a) (float_of_int b) (float_of_int c) (float_of_int d);
-  let quadf (env: ref glEnv) (x1, y1) (x2, y2) (x3, y3) (x4, y4) => {
+  let ellipse env (cx: int, cy: int) rx ry =>
+    ellipsef env (float_of_int cx, float_of_int cy) (float_of_int rx) (float_of_int ry);
+  let quadf (env: ref glEnv) p1 p2 p3 p4 => {
     switch (!env).style.fillColor {
     | None => () /* Don't draw fill */
     | Some fill =>
-      addRectToGlobalBatch
-        env
-        topLeft::(x1, y1)
-        topRight::(x2, y2)
-        bottomRight::(x3, y3)
-        bottomLeft::(x4, y4)
-        color::fill
+      addRectToGlobalBatch env topLeft::p1 topRight::p2 bottomRight::p3 bottomLeft::p4 color::fill
     };
     switch (!env).style.strokeColor {
     | None => () /* don't draw stroke */
     | Some color =>
-      linef env (x1, y1) (x2, y2);
-      linef env (x2, y2) (x3, y3);
-      linef env (x3, y3) (x4, y4);
-      linef env (x4, y4) (x1, y1);
+      linef env p1 p2;
+      linef env p2 p3;
+      linef env p3 p4;
+      linef env p4 p1;
       let r = float_of_int (!env).style.strokeWeight /. 2.;
-      drawEllipseInternal env x1 y1 r r color;
-      drawEllipseInternal env x2 y2 r r color;
-      drawEllipseInternal env x3 y3 r r color;
-      drawEllipseInternal env x4 y4 r r color
+      drawEllipseInternal env p1 r r color;
+      drawEllipseInternal env p2 r r color;
+      drawEllipseInternal env p3 r r color;
+      drawEllipseInternal env p4 r r color
     }
   };
   let quad (env: ref glEnv) (x1, y1) (x2, y2) (x3, y3) (x4, y4) =>
@@ -124,6 +118,29 @@ module P = {
       ::color
   };
   let pixel env x y color => pixelf env (float_of_int x) (float_of_int y) color;
+  let trianglef env p1 p2 p3 => {
+    switch (!env).style.fillColor {
+    | None => () /* draw nothing */
+    | Some color => drawTriangleInternal env p1 p2 p3 ::color
+    };
+    switch (!env).style.strokeColor {
+    | None => () /* don't draw stroke */
+    | Some color =>
+      linef env p1 p2;
+      linef env p2 p3;
+      linef env p3 p1;
+      let r = float_of_int (!env).style.strokeWeight /. 2.;
+      drawEllipseInternal env p1 r r color;
+      drawEllipseInternal env p2 r r color;
+      drawEllipseInternal env p3 r r color
+    }
+  };
+  let triangle env (x1, y1) (x2, y2) (x3, y3) =>
+    trianglef
+      env
+      (float_of_int x1, float_of_int y1)
+      (float_of_int x2, float_of_int y2)
+      (float_of_int x3, float_of_int y3);
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;
   let background env color => {
