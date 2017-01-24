@@ -76,32 +76,52 @@ module P = {
     };
   let ellipse env a b c d =>
     ellipsef env (float_of_int a) (float_of_int b) (float_of_int c) (float_of_int d);
-  let rectf (env: ref glEnv) x y width height => {
+  let quadf (env: ref glEnv) (x1, y1) (x2, y2) (x3, y3) (x4, y4) => {
     switch (!env).style.fillColor {
     | None => () /* Don't draw fill */
     | Some fill =>
       addRectToGlobalBatch
-        env (x +. width, y +. height) (x, y +. height) (x +. width, y) (x, y) fill
+        env
+        topLeft::(x1, y1)
+        topRight::(x2, y2)
+        bottomRight::(x3, y3)
+        bottomLeft::(x4, y4)
+        color::fill
     };
     switch (!env).style.strokeColor {
     | None => () /* don't draw stroke */
     | Some color =>
-      linef env (x +. width, y) (x, y);
-      linef env (x +. width, y) (x +. width, y +. height);
-      linef env (x +. width, y +. height) (x, y +. width);
-      linef env (x, y +. height) (x, y);
+      linef env (x1, y1) (x2, y2);
+      linef env (x2, y2) (x3, y3);
+      linef env (x3, y3) (x4, y4);
+      linef env (x4, y4) (x1, y1);
       let r = float_of_int (!env).style.strokeWeight /. 2.;
-      drawEllipseInternal env x y r r color;
-      drawEllipseInternal env (x +. width) y r r color;
-      drawEllipseInternal env (x +. width) (y +. height) r r color;
-      drawEllipseInternal env x (y +. height) r r color
+      drawEllipseInternal env x1 y1 r r color;
+      drawEllipseInternal env x2 y2 r r color;
+      drawEllipseInternal env x3 y3 r r color;
+      drawEllipseInternal env x4 y4 r r color
     }
   };
+  let quad (env: ref glEnv) (x1, y1) (x2, y2) (x3, y3) (x4, y4) =>
+    quadf
+      env
+      (float_of_int x1, float_of_int y1)
+      (float_of_int x2, float_of_int y2)
+      (float_of_int x3, float_of_int y3)
+      (float_of_int x4, float_of_int y4);
+  let rectf (env: ref glEnv) x y width height =>
+    quadf env (x, y) (x +. width, y) (x +. width, y +. height) (x, y +. height);
   let rect (env: ref glEnv) x y width height =>
     rectf env (float_of_int x) (float_of_int y) (float_of_int width) (float_of_int height);
   let pixelf env (x: float) (y: float) color => {
     let w = float_of_int (!env).style.strokeWeight;
-    addRectToGlobalBatch env (x +. w, y +. w) (x, y +. w) (x +. w, y) (x, y) color
+    addRectToGlobalBatch
+      env
+      bottomRight::(x +. w, y +. w)
+      bottomLeft::(x, y +. w)
+      topRight::(x +. w, y)
+      topLeft::(x, y)
+      ::color
   };
   let pixel env x y color => pixelf env (float_of_int x) (float_of_int y) color;
   let loadFont env filename => Font.parseFontFormat env filename;
@@ -109,6 +129,7 @@ module P = {
   let background env color => {
     let w = float_of_int (width env);
     let h = float_of_int (height env);
-    addRectToGlobalBatch env (w, h) (0., h) (w, 0.) (0., 0.) color
+    addRectToGlobalBatch
+      env bottomRight::(w, h) bottomLeft::(0., h) topRight::(w, 0.) topLeft::(0., 0.) ::color
   };
 };

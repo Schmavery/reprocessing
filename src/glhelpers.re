@@ -155,7 +155,11 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     pMatrixUniform,
     uSampler,
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
-    style: {fillColor: Some {r: 0, g: 0, b: 0}, strokeWeight: 10, strokeColor: Some {r: 0, g: 0, b: 0}},
+    style: {
+      fillColor: Some {r: 0, g: 0, b: 0},
+      strokeWeight: 10,
+      strokeColor: Some {r: 0, g: 0, b: 0}
+    },
     styleStack: [],
     frame: {count: 1, rate: 10},
     size: {height, width, resizeable: true}
@@ -288,7 +292,13 @@ let maybeFlushBatch env texture adding =>
  * triangles: one with the vertices 0, 1 and 2 from the vertex array, and one with the vertices 1, 2 and 3.
  * We can "point" to duplicated vertices in our geometry to avoid sending those vertices.
  */
-let addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) {r, g, b} => {
+let addRectToGlobalBatch
+    env
+    bottomRight::(x1, y1)
+    bottomLeft::(x2, y2)
+    topRight::(x3, y3)
+    topLeft::(x4, y4)
+    color::{r, g, b} => {
   maybeFlushBatch env None 6;
   let set = Gl.Bigarray.set;
   let toColorFloat i => float_of_int i /. 255.;
@@ -484,6 +494,7 @@ let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::sub
   (!env).batch.elementPtr = jj + 6;
   (!env).batch.currTex = Some textureBuffer
 };
+
 
 /** Recomputes matrices while resetting size of window */
 let resetSize env width height => {
