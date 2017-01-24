@@ -12,7 +12,7 @@ type glCamera = {projectionMatrix: Gl.Mat4.t};
 
 type colorT = {r: int, g: int, b: int};
 
-type strokeT = {color: colorT, weight: int};
+type styleT = {strokeColor: option colorT, strokeWeight: int, fillColor: option colorT};
 
 type mouseT = {pos: (int, int), prevPos: (int, int), pressed: bool};
 
@@ -49,10 +49,9 @@ type glEnv = {
   pMatrixUniform: Gl.uniformT,
   uSampler: Gl.uniformT,
   batch: batchT,
-  currFill: option colorT,
-  currBackground: colorT,
   mouse: mouseT,
-  stroke: strokeT,
+  mutable style: styleT,
+  mutable styleStack: list styleT,
   frame: frameT,
   size: sizeT
 };
@@ -103,8 +102,8 @@ let read (name: string) => {
   let ic = open_in name;
   let try_read () =>
     switch (input_line ic) {
-      | exception End_of_file => None
-      | x => Some x
+    | exception End_of_file => None
+    | x => Some x
     };
   let rec loop acc =>
     switch (try_read ()) {

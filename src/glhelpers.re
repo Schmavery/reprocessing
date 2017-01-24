@@ -135,8 +135,6 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     top::0.
     near::0.
     far::1.;
-  let currFill = Some {r: 0, g: 0, b: 0};
-  let currBackground = {r: 0, g: 0, b: 0};
   {
     camera,
     window,
@@ -156,10 +154,9 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     aVertexColor,
     pMatrixUniform,
     uSampler,
-    currFill,
-    currBackground,
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
-    stroke: {color: {r: 0, g: 0, b: 0}, weight: 10},
+    style: {fillColor: Some {r: 0, g: 0, b: 0}, strokeWeight: 10, strokeColor: Some {r: 0, g: 0, b: 0}},
+    styleStack: [],
     frame: {count: 1, rate: 10},
     size: {height, width, resizeable: true}
   }
@@ -487,7 +484,6 @@ let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::sub
   (!env).batch.elementPtr = jj + 6;
   (!env).batch.currTex = Some textureBuffer
 };
-
 
 /** Recomputes matrices while resetting size of window */
 let resetSize env width height => {
