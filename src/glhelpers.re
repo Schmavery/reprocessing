@@ -391,12 +391,17 @@ let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   (!env).batch.elementPtr = j + 3
 };
 
-let drawEllipseInternal
+let drawArcInternal
     env
     (xCenterOfCircle: float, yCenterOfCircle: float)
     (radx: float)
     (rady: float)
+    (start: float)
+    (stop: float)
+    /* (isOpen: bool)
+       (isPie: bool) */
     {r, g, b} => {
+  print_endline "Drawing arc";
   let noOfFans = int_of_float (radx +. rady) * 2 + 10;
   maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
   let pi = 4.0 *. atan 1.0;
@@ -408,11 +413,17 @@ let drawEllipseInternal
   let get = Gl.Bigarray.get;
   let vertexArrayOffset = (!env).batch.vertexPtr;
   let elementArrayOffset = (!env).batch.elementPtr;
-  for i in 0 to (noOfFans - 1) {
+  /* I calculated this roughly by doing:
+     anglePerFan *. float_of_int (i + 1) == start
+     i+1 == start /. anglePerFan
+     */
+  let start_i = int_of_float (start /. anglePerFan) - 1;
+  let stop_i = int_of_float (stop /. anglePerFan) - 1;
+  for i in start_i to stop_i {
     let angle = anglePerFan *. float_of_int (i + 1);
     let xCoordinate = xCenterOfCircle +. cos angle *. radx;
     let yCoordinate = yCenterOfCircle +. sin angle *. rady;
-    let ii = i * vertexSize + vertexArrayOffset;
+    let ii = (i - start_i) * vertexSize + vertexArrayOffset;
     set verticesData (ii + 0) xCoordinate;
     set verticesData (ii + 1) yCoordinate;
     set verticesData (ii + 2) r;
@@ -424,23 +435,27 @@ let drawEllipseInternal
     /* For the first three vertices, we don't do any deduping. Then for the subsequent ones, we'll actually
        have 3 elements, one pointing at the first vertex, one pointing at the previously added vertex and one
        pointing at the current vertex. This mimicks the behavior of triangle_fan. */
-    if (i < 3) {
-      set elementData (i + elementArrayOffset) (ii / vertexSize)
+    if (i - start_i < 3) {
+      /* print_endline "Drawing first 3"; */
+      set elementData (i - start_i + elementArrayOffset) (ii / vertexSize)
     } else {
       /* We've already added 3 elements, for i = 0, 1 and 2. From now on, we'll add 3 elements _per_ i.
          To calculate the correct offset in `elementData` we remove 3 from i as if we're starting from 0 (the
          first time we enter this loop i = 3), then for each i we'll add 3 elements (so multiply by 3) BUT for
          i = 3 we want `jj` to be 3 so we shift everything by 3 (so add 3). Everything's also shifted by
          `elementArrayOffset` */
-      let jj = (i - 3) * 3 + elementArrayOffset + 3;
+      let jj = (i - start_i - 3) * 3 + elementArrayOffset + 3;
       set elementData jj (vertexArrayOffset / vertexSize);
       set elementData (jj + 1) (get elementData (jj - 1));
       set elementData (jj + 2) (ii / vertexSize)
     }
   };
   (!env).batch.vertexPtr = (!env).batch.vertexPtr + noOfFans * vertexSize;
-  (!env).batch.elementPtr = (!env).batch.elementPtr + (noOfFans - 3) * 3 + 3
+  (!env).batch.elementPtr = (!env).batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
 };
+
+let drawEllipseInternal env center (radx: float) (rady: float) c =>
+  drawArcInternal env center radx rady 0. PConstants.tau c;
 
 let loadImage (env: ref glEnv) filename :imageT => {
   let imageRef = ref None;

@@ -120,7 +120,7 @@ module P = {
   let pixel env x y color => pixelf env (float_of_int x) (float_of_int y) color;
   let trianglef env p1 p2 p3 => {
     switch (!env).style.fillColor {
-    | None => () /* draw nothing */
+    | None => () /* don't draw fill */
     | Some color => drawTriangleInternal env p1 p2 p3 ::color
     };
     switch (!env).style.strokeColor {
@@ -141,6 +141,11 @@ module P = {
       (float_of_int x1, float_of_int y1)
       (float_of_int x2, float_of_int y2)
       (float_of_int x3, float_of_int y3);
+  let arcf env (cx, cy) rx ry start stop =>
+    switch (!env).style.fillColor {
+    | None => () /* don't draw fill */
+    | Some color => drawArcInternal env (cx, cy) rx ry start stop color
+    };
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;
   let background env color => {
