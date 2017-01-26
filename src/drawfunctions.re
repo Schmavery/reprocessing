@@ -21,7 +21,7 @@ module P = {
   let fill (env: ref glEnv) (c: colorT) => (!env).style = {...(!env).style, fillColor: Some c};
   let noFill (env: ref glEnv) => (!env).style = {...(!env).style, fillColor: None};
   let stroke env color => (!env).style = {...(!env).style, strokeColor: Some color};
-  let noStroke env color => (!env).style = {...(!env).style, strokeColor: None};
+  let noStroke env => (!env).style = {...(!env).style, strokeColor: None};
   let strokeWeight env weight => (!env).style = {...(!env).style, strokeWeight: weight};
   let pushStyle env => (!env).styleStack = [(!env).style, ...(!env).styleStack];
   let popStyle env =>
@@ -69,11 +69,16 @@ module P = {
     };
   let line env (x1, y1) (x2, y2) =>
     linef env (float_of_int x1, float_of_int y1) (float_of_int x2, float_of_int y2);
-  let ellipsef env (center: (float, float)) (rx: float) (ry: float) =>
+  let ellipsef env (center: (float, float)) (rx: float) (ry: float) => {
     switch (!env).style.fillColor {
     | None => () /* Don't draw fill */
     | Some fill => drawEllipseInternal env center rx ry fill
     };
+    switch (!env).style.strokeColor {
+    | None => () /* Don't draw stroke */
+    | Some stroke => drawArcStroke env center rx ry 0. PConstants.tau stroke
+    }
+  };
   let ellipse env (cx: int, cy: int) rx ry =>
     ellipsef env (float_of_int cx, float_of_int cy) (float_of_int rx) (float_of_int ry);
   let quadf (env: ref glEnv) p1 p2 p3 p4 => {
@@ -141,11 +146,16 @@ module P = {
       (float_of_int x1, float_of_int y1)
       (float_of_int x2, float_of_int y2)
       (float_of_int x3, float_of_int y3);
-  let arcf env (cx, cy) rx ry start stop =>
+  let arcf env (cx, cy) rx ry start stop => {
     switch (!env).style.fillColor {
     | None => () /* don't draw fill */
     | Some color => drawArcInternal env (cx, cy) rx ry start stop color
     };
+    switch (!env).style.strokeColor {
+    | None => () /* don't draw stroke */
+    | Some stroke => drawArcStroke env (cx, cy) rx ry start stop stroke
+    }
+  };
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;
   let background env color => {
