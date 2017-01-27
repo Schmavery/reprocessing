@@ -77,7 +77,7 @@ module P = {
     switch (!env).style.strokeColor {
     | None => () /* Don't draw stroke */
     | Some stroke =>
-      drawArcStroke env center rx ry 0. PConstants.tau false stroke (!env).style.strokeWeight
+      drawArcStroke env center rx ry 0. PConstants.tau false false stroke (!env).style.strokeWeight
     }
   };
   let ellipse env (cx: int, cy: int) rx ry =>
@@ -147,17 +147,27 @@ module P = {
       (float_of_int x1, float_of_int y1)
       (float_of_int x2, float_of_int y2)
       (float_of_int x3, float_of_int y3);
-  let arcf env (cx, cy) rx ry start stop isOpen => {
+  let arcf env centerPt rx ry start stop isOpen isPie => {
     switch (!env).style.fillColor {
     | None => () /* don't draw fill */
-    | Some color => drawArcInternal env (cx, cy) rx ry start stop color
+    | Some color => drawArcInternal env centerPt rx ry start stop isPie color
     };
     switch (!env).style.strokeColor {
     | None => () /* don't draw stroke */
     | Some stroke =>
-      drawArcStroke env (cx, cy) rx ry start stop isOpen stroke (!env).style.strokeWeight
+      drawArcStroke env centerPt rx ry start stop isOpen isPie stroke (!env).style.strokeWeight
     }
   };
+  let arc env (cx, cy) rx ry start stop isOpen isPie =>
+    arcf
+      env
+      (float_of_int cx, float_of_int cy)
+      (float_of_int rx)
+      (float_of_int ry)
+      start
+      stop
+      isOpen
+      isPie;
   let loadFont env filename => Font.parseFontFormat env filename;
   let text env fnt str x y => Font.drawString env fnt str x y;
   let background env color => {

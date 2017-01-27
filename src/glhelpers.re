@@ -416,6 +416,7 @@ let drawArcInternal
     (rady: float)
     (start: float)
     (stop: float)
+    (isPie: bool)
     {r, g, b} => {
   let noOfFans = int_of_float (radx +. rady) * 2 + 10;
   maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
@@ -428,16 +429,23 @@ let drawArcInternal
   let get = Gl.Bigarray.get;
   let vertexArrayOffset = (!env).batch.vertexPtr;
   let elementArrayOffset = (!env).batch.elementPtr;
-  /* I calculated this roughly by doing:
-     anglePerFan *. float_of_int (i + 1) == start
-     i+1 == start /. anglePerFan
-     */
-  let start_i = int_of_float (start /. anglePerFan) - 1;
+  let start_i =
+    if isPie {
+      /* Start one earlier and force the first point to be the center */
+      int_of_float (start /. anglePerFan) - 2
+    } else {
+      int_of_float (start /. anglePerFan) - 1
+    };
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
   for i in start_i to stop_i {
-    let angle = anglePerFan *. float_of_int (i + 1);
-    let xCoordinate = xCenterOfCircle +. cos angle *. radx;
-    let yCoordinate = yCenterOfCircle +. sin angle *. rady;
+    let (xCoordinate, yCoordinate) =
+      if (isPie && i - start_i == 0) {
+        /* force the first point to be the center */
+        (xCenterOfCircle, yCenterOfCircle)
+      } else {
+        let angle = anglePerFan *. float_of_int (i + 1);
+        (xCenterOfCircle +. cos angle *. radx, yCenterOfCircle +. sin angle *. rady)
+      };
     let ii = (i - start_i) * vertexSize + vertexArrayOffset;
     set verticesData (ii + 0) xCoordinate;
     set verticesData (ii + 1) yCoordinate;
@@ -451,7 +459,6 @@ let drawArcInternal
        have 3 elements, one pointing at the first vertex, one pointing at the previously added vertex and one
        pointing at the current vertex. This mimicks the behavior of triangle_fan. */
     if (i - start_i < 3) {
-      /* print_endline "Drawing first 3"; */
       set elementData (i - start_i + elementArrayOffset) (ii / vertexSize)
     } else {
       /* We've already added 3 elements, for i = 0, 1 and 2. From now on, we'll add 3 elements _per_ i.
@@ -470,7 +477,7 @@ let drawArcInternal
 };
 
 let drawEllipseInternal env center (radx: float) (rady: float) c =>
-  drawArcInternal env center radx rady 0. PConstants.tau c;
+  drawArcInternal env center radx rady 0. PConstants.tau false c;
 
 let drawArcStroke
     env
@@ -480,6 +487,7 @@ let drawArcStroke
     (start: float)
     (stop: float)
     (isOpen: bool)
+    (isPie: bool)
     ({r, g, b} as strokeColor)
     strokeWidth => {
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
@@ -497,7 +505,6 @@ let drawArcStroke
   let start_i = int_of_float (start /. anglePerFan) - 1;
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
   let prevEl: ref (option (int, int)) = ref None;
-  let firstEl: ref (option (int, int)) = ref None;
   let halfwidth = float_of_int strokeWidth /. 2.;
   for i in start_i to stop_i {
     let angle = anglePerFan *. float_of_int (i + 1);
@@ -542,14 +549,19 @@ let drawArcStroke
     }
   };
   if (not isOpen) {
-    let startXCoordinate = xCenterOfCircle +. cos start *. radx;
-    let startYCoordinate = yCenterOfCircle +. sin start *. rady;
-    let stopXCoordinate = xCenterOfCircle +. cos stop *. radx;
-    let stopYCoordinate = yCenterOfCircle +. sin stop *. rady;
-    drawLineInternal
-      env (startXCoordinate, startYCoordinate) (stopXCoordinate, stopYCoordinate) strokeColor;
-    drawEllipseInternal env (startXCoordinate, startYCoordinate) halfwidth halfwidth strokeColor;
-    drawEllipseInternal env (stopXCoordinate, stopYCoordinate) halfwidth halfwidth strokeColor
+    let startX = xCenterOfCircle +. cos start *. radx;
+    let startY = yCenterOfCircle +. sin start *. rady;
+    let stopX = xCenterOfCircle +. cos stop *. radx;
+    let stopY = yCenterOfCircle +. sin stop *. rady;
+    if isPie {
+      drawLineInternal env (startX, startY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
+      drawLineInternal env (stopX, stopY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
+      drawEllipseInternal env (xCenterOfCircle, yCenterOfCircle) halfwidth halfwidth strokeColor
+    } else {
+      drawLineInternal env (startX, startY) (stopX, stopY) strokeColor
+    };
+    drawEllipseInternal env (startX, startY) halfwidth halfwidth strokeColor;
+    drawEllipseInternal env (stopX, stopY) halfwidth halfwidth strokeColor
   }
 };
 
