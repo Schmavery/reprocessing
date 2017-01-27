@@ -76,7 +76,8 @@ module P = {
     };
     switch (!env).style.strokeColor {
     | None => () /* Don't draw stroke */
-    | Some stroke => drawArcStroke env center rx ry 0. PConstants.tau stroke
+    | Some stroke =>
+      drawArcStroke env center rx ry 0. PConstants.tau false stroke (!env).style.strokeWeight
     }
   };
   let ellipse env (cx: int, cy: int) rx ry =>
@@ -146,14 +147,15 @@ module P = {
       (float_of_int x1, float_of_int y1)
       (float_of_int x2, float_of_int y2)
       (float_of_int x3, float_of_int y3);
-  let arcf env (cx, cy) rx ry start stop => {
+  let arcf env (cx, cy) rx ry start stop isOpen => {
     switch (!env).style.fillColor {
     | None => () /* don't draw fill */
     | Some color => drawArcInternal env (cx, cy) rx ry start stop color
     };
     switch (!env).style.strokeColor {
     | None => () /* don't draw stroke */
-    | Some stroke => drawArcStroke env (cx, cy) rx ry start stop stroke
+    | Some stroke =>
+      drawArcStroke env (cx, cy) rx ry start stop isOpen stroke (!env).style.strokeWeight
     }
   };
   let loadFont env filename => Font.parseFontFormat env filename;

@@ -409,66 +409,6 @@ let drawLineInternal env (xx1, yy1) (xx2, yy2) color => {
   addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) color
 };
 
-let drawArcStroke
-    env
-    (xCenterOfCircle: float, yCenterOfCircle: float)
-    (radx: float)
-    (rady: float)
-    (start: float)
-    (stop: float)
-    strokeColor => {
-  let noOfFans = int_of_float (radx +. rady) * 2 + 10;
-  maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
-  let pi = 4.0 *. atan 1.0;
-  let anglePerFan = 2. *. pi /. float_of_int noOfFans;
-  /* I calculated this roughly by doing:
-     anglePerFan *. float_of_int (i + 1) == start
-     i+1 == start /. anglePerFan
-     */
-  let start_i = int_of_float (start /. anglePerFan) - 1;
-  let stop_i = int_of_float (stop /. anglePerFan) - 1;
-  let prevPt: ref (option (float, float)) = ref None;
-  let firstPt: ref (option (float, float)) = ref None;
-  for i in start_i to stop_i {
-    let angle = anglePerFan *. float_of_int (i + 1);
-    let xCoordinate = xCenterOfCircle +. cos angle *. radx;
-    let yCoordinate = yCenterOfCircle +. sin angle *. rady;
-    switch !firstPt {
-    | None =>
-      firstPt := Some (xCoordinate, yCoordinate);
-      prevPt := Some (xCoordinate, yCoordinate)
-    | Some _ => ()
-    };
-    switch !prevPt {
-    | None => ()
-    | Some prevpt =>
-      drawLineInternal env prevpt (xCoordinate, yCoordinate) strokeColor;
-      prevPt := Some (xCoordinate, yCoordinate)
-    }
-  };
-  /* For the first three vertices, we don't do any deduping. Then for the subsequent ones, we'll actually
-     have 3 elements, one pointing at the first vertex, one pointing at the previously added vertex and one
-     pointing at the current vertex. This mimicks the behavior of triangle_fan. */
-  /* if (i - start_i < 3) { */
-  /* print_endline "Drawing first 3"; */
-  /* set elementData (i - start_i + elementArrayOffset) (ii / vertexSize) */
-  /* } else { */
-  /* We've already added 3 elements, for i = 0, 1 and 2. From now on, we'll add 3 elements _per_ i.
-     To calculate the correct offset in `elementData` we remove 3 from i as if we're starting from 0 (the
-     first time we enter this loop i = 3), then for each i we'll add 3 elements (so multiply by 3) BUT for
-     i = 3 we want `jj` to be 3 so we shift everything by 3 (so add 3). Everything's also shifted by
-     `elementArrayOffset` */
-  /* let jj = (i - start_i - 3) * 3 + elementArrayOffset + 3;
-     set elementData jj (vertexArrayOffset / vertexSize);
-     set elementData (jj + 1) (get elementData (jj - 1));
-     set elementData (jj + 2) (ii / vertexSize) */
-  /* } */
-  switch (!firstPt, !prevPt) {
-  | (Some first, Some prev) => drawLineInternal env first prev strokeColor
-  | (_, _) => ()
-  }
-};
-
 let drawArcInternal
     env
     (xCenterOfCircle: float, yCenterOfCircle: float)
@@ -531,6 +471,87 @@ let drawArcInternal
 
 let drawEllipseInternal env center (radx: float) (rady: float) c =>
   drawArcInternal env center radx rady 0. PConstants.tau c;
+
+let drawArcStroke
+    env
+    (xCenterOfCircle: float, yCenterOfCircle: float)
+    (radx: float)
+    (rady: float)
+    (start: float)
+    (stop: float)
+    (isOpen: bool)
+    ({r, g, b} as strokeColor)
+    strokeWidth => {
+  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
+  let verticesData = (!env).batch.vertexArray;
+  let elementData = (!env).batch.elementArray;
+  let set = Gl.Bigarray.set;
+  let noOfFans = int_of_float (radx +. rady) * 2 + 10;
+  maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
+  let pi = 4.0 *. atan 1.0;
+  let anglePerFan = 2. *. pi /. float_of_int noOfFans;
+  /* I calculated this roughly by doing:
+     anglePerFan *. float_of_int (i + 1) == start
+     i+1 == start /. anglePerFan
+     */
+  let start_i = int_of_float (start /. anglePerFan) - 1;
+  let stop_i = int_of_float (stop /. anglePerFan) - 1;
+  let prevEl: ref (option (int, int)) = ref None;
+  let firstEl: ref (option (int, int)) = ref None;
+  let halfwidth = float_of_int strokeWidth /. 2.;
+  for i in start_i to stop_i {
+    let angle = anglePerFan *. float_of_int (i + 1);
+    let xCoordinateInner = xCenterOfCircle +. cos angle *. (radx -. halfwidth);
+    let yCoordinateInner = yCenterOfCircle +. sin angle *. (rady -. halfwidth);
+    let xCoordinateOuter = xCenterOfCircle +. cos angle *. (radx +. halfwidth);
+    let yCoordinateOuter = yCenterOfCircle +. sin angle *. (rady +. halfwidth);
+    let ii = (!env).batch.vertexPtr;
+    set verticesData (ii + 0) xCoordinateInner;
+    set verticesData (ii + 1) yCoordinateInner;
+    set verticesData (ii + 2) r;
+    set verticesData (ii + 3) g;
+    set verticesData (ii + 4) b;
+    set verticesData (ii + 5) 1.0;
+    set verticesData (ii + 6) 0.0;
+    set verticesData (ii + 7) 0.0;
+    let ii = ii + vertexSize;
+    set verticesData (ii + 0) xCoordinateOuter;
+    set verticesData (ii + 1) yCoordinateOuter;
+    set verticesData (ii + 2) r;
+    set verticesData (ii + 3) g;
+    set verticesData (ii + 4) b;
+    set verticesData (ii + 5) 1.0;
+    set verticesData (ii + 6) 0.0;
+    set verticesData (ii + 7) 0.0;
+    (!env).batch.vertexPtr = (!env).batch.vertexPtr + vertexSize * 2;
+    let currOuter = ii / vertexSize;
+    let currInner = ii / vertexSize - 1;
+    let currEl = Some (currInner, currOuter);
+    switch !prevEl {
+    | None => prevEl := currEl
+    | Some (prevInner, prevOuter) =>
+      let elementArrayOffset = (!env).batch.elementPtr;
+      set elementData elementArrayOffset prevInner;
+      set elementData (elementArrayOffset + 1) prevOuter;
+      set elementData (elementArrayOffset + 2) currOuter;
+      set elementData (elementArrayOffset + 3) currOuter;
+      set elementData (elementArrayOffset + 4) prevInner;
+      set elementData (elementArrayOffset + 5) currInner;
+      (!env).batch.elementPtr = (!env).batch.elementPtr + 6;
+      prevEl := currEl
+    }
+  };
+  if (not isOpen) {
+    let startXCoordinate = xCenterOfCircle +. cos start *. radx;
+    let startYCoordinate = yCenterOfCircle +. sin start *. rady;
+    let stopXCoordinate = xCenterOfCircle +. cos stop *. radx;
+    let stopYCoordinate = yCenterOfCircle +. sin stop *. rady;
+    drawLineInternal
+      env (startXCoordinate, startYCoordinate) (stopXCoordinate, stopYCoordinate) strokeColor;
+    drawEllipseInternal env (startXCoordinate, startYCoordinate) halfwidth halfwidth strokeColor;
+    drawEllipseInternal env (stopXCoordinate, stopYCoordinate) halfwidth halfwidth strokeColor
+  }
+};
 
 let loadImage (env: ref glEnv) filename :imageT => {
   let imageRef = ref None;
