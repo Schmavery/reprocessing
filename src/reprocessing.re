@@ -18,25 +18,22 @@ module P = Drawfunctions.P;
 
 type userCallbackT 'a = 'a => ref glState => ('a, glState);
 
-let afterDraw f (env: ref glEnv) => {
+let afterDraw f (env: glEnv) => {
   let rate = int_of_float (1000. /. f);
-  env := {
-    ...!env,
-    mouse: {...(!env).mouse, prevPos: (!env).mouse.pos},
-    frame: {count: (!env).frame.count + 1, rate}
-  };
+  env.mouse.prevPos = env.mouse.pos;
+  env.frame = {count: env.frame.count + 1, rate};
   /* Flush the batching buffer at the end of every frame. */
-  if ((!env).batch.elementPtr > 0) {
+  if (env.batch.elementPtr > 0) {
     flushGlobalBatch env
   }
 };
 
 module ReProcessor: ReProcessorT = {
-  type t = ref glEnv;
+  type t = glEnv;
   let run ::setup ::draw=? ::mouseMove=? ::mouseDragged=? ::mouseDown=? ::mouseUp=? () => {
     Random.self_init ();
     PUtils.noiseSeed (Random.int (PUtils.pow 2 30 - 1));
-    let env = ref (createCanvas (Gl.Window.init argv::Sys.argv) 200 200);
+    let env = createCanvas (Gl.Window.init argv::Sys.argv) 200 200;
     let userState = ref (setup env);
 
     /** This is a basically a hack to get around the default behavior of drawing something inside setup.
@@ -45,13 +42,13 @@ module ReProcessor: ReProcessorT = {
         one frame and then paint that array as a texture on top before calling draw for the 2nd time. This ensures
         that both internal buffers contain the same data. **/
     let reDrawPreviousBufferOnSecondFrame = {
-      let width = Gl.Window.getWidth (!env).window;
-      let height = Gl.Window.getHeight (!env).window;
-      let data = Gl.readPixelsRGBA context::(!env).gl x::0 y::0 ::width ::height;
-      let textureBuffer = Gl.createTexture context::(!env).gl;
-      Gl.bindTexture context::(!env).gl target::Constants.texture_2d texture::textureBuffer;
+      let width = Gl.Window.getWidth env.window;
+      let height = Gl.Window.getHeight env.window;
+      let data = Gl.readPixelsRGBA context::env.gl x::0 y::0 ::width ::height;
+      let textureBuffer = Gl.createTexture context::env.gl;
+      Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
       Gl.texImage2D
-        context::(!env).gl
+        context::env.gl
         target::Constants.texture_2d
         level::0
         internalFormat::Constants.rgba
@@ -61,22 +58,22 @@ module ReProcessor: ReProcessorT = {
         type_::Constants.unsigned_byte
         ::data;
       Gl.texParameteri
-        context::(!env).gl
+        context::env.gl
         target::Constants.texture_2d
         pname::Constants.texture_mag_filter
         param::Constants.linear;
       Gl.texParameteri
-        context::(!env).gl
+        context::env.gl
         target::Constants.texture_2d
         pname::Constants.texture_min_filter
         param::Constants.linear;
       Gl.texParameteri
-        context::(!env).gl
+        context::env.gl
         target::Constants.texture_2d
         pname::Constants.texture_wrap_s
         param::Constants.clamp_to_edge;
       Gl.texParameteri
-        context::(!env).gl
+        context::env.gl
         target::Constants.texture_2d
         pname::Constants.texture_wrap_t
         param::Constants.clamp_to_edge;
@@ -130,16 +127,16 @@ module ReProcessor: ReProcessorT = {
           mode::Constants.triangles
           count::6
           ::textureBuffer
-          !env
+          env
       }
     };
 
     /** Start the render loop. **/
     Gl.render
-      window::(!env).window
+      window::env.window
       displayFunc::(
         fun f => {
-          if ((!env).frame.count === 2) {
+          if (env.frame.count === 2) {
             reDrawPreviousBufferOnSecondFrame ()
           };
           switch draw {
@@ -151,7 +148,8 @@ module ReProcessor: ReProcessorT = {
       )
       mouseDown::(
         fun ::button ::state ::x ::y => {
-          env := {...!env, mouse: {...(!env).mouse, pos: (x, y), pressed: true}};
+          env.mouse.pos = (x, y);
+          env.mouse.pressed = true;
           switch mouseDown {
           | Some mouseDown => userState := mouseDown !userState env
           | None => ()
@@ -160,7 +158,8 @@ module ReProcessor: ReProcessorT = {
       )
       mouseUp::(
         fun ::button ::state ::x ::y => {
-          env := {...!env, mouse: {...(!env).mouse, pos: (x, y), pressed: false}};
+          env.mouse.pos = (x, y);
+          env.mouse.pressed = false;
           switch mouseUp {
           | Some mouseUp => userState := mouseUp !userState env
           | None => ()
@@ -169,8 +168,8 @@ module ReProcessor: ReProcessorT = {
       )
       mouseMove::(
         fun ::x ::y => {
-          env := {...!env, mouse: {...(!env).mouse, pos: (x, y)}};
-          if (!env).mouse.pressed {
+          env.mouse.pos = (x, y);
+          if env.mouse.pressed {
             switch mouseDragged {
             | Some mouseDragged => userState := mouseDragged !userState env
             | None => ()
@@ -185,9 +184,9 @@ module ReProcessor: ReProcessorT = {
       )
       windowResize::(
         fun () =>
-          if (!env).size.resizeable {
-            let height = Gl.Window.getHeight (!env).window;
-            let width = Gl.Window.getWidth (!env).window;
+          if env.size.resizeable {
+            let height = Gl.Window.getHeight env.window;
+            let width = Gl.Window.getWidth env.window;
             resetSize env width height
           } else {
             P.size env (P.width env) (P.height env)

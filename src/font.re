@@ -138,7 +138,7 @@ module Font = {
     | _ => failwith ("Could not find character " ^ string_of_int code ^ " in font.")
     }
   };
-  let drawChar (env: ref glEnv) fnt image (ch: char) (last: option char) x y => {
+  let drawChar (env: glEnv) fnt image (ch: char) (last: option char) x y => {
     let c = getChar fnt ch;
     let kernAmount =
       switch last {
@@ -165,7 +165,7 @@ module Font = {
     | None => c.xadvance + kernAmount
     }
   };
-  let drawString (env: ref glEnv) fnt (str: string) x y =>
+  let drawString (env: glEnv) fnt (str: string) x y =>
     switch !fnt {
     | None => ()
     | Some fnt =>

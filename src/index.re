@@ -13,14 +13,13 @@ let squareHeight = 300;
 let setup env => {
   size env 600 600;
   fill env (color 255 0 0);
-  strokeWeight env 10;
-  stroke env (color 0 0 0);
+  strokeWeight env 8;
+  stroke env (color 155 0 0);
   {squarePos: (0, 0)}
 };
 
 let draw state env => {
   background env (color 150 255 255);
-  linef env (10., 10.) (50., 50.);
   let (sx, sy) = state.squarePos;
   let (px, py) = pmouse env;
   let (x, y) as squarePos =
