@@ -1,7 +1,3 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Common;
 
 open Glloader;
@@ -189,7 +185,7 @@ module ReProcessor: ReProcessorT = {
             let width = Gl.Window.getWidth env.window;
             resetSize env width height
           } else {
-            P.size env (P.width env) (P.height env)
+            P.size (P.width env) (P.height env) env
           }
       )
       ()

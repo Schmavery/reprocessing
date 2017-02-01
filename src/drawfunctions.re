@@ -1,7 +1,3 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Common;
 
 open Glloader;
@@ -18,11 +14,11 @@ module P = {
   let mouse env => env.mouse.pos;
   let pmouse env => env.mouse.prevPos;
   let mousePressed env => env.mouse.pressed;
-  let fill (env: glEnv) (c: colorT) => env.style = {...env.style, fillColor: Some c};
+  let fill (c: colorT) (env: glEnv) => env.style = {...env.style, fillColor: Some c};
   let noFill (env: glEnv) => env.style = {...env.style, fillColor: None};
-  let stroke env color => env.style = {...env.style, strokeColor: Some color};
+  let stroke color env => env.style = {...env.style, strokeColor: Some color};
   let noStroke env => env.style = {...env.style, strokeColor: None};
-  let strokeWeight env weight => env.style = {...env.style, strokeWeight: weight};
+  let strokeWeight weight env => env.style = {...env.style, strokeWeight: weight};
   let pushStyle env => env.styleStack = [env.style, ...env.styleStack];
   let popStyle env =>
     switch env.styleStack {
@@ -34,19 +30,19 @@ module P = {
     };
   let frameRate (env: glEnv) => env.frame.rate;
   let frameCount (env: glEnv) => env.frame.count;
-  let size (env: glEnv) width height => {
+  let size width height (env: glEnv) => {
     Gl.Window.setWindowSize window::env.window ::width ::height;
     resetSize env width height
   };
-  let resizeable (env: glEnv) resizeable => env.size.resizeable = resizeable;
+  let resizeable resizeable (env: glEnv) => env.size.resizeable = resizeable;
   let loadImage = loadImage;
-  let image (env: glEnv) img x y =>
+  let image img x y (env: glEnv) =>
     switch !img {
     | None => print_endline "image not ready yet, just doing nothing :D"
     | Some ({width, height} as i) => drawImageInternal i x y 0 0 width height env
     };
   let clear env => Gl.clear env.gl (Constants.color_buffer_bit lor Constants.depth_buffer_bit);
-  let linef env (xx1: float, yy1: float) (xx2: float, yy2: float) =>
+  let linef (xx1: float, yy1: float) (xx2: float, yy2: float) (env: glEnv) =>
     switch env.style.strokeColor {
     | None => () /* don't draw stroke */
     | Some color =>
@@ -66,9 +62,9 @@ module P = {
       let y4 = yy1 -. ything;
       addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) color
     };
-  let line env (x1, y1) (x2, y2) =>
-    linef env (float_of_int x1, float_of_int y1) (float_of_int x2, float_of_int y2);
-  let ellipsef env (center: (float, float)) (rx: float) (ry: float) => {
+  let line (x1, y1) (x2, y2) (env: glEnv) =>
+    linef (float_of_int x1, float_of_int y1) (float_of_int x2, float_of_int y2) env;
+  let ellipsef (center: (float, float)) (rx: float) (ry: float) (env: glEnv) => {
     switch env.style.fillColor {
     | None => () /* Don't draw fill */
     | Some fill => drawEllipseInternal env center rx ry fill
@@ -79,9 +75,9 @@ module P = {
       drawArcStroke env center rx ry 0. PConstants.tau false false stroke env.style.strokeWeight
     }
   };
-  let ellipse env (cx: int, cy: int) rx ry =>
-    ellipsef env (float_of_int cx, float_of_int cy) (float_of_int rx) (float_of_int ry);
-  let quadf (env: glEnv) p1 p2 p3 p4 => {
+  let ellipse (cx: int, cy: int) rx ry (env: glEnv) =>
+    ellipsef (float_of_int cx, float_of_int cy) (float_of_int rx) (float_of_int ry) env;
+  let quadf p1 p2 p3 p4 (env: glEnv) => {
     switch env.style.fillColor {
     | None => () /* Don't draw fill */
     | Some fill =>
@@ -90,10 +86,10 @@ module P = {
     switch env.style.strokeColor {
     | None => () /* don't draw stroke */
     | Some color =>
-      linef env p1 p2;
-      linef env p2 p3;
-      linef env p3 p4;
-      linef env p4 p1;
+      linef p1 p2 env;
+      linef p2 p3 env;
+      linef p3 p4 env;
+      linef p4 p1 env;
       let r = float_of_int env.style.strokeWeight /. 2.;
       drawEllipseInternal env p1 r r color;
       drawEllipseInternal env p2 r r color;
@@ -101,18 +97,18 @@ module P = {
       drawEllipseInternal env p4 r r color
     }
   };
-  let quad (env: glEnv) (x1, y1) (x2, y2) (x3, y3) (x4, y4) =>
+  let quad (x1, y1) (x2, y2) (x3, y3) (x4, y4) (env: glEnv) =>
     quadf
-      env
       (float_of_int x1, float_of_int y1)
       (float_of_int x2, float_of_int y2)
       (float_of_int x3, float_of_int y3)
-      (float_of_int x4, float_of_int y4);
-  let rectf (env: glEnv) x y width height =>
-    quadf env (x, y) (x +. width, y) (x +. width, y +. height) (x, y +. height);
-  let rect (env: glEnv) x y width height =>
-    rectf env (float_of_int x) (float_of_int y) (float_of_int width) (float_of_int height);
-  let pixelf env (x: float) (y: float) color => {
+      (float_of_int x4, float_of_int y4)
+      env;
+  let rectf x y width height (env: glEnv) =>
+    quadf (x, y) (x +. width, y) (x +. width, y +. height) (x, y +. height) env;
+  let rect x y width height (env: glEnv) =>
+    rectf (float_of_int x) (float_of_int y) (float_of_int width) (float_of_int height) env;
+  let pixelf (x: float) (y: float) color (env: glEnv) => {
     let w = float_of_int env.style.strokeWeight;
     addRectToGlobalBatch
       env
@@ -122,8 +118,8 @@ module P = {
       topLeft::(x, y)
       ::color
   };
-  let pixel env x y color => pixelf env (float_of_int x) (float_of_int y) color;
-  let trianglef env p1 p2 p3 => {
+  let pixel x y color (env: glEnv) => pixelf (float_of_int x) (float_of_int y) color env;
+  let trianglef p1 p2 p3 (env: glEnv) => {
     switch env.style.fillColor {
     | None => () /* don't draw fill */
     | Some color => drawTriangleInternal env p1 p2 p3 ::color
@@ -131,22 +127,22 @@ module P = {
     switch env.style.strokeColor {
     | None => () /* don't draw stroke */
     | Some color =>
-      linef env p1 p2;
-      linef env p2 p3;
-      linef env p3 p1;
+      linef p1 p2 env;
+      linef p2 p3 env;
+      linef p3 p1 env;
       let r = float_of_int env.style.strokeWeight /. 2.;
       drawEllipseInternal env p1 r r color;
       drawEllipseInternal env p2 r r color;
       drawEllipseInternal env p3 r r color
     }
   };
-  let triangle env (x1, y1) (x2, y2) (x3, y3) =>
+  let triangle (x1, y1) (x2, y2) (x3, y3) (env: glEnv) =>
     trianglef
-      env
       (float_of_int x1, float_of_int y1)
       (float_of_int x2, float_of_int y2)
-      (float_of_int x3, float_of_int y3);
-  let arcf env centerPt rx ry start stop isOpen isPie => {
+      (float_of_int x3, float_of_int y3)
+      env;
+  let arcf centerPt rx ry start stop isOpen isPie (env: glEnv) => {
     switch env.style.fillColor {
     | None => () /* don't draw fill */
     | Some color => drawArcInternal env centerPt rx ry start stop isPie color
@@ -157,19 +153,19 @@ module P = {
       drawArcStroke env centerPt rx ry start stop isOpen isPie stroke env.style.strokeWeight
     }
   };
-  let arc env (cx, cy) rx ry start stop isOpen isPie =>
+  let arc (cx, cy) rx ry start stop isOpen isPie (env: glEnv) =>
     arcf
-      env
       (float_of_int cx, float_of_int cy)
       (float_of_int rx)
       (float_of_int ry)
       start
       stop
       isOpen
-      isPie;
-  let loadFont env filename => Font.parseFontFormat env filename;
-  let text env fnt str x y => Font.drawString env fnt str x y;
-  let background env color => {
+      isPie
+      env;
+  let loadFont filename (env: glEnv) => Font.parseFontFormat env filename;
+  let text fnt str x y (env: glEnv) => Font.drawString env fnt str x y;
+  let background color (env: glEnv) => {
     let w = float_of_int (width env);
     let h = float_of_int (height env);
     addRectToGlobalBatch

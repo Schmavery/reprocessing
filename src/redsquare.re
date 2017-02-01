@@ -11,8 +11,8 @@ let squareWidth = 300;
 let squareHeight = 300;
 
 let setup env => {
-  size env 600 600;
-  fill env (color 255 0 0);
+  size 600 600 env;
+  fill (color 255 0 0) env;
   {squarePos: (0, 0)}
 };
 
@@ -29,7 +29,7 @@ let draw state env => {
     } else {
       state.squarePos
     };
-  rect env x y squareWidth squareHeight;
+  rect x y squareWidth squareHeight env;
   {...state, squarePos}
 };
 

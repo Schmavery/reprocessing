@@ -11,15 +11,15 @@ let squareWidth = 300;
 let squareHeight = 300;
 
 let setup env => {
-  size env 600 600;
-  fill env (color 255 0 0);
-  strokeWeight env 8;
-  stroke env (color 155 0 0);
+  size 600 600 env;
+  fill (color 255 0 0) env;
+  strokeWeight 8 env;
+  stroke (color 155 0 0) env;
   {squarePos: (0, 0)}
 };
 
 let draw state env => {
-  background env (color 150 255 255);
+  background (color 150 255 255) env;
   let (sx, sy) = state.squarePos;
   let (px, py) = pmouse env;
   let (x, y) as squarePos =
@@ -31,7 +31,7 @@ let draw state env => {
     } else {
       state.squarePos
     };
-  rect env x y squareWidth squareHeight;
+  rect x y squareWidth squareHeight env;
   {...state, squarePos}
 };
 
