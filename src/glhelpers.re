@@ -506,7 +506,7 @@ let drawArcStroke
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
   let prevEl: ref (option (int, int)) = ref None;
   let halfwidth = float_of_int strokeWidth /. 2.;
-  for i in start_i to stop_i {
+  for i in start_i to (stop_i - 1) {
     let angle = anglePerFan *. float_of_int (i + 1);
     let xCoordinateInner = xCenterOfCircle +. cos angle *. (radx -. halfwidth);
     let yCoordinateInner = yCenterOfCircle +. sin angle *. (rady -. halfwidth);
