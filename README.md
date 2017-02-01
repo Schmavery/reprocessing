@@ -11,13 +11,13 @@ open P;
 open PUtils;
 
 let setup env => {
-  size env 600 600;
-  fill env (color 255 0 0)
+  size 600 600 env;
+  fill (color 255 0 0) env
 };
 
 let draw state env => {
-  background env (color 0 0 0);
-  rect env 150 150 300 300
+  background (color 0 0 0) env;
+  rect 150 150 300 300 env
 };
 
 ReProcessor.run ::setup ::draw ();
