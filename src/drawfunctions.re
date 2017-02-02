@@ -14,6 +14,7 @@ module P = {
   let mouse env => env.mouse.pos;
   let pmouse env => env.mouse.prevPos;
   let mousePressed env => env.mouse.pressed;
+  let keyCode env => env.keyboard.keyCode;
   let fill (c: colorT) (env: glEnv) => env.style = {...env.style, fillColor: Some c};
   let noFill (env: glEnv) => env.style = {...env.style, fillColor: None};
   let stroke color env => env.style = {...env.style, strokeColor: Some color};

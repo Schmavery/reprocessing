@@ -12,6 +12,8 @@ type styleT = {strokeColor: option colorT, strokeWeight: int, fillColor: option 
 
 type mouseT = {mutable pos: (int, int), mutable prevPos: (int, int), mutable pressed: bool};
 
+type keyboardT = {mutable keyCode: int};
+
 type frameT = {count: int, rate: int};
 
 type sizeT = {mutable height: int, mutable width: int, mutable resizeable: bool};
@@ -45,6 +47,7 @@ type glEnv = {
   pMatrixUniform: Gl.uniformT,
   uSampler: Gl.uniformT,
   batch: batchT,
+  keyboard: keyboardT,
   mouse: mouseT,
   mutable style: styleT,
   mutable styleStack: list styleT,
@@ -61,6 +64,9 @@ module type ReProcessorT = {
     mouseDragged::('a => glEnv => 'a)? =>
     mouseDown::('a => glEnv => 'a)? =>
     mouseUp::('a => glEnv => 'a)? =>
+    keyPressed::('a => glEnv => 'a)? =>
+    keyReleased::('a => glEnv => 'a)? =>
+    keyTyped::('a => glEnv => 'a)? =>
     unit =>
     unit;
 };

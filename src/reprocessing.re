@@ -26,7 +26,17 @@ let afterDraw f (env: glEnv) => {
 
 module ReProcessor: ReProcessorT = {
   type t = glEnv;
-  let run ::setup ::draw=? ::mouseMove=? ::mouseDragged=? ::mouseDown=? ::mouseUp=? () => {
+  let run
+      ::setup
+      ::draw=?
+      ::mouseMove=?
+      ::mouseDragged=?
+      ::mouseDown=?
+      ::mouseUp=?
+      ::keyPressed=?
+      ::keyReleased=?
+      ::keyTyped=?
+      () => {
     Random.self_init ();
     PUtils.noiseSeed (Random.int (PUtils.pow 2 30 - 1));
     let env = createCanvas (Gl.Window.init argv::Sys.argv) 200 200;
@@ -187,6 +197,30 @@ module ReProcessor: ReProcessorT = {
           } else {
             P.size (P.width env) (P.height env) env
           }
+      )
+      keyDown::(
+        fun ::keycode ::repeat => {
+          env.keyboard.keyCode = keycode;
+          if (not repeat) {
+            switch keyPressed {
+            | Some keyPressed => userState := keyPressed !userState env
+            | None => ()
+            }
+          };
+          switch keyTyped {
+          | Some keyTyped => userState := keyTyped !userState env
+          | None => ()
+          }
+        }
+      )
+      keyUp::(
+        fun ::keycode => {
+          env.keyboard.keyCode = keycode;
+          switch keyReleased {
+          | Some keyReleased => userState := keyReleased !userState env
+          | None => ()
+          }
+        }
       )
       ()
   };
