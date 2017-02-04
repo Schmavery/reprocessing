@@ -52,6 +52,8 @@ type glEnv = {
   mutable style: styleT,
   mutable styleStack: list styleT,
   mutable frame: frameT,
+  matrix: array float,
+  mutable matrixStack: list (array float),
   size: sizeT
 };
 

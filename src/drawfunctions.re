@@ -15,6 +15,8 @@ module P = {
   let pmouse env => env.mouse.prevPos;
   let mousePressed env => env.mouse.pressed;
   let keyCode env => env.keyboard.keyCode;
+  let translate dx dy env => Matrix.(matmatmul env.matrix (createTranslation dx dy));
+  let rotate theta env => Matrix.(matmatmul env.matrix (createRotation theta));
   let fill (c: colorT) (env: glEnv) => env.style = {...env.style, fillColor: Some c};
   let noFill (env: glEnv) => env.style = {...env.style, fillColor: None};
   let stroke color env => env.style = {...env.style, strokeColor: Some color};
@@ -43,10 +45,12 @@ module P = {
     | Some ({width, height} as i) => drawImageInternal i x y 0 0 width height env
     };
   let clear env => Gl.clear env.gl (Constants.color_buffer_bit lor Constants.depth_buffer_bit);
-  let linef (xx1: float, yy1: float) (xx2: float, yy2: float) (env: glEnv) =>
+  let linef p1 p2 (env: glEnv) =>
     switch env.style.strokeColor {
     | None => () /* don't draw stroke */
     | Some color =>
+      let transform = Matrix.matptmul env.matrix;
+      let ((xx1, yy1), (xx2, yy2)) = (transform p1, transform p2);
       let dx = xx2 -. xx1;
       let dy = yy2 -. yy1;
       let mag = PUtils.distf (xx1, yy1) (xx2, yy2);
@@ -68,17 +72,20 @@ module P = {
   let ellipsef (center: (float, float)) (rx: float) (ry: float) (env: glEnv) => {
     switch env.style.fillColor {
     | None => () /* Don't draw fill */
-    | Some fill => drawEllipseInternal env center rx ry fill
+    | Some fill => drawEllipseInternal env center rx ry env.matrix fill
     };
     switch env.style.strokeColor {
     | None => () /* Don't draw stroke */
     | Some stroke =>
-      drawArcStroke env center rx ry 0. PConstants.tau false false stroke env.style.strokeWeight
+      drawArcStroke
+        env center rx ry 0. PConstants.tau false false env.matrix stroke env.style.strokeWeight
     }
   };
   let ellipse (cx: int, cy: int) rx ry (env: glEnv) =>
     ellipsef (float_of_int cx, float_of_int cy) (float_of_int rx) (float_of_int ry) env;
   let quadf p1 p2 p3 p4 (env: glEnv) => {
+    let transform = Matrix.matptmul env.matrix;
+    let (p1, p2, p3, p4) = (transform p1, transform p2, transform p3, transform p4);
     switch env.style.fillColor {
     | None => () /* Don't draw fill */
     | Some fill =>
@@ -92,10 +99,11 @@ module P = {
       linef p3 p4 env;
       linef p4 p1 env;
       let r = float_of_int env.style.strokeWeight /. 2.;
-      drawEllipseInternal env p1 r r color;
-      drawEllipseInternal env p2 r r color;
-      drawEllipseInternal env p3 r r color;
-      drawEllipseInternal env p4 r r color
+      let m = Matrix.identity;
+      drawEllipseInternal env p1 r r m color;
+      drawEllipseInternal env p2 r r m color;
+      drawEllipseInternal env p3 r r m color;
+      drawEllipseInternal env p4 r r m color
     }
   };
   let quad (x1, y1) (x2, y2) (x3, y3) (x4, y4) (env: glEnv) =>
@@ -121,6 +129,8 @@ module P = {
   };
   let pixel x y color (env: glEnv) => pixelf (float_of_int x) (float_of_int y) color env;
   let trianglef p1 p2 p3 (env: glEnv) => {
+    let transform = Matrix.matptmul env.matrix;
+    let (p1, p2, p3) = (transform p1, transform p2, transform p3);
     switch env.style.fillColor {
     | None => () /* don't draw fill */
     | Some color => drawTriangleInternal env p1 p2 p3 ::color
@@ -132,9 +142,10 @@ module P = {
       linef p2 p3 env;
       linef p3 p1 env;
       let r = float_of_int env.style.strokeWeight /. 2.;
-      drawEllipseInternal env p1 r r color;
-      drawEllipseInternal env p2 r r color;
-      drawEllipseInternal env p3 r r color
+      let m = Matrix.identity;
+      drawEllipseInternal env p1 r r m color;
+      drawEllipseInternal env p2 r r m color;
+      drawEllipseInternal env p3 r r m color
     }
   };
   let triangle (x1, y1) (x2, y2) (x3, y3) (env: glEnv) =>
@@ -146,12 +157,13 @@ module P = {
   let arcf centerPt rx ry start stop isOpen isPie (env: glEnv) => {
     switch env.style.fillColor {
     | None => () /* don't draw fill */
-    | Some color => drawArcInternal env centerPt rx ry start stop isPie color
+    | Some color => drawArcInternal env centerPt rx ry start stop isPie env.matrix color
     };
     switch env.style.strokeColor {
     | None => () /* don't draw stroke */
     | Some stroke =>
-      drawArcStroke env centerPt rx ry start stop isOpen isPie stroke env.style.strokeWeight
+      drawArcStroke
+        env centerPt rx ry start stop isOpen isPie env.matrix stroke env.style.strokeWeight
     }
   };
   let arc (cx, cy) rx ry start stop isOpen isPie (env: glEnv) =>

@@ -158,6 +158,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
       strokeColor: Some {r: 0, g: 0, b: 0}
     },
     styleStack: [],
+    matrix: Matrix.createIdentity (),
+    matrixStack: [],
     frame: {count: 1, rate: 10},
     size: {height, width, resizeable: true}
   }
@@ -238,30 +240,28 @@ let drawGeometry
  * underlying array of memory. So mutation done to that sub array will be reflected in the original one.
  */
 let flushGlobalBatch env =>
-  if ((env).batch.elementPtr > 0) {
+  if (env.batch.elementPtr > 0) {
     let textureBuffer =
-      switch (env).batch.currTex {
-      | None => (env).batch.nullTex
+      switch env.batch.currTex {
+      | None => env.batch.nullTex
       | Some textureBuffer => textureBuffer
       };
     drawGeometry
-      vertexArray::(Gl.Bigarray.sub (env).batch.vertexArray offset::0 len::(env).batch.vertexPtr)
-      elementArray::(
-        Gl.Bigarray.sub (env).batch.elementArray offset::0 len::(env).batch.elementPtr
-      )
+      vertexArray::(Gl.Bigarray.sub env.batch.vertexArray offset::0 len::env.batch.vertexPtr)
+      elementArray::(Gl.Bigarray.sub env.batch.elementArray offset::0 len::env.batch.elementPtr)
       mode::Constants.triangles
-      count::(env).batch.elementPtr
+      count::env.batch.elementPtr
       ::textureBuffer
       env;
-    (env).batch.currTex = None;
-    (env).batch.vertexPtr = 0;
-    (env).batch.elementPtr = 0
+    env.batch.currTex = None;
+    env.batch.vertexPtr = 0;
+    env.batch.elementPtr = 0
   };
 
 let maybeFlushBatch env texture adding =>
   if (
-    (env).batch.elementPtr + adding >= circularBufferSize ||
-    (env).batch.elementPtr > 0 && (env).batch.currTex !== texture
+    env.batch.elementPtr + adding >= circularBufferSize ||
+    env.batch.elementPtr > 0 && env.batch.currTex !== texture
   ) {
     flushGlobalBatch env
   };
@@ -301,8 +301,8 @@ let addRectToGlobalBatch
   maybeFlushBatch env None 6;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let i = (env).batch.vertexPtr;
-  let vertexArrayToMutate = (env).batch.vertexArray;
+  let i = env.batch.vertexPtr;
+  let vertexArrayToMutate = env.batch.vertexArray;
   set vertexArrayToMutate (i + 0) x1;
   set vertexArrayToMutate (i + 1) y1;
   set vertexArrayToMutate (i + 2) r;
@@ -336,24 +336,24 @@ let addRectToGlobalBatch
   set vertexArrayToMutate (i + 30) 0.0;
   set vertexArrayToMutate (i + 31) 0.0;
   let ii = i / vertexSize;
-  let j = (env).batch.elementPtr;
-  let elementArrayToMutate = (env).batch.elementArray;
+  let j = env.batch.elementPtr;
+  let elementArrayToMutate = env.batch.elementArray;
   set elementArrayToMutate (j + 0) ii;
   set elementArrayToMutate (j + 1) (ii + 1);
   set elementArrayToMutate (j + 2) (ii + 2);
   set elementArrayToMutate (j + 3) (ii + 1);
   set elementArrayToMutate (j + 4) (ii + 2);
   set elementArrayToMutate (j + 5) (ii + 3);
-  (env).batch.vertexPtr = i + 4 * vertexSize;
-  (env).batch.elementPtr = j + 6
+  env.batch.vertexPtr = i + 4 * vertexSize;
+  env.batch.elementPtr = j + 6
 };
 
 let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   maybeFlushBatch env None 3;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let i = (env).batch.vertexPtr;
-  let vertexArrayToMutate = (env).batch.vertexArray;
+  let i = env.batch.vertexPtr;
+  let vertexArrayToMutate = env.batch.vertexArray;
   set vertexArrayToMutate (i + 0) x1;
   set vertexArrayToMutate (i + 1) y1;
   set vertexArrayToMutate (i + 2) r;
@@ -379,20 +379,20 @@ let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   set vertexArrayToMutate (i + 22) 0.0;
   set vertexArrayToMutate (i + 23) 0.0;
   let ii = i / vertexSize;
-  let j = (env).batch.elementPtr;
-  let elementArrayToMutate = (env).batch.elementArray;
+  let j = env.batch.elementPtr;
+  let elementArrayToMutate = env.batch.elementArray;
   set elementArrayToMutate (j + 0) ii;
   set elementArrayToMutate (j + 1) (ii + 1);
   set elementArrayToMutate (j + 2) (ii + 2);
-  (env).batch.vertexPtr = i + 3 * vertexSize;
-  (env).batch.elementPtr = j + 3
+  env.batch.vertexPtr = i + 3 * vertexSize;
+  env.batch.elementPtr = j + 3
 };
 
 let drawLineInternal env (xx1, yy1) (xx2, yy2) color => {
   let dx = xx2 -. xx1;
   let dy = yy2 -. yy1;
   let mag = PUtils.distf (xx1, yy1) (xx2, yy2);
-  let radius = float_of_int (env).style.strokeWeight /. 2.;
+  let radius = float_of_int env.style.strokeWeight /. 2.;
   let xthing = dy /. mag *. radius;
   let ything = -. dx /. mag *. radius;
   let x1 = xx2 +. xthing;
@@ -414,18 +414,20 @@ let drawArcInternal
     (start: float)
     (stop: float)
     (isPie: bool)
+    (matrix: array float)
     {r, g, b} => {
+  let transform = Matrix.matptmul matrix;
   let noOfFans = int_of_float (radx +. rady) * 2 + 10;
   maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let verticesData = (env).batch.vertexArray;
-  let elementData = (env).batch.elementArray;
+  let verticesData = env.batch.vertexArray;
+  let elementData = env.batch.elementArray;
   let set = Gl.Bigarray.set;
   let get = Gl.Bigarray.get;
-  let vertexArrayOffset = (env).batch.vertexPtr;
-  let elementArrayOffset = (env).batch.elementPtr;
+  let vertexArrayOffset = env.batch.vertexPtr;
+  let elementArrayOffset = env.batch.elementPtr;
   let start_i =
     if isPie {
       /* Start one earlier and force the first point to be the center */
@@ -436,13 +438,18 @@ let drawArcInternal
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
   for i in start_i to stop_i {
     let (xCoordinate, yCoordinate) =
-      if (isPie && i - start_i == 0) {
-        /* force the first point to be the center */
-        (xCenterOfCircle, yCenterOfCircle)
-      } else {
-        let angle = anglePerFan *. float_of_int (i + 1);
-        (xCenterOfCircle +. cos angle *. radx, yCenterOfCircle +. sin angle *. rady)
-      };
+      transform (
+        if (isPie && i - start_i == 0) {
+          (
+            /* force the first point to be the center */
+            xCenterOfCircle,
+            yCenterOfCircle
+          )
+        } else {
+          let angle = anglePerFan *. float_of_int (i + 1);
+          (xCenterOfCircle +. cos angle *. radx, yCenterOfCircle +. sin angle *. rady)
+        }
+      );
     let ii = (i - start_i) * vertexSize + vertexArrayOffset;
     set verticesData (ii + 0) xCoordinate;
     set verticesData (ii + 1) yCoordinate;
@@ -469,12 +476,12 @@ let drawArcInternal
       set elementData (jj + 2) (ii / vertexSize)
     }
   };
-  (env).batch.vertexPtr = (env).batch.vertexPtr + noOfFans * vertexSize;
-  (env).batch.elementPtr = (env).batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
+  env.batch.vertexPtr = env.batch.vertexPtr + noOfFans * vertexSize;
+  env.batch.elementPtr = env.batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
 };
 
-let drawEllipseInternal env center (radx: float) (rady: float) c =>
-  drawArcInternal env center radx rady 0. PConstants.tau false c;
+let drawEllipseInternal env center (radx: float) (rady: float) (matrix: array float) c =>
+  drawArcInternal env center radx rady 0. PConstants.tau false matrix c;
 
 let drawArcStroke
     env
@@ -485,11 +492,13 @@ let drawArcStroke
     (stop: float)
     (isOpen: bool)
     (isPie: bool)
+    (matrix: array float)
     ({r, g, b} as strokeColor)
     strokeWidth => {
+  let transform = Matrix.matptmul matrix;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
-  let verticesData = (env).batch.vertexArray;
-  let elementData = (env).batch.elementArray;
+  let verticesData = env.batch.vertexArray;
+  let elementData = env.batch.elementArray;
   let set = Gl.Bigarray.set;
   let noOfFans = int_of_float (radx +. rady) * 2 + 10;
   maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
@@ -503,13 +512,19 @@ let drawArcStroke
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
   let prevEl: ref (option (int, int)) = ref None;
   let halfwidth = float_of_int strokeWidth /. 2.;
-  for i in start_i to (stop_i - 1) {
+  for i in start_i to (stop_i) {
     let angle = anglePerFan *. float_of_int (i + 1);
-    let xCoordinateInner = xCenterOfCircle +. cos angle *. (radx -. halfwidth);
-    let yCoordinateInner = yCenterOfCircle +. sin angle *. (rady -. halfwidth);
-    let xCoordinateOuter = xCenterOfCircle +. cos angle *. (radx +. halfwidth);
-    let yCoordinateOuter = yCenterOfCircle +. sin angle *. (rady +. halfwidth);
-    let ii = (env).batch.vertexPtr;
+    let (xCoordinateInner, yCoordinateInner) =
+      transform (
+        xCenterOfCircle +. cos angle *. (radx -. halfwidth),
+        yCenterOfCircle +. sin angle *. (rady -. halfwidth)
+      );
+    let (xCoordinateOuter, yCoordinateOuter) =
+      transform (
+        xCenterOfCircle +. cos angle *. (radx +. halfwidth),
+        yCenterOfCircle +. sin angle *. (rady +. halfwidth)
+      );
+    let ii = env.batch.vertexPtr;
     set verticesData (ii + 0) xCoordinateInner;
     set verticesData (ii + 1) yCoordinateInner;
     set verticesData (ii + 2) r;
@@ -527,38 +542,39 @@ let drawArcStroke
     set verticesData (ii + 5) 1.0;
     set verticesData (ii + 6) 0.0;
     set verticesData (ii + 7) 0.0;
-    (env).batch.vertexPtr = (env).batch.vertexPtr + vertexSize * 2;
+    env.batch.vertexPtr = env.batch.vertexPtr + vertexSize * 2;
     let currOuter = ii / vertexSize;
     let currInner = ii / vertexSize - 1;
     let currEl = Some (currInner, currOuter);
     switch !prevEl {
     | None => prevEl := currEl
     | Some (prevInner, prevOuter) =>
-      let elementArrayOffset = (env).batch.elementPtr;
+      let elementArrayOffset = env.batch.elementPtr;
       set elementData elementArrayOffset prevInner;
       set elementData (elementArrayOffset + 1) prevOuter;
       set elementData (elementArrayOffset + 2) currOuter;
       set elementData (elementArrayOffset + 3) currOuter;
       set elementData (elementArrayOffset + 4) prevInner;
       set elementData (elementArrayOffset + 5) currInner;
-      (env).batch.elementPtr = (env).batch.elementPtr + 6;
+      env.batch.elementPtr = env.batch.elementPtr + 6;
       prevEl := currEl
     }
   };
   if (not isOpen) {
-    let startX = xCenterOfCircle +. cos start *. radx;
-    let startY = yCenterOfCircle +. sin start *. rady;
-    let stopX = xCenterOfCircle +. cos stop *. radx;
-    let stopY = yCenterOfCircle +. sin stop *. rady;
+    let (startX, startY) =
+      transform (xCenterOfCircle +. cos start *. radx, yCenterOfCircle +. sin start *. rady);
+    let (stopX, stopY) =
+      transform (xCenterOfCircle +. cos stop *. radx, yCenterOfCircle +. sin stop *. rady);
     if isPie {
       drawLineInternal env (startX, startY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
       drawLineInternal env (stopX, stopY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
-      drawEllipseInternal env (xCenterOfCircle, yCenterOfCircle) halfwidth halfwidth strokeColor
+      drawEllipseInternal
+        env (transform (xCenterOfCircle, yCenterOfCircle)) halfwidth halfwidth matrix strokeColor
     } else {
       drawLineInternal env (startX, startY) (stopX, stopY) strokeColor
     };
-    drawEllipseInternal env (startX, startY) halfwidth halfwidth strokeColor;
-    drawEllipseInternal env (stopX, stopY) halfwidth halfwidth strokeColor
+    drawEllipseInternal env (startX, startY) halfwidth halfwidth matrix strokeColor;
+    drawEllipseInternal env (stopX, stopY) halfwidth halfwidth matrix strokeColor
   }
 };
 
@@ -607,8 +623,8 @@ let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::sub
   let (x3, y3) = (float_of_int @@ x + subw, float_of_int y);
   let (x4, y4) = (float_of_int x, float_of_int y);
   let set = Gl.Bigarray.set;
-  let ii = (env).batch.vertexPtr;
-  let vertexArray = (env).batch.vertexArray;
+  let ii = env.batch.vertexPtr;
+  let vertexArray = env.batch.vertexArray;
   set vertexArray (ii + 0) x1;
   set vertexArray (ii + 1) y1;
   set vertexArray (ii + 2) 0.0;
@@ -641,17 +657,17 @@ let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::sub
   set vertexArray (ii + 29) 0.0;
   set vertexArray (ii + 30) fsubx;
   set vertexArray (ii + 31) fsuby;
-  let jj = (env).batch.elementPtr;
-  let elementArray = (env).batch.elementArray;
+  let jj = env.batch.elementPtr;
+  let elementArray = env.batch.elementArray;
   set elementArray jj (ii / vertexSize);
   set elementArray (jj + 1) (ii / vertexSize + 1);
   set elementArray (jj + 2) (ii / vertexSize + 2);
   set elementArray (jj + 3) (ii / vertexSize + 1);
   set elementArray (jj + 4) (ii / vertexSize + 2);
   set elementArray (jj + 5) (ii / vertexSize + 3);
-  (env).batch.vertexPtr = ii + 4 * vertexSize;
-  (env).batch.elementPtr = jj + 6;
-  (env).batch.currTex = Some textureBuffer
+  env.batch.vertexPtr = ii + 4 * vertexSize;
+  env.batch.elementPtr = jj + 6;
+  env.batch.currTex = Some textureBuffer
 };
 
 
@@ -659,10 +675,10 @@ let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::sub
 let resetSize env width height => {
   env.size.width = width;
   env.size.height = height;
-  Gl.viewport context::(env).gl x::0 y::0 ::width ::height;
-  Gl.clearColor context::(env).gl r::0. g::0. b::0. a::1.;
+  Gl.viewport context::env.gl x::0 y::0 ::width ::height;
+  Gl.clearColor context::env.gl r::0. g::0. b::0. a::1.;
   Gl.Mat4.ortho
-    out::(env).camera.projectionMatrix
+    out::env.camera.projectionMatrix
     left::0.
     right::(float_of_int width)
     bottom::(float_of_int height)
@@ -672,5 +688,5 @@ let resetSize env width height => {
 
   /** Tell OpenGL about what the uniform called `pMatrixUniform` is, here it's the projectionMatrix. **/
   Gl.uniformMatrix4fv
-    context::(env).gl location::(env).pMatrixUniform value::(env).camera.projectionMatrix
+    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix
 };
