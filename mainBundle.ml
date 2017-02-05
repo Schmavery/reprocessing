@@ -1,3 +1,225 @@
+module Events
+= struct
+#1 "events.ml"
+type buttonStateT =
+  | LeftButton
+  | MiddleButton
+  | RightButton
+type stateT =
+  | MouseDown
+  | MouseUp
+type keycodeT =
+  | Backspace
+  | Tab
+  | Enter
+  | Escape
+  | Space
+  | Quote
+  | Comma
+  | Minus
+  | Period
+  | Slash
+  | Num_0
+  | Num_1
+  | Num_2
+  | Num_3
+  | Num_4
+  | Num_5
+  | Num_6
+  | Num_7
+  | Num_8
+  | Num_9
+  | Semicolon
+  | Equals
+  | OpenBracket
+  | Backslash
+  | CloseBracket
+  | A
+  | B
+  | C
+  | D
+  | E
+  | F
+  | G
+  | H
+  | I
+  | J
+  | K
+  | L
+  | M
+  | N
+  | O
+  | P
+  | Q
+  | R
+  | S
+  | T
+  | U
+  | V
+  | W
+  | X
+  | Y
+  | Z
+  | Right
+  | Left
+  | Down
+  | Up
+  | LeftCtrl
+  | LeftShift
+  | LeftAlt
+  | LeftOsKey
+  | RightCtrl
+  | RightShift
+  | RightAlt
+  | RightOsKey
+  | CapsLock
+  | Backtick
+  | Nothing
+let keycodeMap: int -> keycodeT =
+  function
+  | 8 -> Backspace
+  | 9 -> Tab
+  | 13 -> Enter
+  | 16 -> LeftShift
+  | 17 -> LeftCtrl
+  | 18 -> LeftAlt
+  | 20 -> CapsLock
+  | 27 -> Escape
+  | 32 -> Space
+  | 37 -> Left
+  | 38 -> Up
+  | 39 -> Right
+  | 40 -> Down
+  | 48 -> Num_0
+  | 49 -> Num_1
+  | 50 -> Num_2
+  | 51 -> Num_3
+  | 52 -> Num_4
+  | 53 -> Num_5
+  | 54 -> Num_6
+  | 55 -> Num_7
+  | 56 -> Num_8
+  | 57 -> Num_9
+  | 65 -> A
+  | 66 -> B
+  | 67 -> C
+  | 68 -> D
+  | 69 -> E
+  | 70 -> F
+  | 71 -> G
+  | 72 -> H
+  | 73 -> I
+  | 74 -> J
+  | 75 -> K
+  | 76 -> L
+  | 77 -> M
+  | 78 -> N
+  | 79 -> O
+  | 80 -> P
+  | 81 -> Q
+  | 82 -> R
+  | 83 -> S
+  | 84 -> T
+  | 85 -> U
+  | 86 -> V
+  | 87 -> W
+  | 88 -> X
+  | 89 -> Y
+  | 90 -> Z
+  | 91 -> LeftOsKey
+  | 93 -> RightOsKey
+  | 186 -> Semicolon
+  | 187 -> Equals
+  | 188 -> Comma
+  | 189 -> Minus
+  | 190 -> Period
+  | 191 -> Slash
+  | 192 -> Backtick
+  | 219 -> OpenBracket
+  | 220 -> Backslash
+  | 221 -> CloseBracket
+  | 222 -> Quote
+  | _ -> Nothing
+
+module type t  =
+  sig
+    type buttonStateT =
+      | LeftButton
+      | MiddleButton
+      | RightButton
+    type stateT =
+      | MouseDown
+      | MouseUp
+    type keycodeT =
+      | Backspace
+      | Tab
+      | Enter
+      | Escape
+      | Space
+      | Quote
+      | Comma
+      | Minus
+      | Period
+      | Slash
+      | Num_0
+      | Num_1
+      | Num_2
+      | Num_3
+      | Num_4
+      | Num_5
+      | Num_6
+      | Num_7
+      | Num_8
+      | Num_9
+      | Semicolon
+      | Equals
+      | OpenBracket
+      | Backslash
+      | CloseBracket
+      | A
+      | B
+      | C
+      | D
+      | E
+      | F
+      | G
+      | H
+      | I
+      | J
+      | K
+      | L
+      | M
+      | N
+      | O
+      | P
+      | Q
+      | R
+      | S
+      | T
+      | U
+      | V
+      | W
+      | X
+      | Y
+      | Z
+      | Right
+      | Left
+      | Down
+      | Up
+      | LeftCtrl
+      | LeftShift
+      | LeftAlt
+      | LeftOsKey
+      | RightCtrl
+      | RightShift
+      | RightAlt
+      | RightOsKey
+      | CapsLock
+      | Backtick
+      | Nothing
+    val keycodeMap : int -> keycodeT
+  end
+end
 module Constants
 = struct
 #1 "constants.ml"
@@ -113,17 +335,7 @@ module type t  =
         val getContext : t -> contextT
       end
     module Window : WindowT
-    module type EventsT  =
-      sig
-        type buttonStateT =
-          | LEFT_BUTTON
-          | MIDDLE_BUTTON
-          | RIGHT_BUTTON
-        type stateT =
-          | DOWN
-          | UP
-      end
-    module Events : EventsT
+    module Events : Events.t
     val render :
       window:Window.t ->
         ?mouseDown:(button:Events.buttonStateT ->
@@ -133,8 +345,10 @@ module type t  =
                       state:Events.stateT -> x:int -> y:int -> unit)
             ->
             ?mouseMove:(x:int -> y:int -> unit) ->
-              ?windowResize:(unit -> unit) ->
-                displayFunc:(float -> unit) -> unit -> unit
+              ?keyDown:(keycode:Events.keycodeT -> repeat:bool -> unit) ->
+                ?keyUp:(keycode:Events.keycodeT -> unit) ->
+                  ?windowResize:(unit -> unit) ->
+                    displayFunc:(float -> unit) -> unit -> unit
     type programT
     type shaderT
     val clearColor :
@@ -327,6 +541,7 @@ module Document =
 external getButton : 'eventT -> int = "button"[@@bs.get ]
 external getClientX : 'eventT -> int = "clientX"[@@bs.get ]
 external getClientY : 'eventT -> int = "clientY"[@@bs.get ]
+external getWhich : 'eventT -> int = "which"[@@bs.get ]
 external getBoundingClientRect :
   'canvas -> 'leftAndTop = "getBoundingClientRect"[@@bs.send ]
 external getTop : 'a -> int = "top"[@@bs.get ]
@@ -408,81 +623,88 @@ module Gl : Reglinterface.Gl.t =
         let initDisplayMode ~window  ~double_buffer:_  () = ()
         let getContext (window : t) =
           (getContext window "webgl"
-             ([%bs.obj { preserveDrawingBuffer = true }]) : contextT)
+             ([%bs.obj { preserveDrawingBuffer = true; antialias = false }]) : 
+          contextT)
       end
-    module type EventsT  =
-      sig
-        type buttonStateT =
-          | LEFT_BUTTON
-          | MIDDLE_BUTTON
-          | RIGHT_BUTTON
-        type stateT =
-          | DOWN
-          | UP
-      end
-    module Events =
-      struct
-        type buttonStateT =
-          | LEFT_BUTTON
-          | MIDDLE_BUTTON
-          | RIGHT_BUTTON
-        type stateT =
-          | DOWN
-          | UP
-      end
+    module Events = Events
     type mouseButtonEventT =
       button:Events.buttonStateT ->
         state:Events.stateT -> x:int -> y:int -> unit
-    let render ~window:(window : Window.t) 
+    let render ~window:(canvas : Window.t) 
       ?mouseDown:(mouseDown : mouseButtonEventT option) 
       ?mouseUp:(mouseUp : mouseButtonEventT option) 
       ?mouseMove:(mouseMove : (x:int -> y:int -> unit) option) 
+      ?keyDown:(keyDown :
+                 (keycode:Events.keycodeT -> repeat:bool -> unit) option)
+       ?keyUp:(keyUp : (keycode:Events.keycodeT -> unit) option) 
       ?windowResize:(windowResize : (unit -> unit) option) 
       ~displayFunc:(displayFunc : float -> unit)  () =
       (match mouseDown with
        | None  -> ()
        | ((Some (cb))[@explicit_arity ]) ->
-           Document.addEventListener window "mousedown"
+           Document.addEventListener canvas "mousedown"
              (fun e  ->
                 let button =
                   match getButton e with
-                  | 0 -> Events.LEFT_BUTTON
-                  | 1 -> Events.MIDDLE_BUTTON
-                  | 2 -> Events.RIGHT_BUTTON
+                  | 0 -> Events.LeftButton
+                  | 1 -> Events.MiddleButton
+                  | 2 -> Events.RightButton
                   | _ -> assert false in
-                let state = Events.DOWN in
-                let rect = getBoundingClientRect window in
+                let state = Events.MouseDown in
+                let rect = getBoundingClientRect canvas in
                 let x = (getClientX e) - (getLeft rect) in
                 let y = (getClientY e) - (getTop rect) in
                 cb ~button ~state ~x ~y));
       (match mouseUp with
        | None  -> ()
        | ((Some (cb))[@explicit_arity ]) ->
-           Document.addEventListener window "mouseup"
+           Document.addEventListener canvas "mouseup"
              (fun e  ->
                 let button =
                   match getButton e with
-                  | 0 -> Events.LEFT_BUTTON
-                  | 1 -> Events.MIDDLE_BUTTON
-                  | 2 -> Events.RIGHT_BUTTON
+                  | 0 -> Events.LeftButton
+                  | 1 -> Events.MiddleButton
+                  | 2 -> Events.RightButton
                   | _ -> assert false in
-                let state = Events.UP in
-                let rect = getBoundingClientRect window in
+                let state = Events.MouseUp in
+                let rect = getBoundingClientRect canvas in
                 let x = (getClientX e) - (getLeft rect) in
                 let y = (getClientY e) - (getTop rect) in
                 cb ~button ~state ~x ~y));
       (match mouseMove with
        | None  -> ()
        | ((Some (cb))[@explicit_arity ]) ->
-           Document.addEventListener window "mousemove"
+           Document.addEventListener canvas "mousemove"
              (fun e  ->
-                let rect = getBoundingClientRect window in
+                let rect = getBoundingClientRect canvas in
                 let x = (getClientX e) - (getLeft rect) in
                 let y = (getClientY e) - (getTop rect) in cb ~x ~y));
-      (let rec tick prev () =
-         let now = Document.now () in
-         displayFunc (now -. prev); Document.requestAnimationFrame (tick now) in
-       Document.requestAnimationFrame (tick (Document.now ())))
+      (let keyLastPressed = ref None in
+       (match keyDown with
+        | None  -> ()
+        | ((Some (cb))[@explicit_arity ]) ->
+            Document.addEventListener Document.window "keydown"
+              (fun e  ->
+                 let keycode = getWhich e in
+                 let repeat =
+                   match !keyLastPressed with
+                   | None  -> false
+                   | ((Some (k))[@explicit_arity ]) -> k == keycode in
+                 keyLastPressed := (Some keycode);
+                 cb ~keycode:(Events.keycodeMap keycode) ~repeat));
+       (match keyUp with
+        | None  -> ()
+        | ((Some (cb))[@explicit_arity ]) ->
+            Document.addEventListener Document.window "keyup"
+              (fun e  ->
+                 let keycode = getWhich e in
+                 keyLastPressed := None;
+                 cb ~keycode:(Events.keycodeMap keycode)));
+       (let rec tick prev () =
+          let now = Document.now () in
+          displayFunc (now -. prev);
+          Document.requestAnimationFrame (tick now) in
+        Document.requestAnimationFrame (tick (Document.now ()))))
     type programT
     type shaderT
     external clearColor :
@@ -931,20 +1153,26 @@ type colorT = {
   r: int;
   g: int;
   b: int;}
-type strokeT = {
-  color: colorT;
-  weight: int;}
-type mouseT = {
-  pos: (int* int);
-  prevPos: (int* int);
-  pressed: bool;}
+type styleT =
+  {
+  strokeColor: colorT option;
+  strokeWeight: int;
+  fillColor: colorT option;}
+type mouseT =
+  {
+  mutable pos: (int* int);
+  mutable prevPos: (int* int);
+  mutable pressed: bool;}
+type keyboardT = {
+  mutable keyCode: Gl.Events.keycodeT;}
 type frameT = {
   count: int;
   rate: int;}
-type sizeT = {
-  height: int;
-  width: int;
-  resizeable: bool;}
+type sizeT =
+  {
+  mutable height: int;
+  mutable width: int;
+  mutable resizeable: bool;}
 let circularBufferSize = 6 * 10000
 let vertexSize = 8
 type _imageT =
@@ -975,22 +1203,27 @@ type glEnv =
   pMatrixUniform: Gl.uniformT;
   uSampler: Gl.uniformT;
   batch: batchT;
-  currFill: colorT option;
-  currBackground: colorT;
+  keyboard: keyboardT;
   mouse: mouseT;
-  stroke: strokeT;
-  frame: frameT;
+  mutable style: styleT;
+  mutable styleStack: styleT list;
+  mutable frame: frameT;
+  matrix: float array;
+  mutable matrixStack: float array list;
   size: sizeT;}
 module type ReProcessorT  =
   sig
     type t
     val run :
-      setup:(glEnv ref -> 'a) ->
-        ?draw:('a -> glEnv ref -> 'a) ->
-          ?mouseMove:('a -> glEnv ref -> 'a) ->
-            ?mouseDragged:('a -> glEnv ref -> 'a) ->
-              ?mouseDown:('a -> glEnv ref -> 'a) ->
-                ?mouseUp:('a -> glEnv ref -> 'a) -> unit -> unit
+      setup:(glEnv -> 'a) ->
+        ?draw:('a -> glEnv -> 'a) ->
+          ?mouseMove:('a -> glEnv -> 'a) ->
+            ?mouseDragged:('a -> glEnv -> 'a) ->
+              ?mouseDown:('a -> glEnv -> 'a) ->
+                ?mouseUp:('a -> glEnv -> 'a) ->
+                  ?keyPressed:('a -> glEnv -> 'a) ->
+                    ?keyReleased:('a -> glEnv -> 'a) ->
+                      ?keyTyped:('a -> glEnv -> 'a) -> unit -> unit
   end
 module Stream =
   struct
@@ -1028,6 +1261,47 @@ let read (name : string) =
     | None  -> (close_in ic; List.rev acc) in
   (loop []) |> (String.concat "")
 let append_char (s : string) (c : char) = (s ^ (String.make 1 c) : string)
+end
+module Matrix
+= struct
+#1 "matrix.ml"
+let identity = [|1.;0.;0.;0.;1.;0.;0.;0.;1.|]
+let createIdentity () = [|1.;0.;0.;0.;1.;0.;0.;0.;1.|]
+let createTranslation dx dy = [|1.;0.;dx;0.;1.;dy;0.;0.;1.|]
+let createRotation theta =
+  [|(cos theta);(-. (sin theta));0.;(sin theta);(cos theta);0.;0.;0.;1.|]
+let copyInto ~src  ~dst  =
+  dst.(0) <- src.(0);
+  dst.(1) <- src.(1);
+  dst.(2) <- src.(2);
+  dst.(3) <- src.(3);
+  dst.(4) <- src.(4);
+  dst.(5) <- src.(5);
+  dst.(6) <- src.(6);
+  dst.(7) <- src.(7);
+  dst.(8) <- src.(8)
+let matmatmul (mat1 : float array) (mat2 : float array) =
+  let [|m0;m1;m2;m3;m4;m5;m6;m7;m8|] = mat1 in
+  let [|ma;mb;mc;md;me;mf;mg;mh;mi|] = mat2 in
+  mat1.(0) <- ((ma *. m0) +. (md *. m1)) +. (mg *. m2);
+  mat1.(1) <- ((mb *. m0) +. (me *. m1)) +. (mh *. m2);
+  mat1.(2) <- ((mc *. m0) +. (mf *. m1)) +. (mi *. m2);
+  mat1.(3) <- ((ma *. m3) +. (md *. m4)) +. (mg *. m5);
+  mat1.(4) <- ((mb *. m3) +. (me *. m4)) +. (mh *. m5);
+  mat1.(5) <- ((mc *. m3) +. (mf *. m4)) +. (mi *. m5);
+  mat1.(6) <- ((ma *. m6) +. (md *. m7)) +. (mg *. m8);
+  mat1.(7) <- ((mb *. m6) +. (me *. m7)) +. (mh *. m8);
+  mat1.(8) <- ((mc *. m6) +. (mf *. m7)) +. (mi *. m8)
+let matvecmul m v =
+  let a = v.(0) in
+  let b = v.(1) in
+  let c = v.(2) in
+  v.(0) <- ((a *. (m.(0))) +. (b *. (m.(1)))) +. (c *. (m.(2)));
+  v.(1) <- ((a *. (m.(3))) +. (b *. (m.(4)))) +. (c *. (m.(5)));
+  v.(2) <- ((a *. (m.(6))) +. (b *. (m.(7)))) +. (c *. (m.(8)))
+let matptmul m (x,y) =
+  ((((x *. (m.(0))) +. (y *. (m.(1)))) +. (m.(2))),
+    (((x *. (m.(3))) +. (y *. (m.(4)))) +. (m.(5))))
 end
 module Shaders
 = struct
@@ -1319,38 +1593,43 @@ let createCanvas window (height : int) (width : int) =
            Gl.Mat4.ortho ~out:(camera.projectionMatrix) ~left:0.
              ~right:(float_of_int width) ~bottom:(float_of_int height)
              ~top:0. ~near:0. ~far:1.;
-           (let currFill = Some { r = 0; g = 0; b = 0 } in
-            let currBackground = { r = 0; g = 0; b = 0 } in
-            {
-              camera;
-              window;
-              gl;
-              batch =
-                {
-                  vertexArray =
-                    (Gl.Bigarray.create Gl.Bigarray.Float32
-                       (circularBufferSize * vertexSize));
-                  elementArray =
-                    (Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize);
-                  vertexPtr = 0;
-                  elementPtr = 0;
-                  currTex = None;
-                  nullTex = texture
-                };
-              vertexBuffer;
-              elementBuffer;
-              aVertexPosition;
-              aTextureCoord;
-              aVertexColor;
-              pMatrixUniform;
-              uSampler;
-              currFill;
-              currBackground;
-              mouse = { pos = (0, 0); prevPos = (0, 0); pressed = false };
-              stroke = { color = { r = 0; g = 0; b = 0 }; weight = 10 };
-              frame = { count = 1; rate = 10 };
-              size = { height; width; resizeable = true }
-            }))))))))) : glEnv)
+           {
+             camera;
+             window;
+             gl;
+             batch =
+               {
+                 vertexArray =
+                   (Gl.Bigarray.create Gl.Bigarray.Float32
+                      (circularBufferSize * vertexSize));
+                 elementArray =
+                   (Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize);
+                 vertexPtr = 0;
+                 elementPtr = 0;
+                 currTex = None;
+                 nullTex = texture
+               };
+             vertexBuffer;
+             elementBuffer;
+             aVertexPosition;
+             aTextureCoord;
+             aVertexColor;
+             pMatrixUniform;
+             uSampler;
+             keyboard = { keyCode = Gl.Events.Nothing };
+             mouse = { pos = (0, 0); prevPos = (0, 0); pressed = false };
+             style =
+               {
+                 fillColor = (Some { r = 0; g = 0; b = 0 });
+                 strokeWeight = 10;
+                 strokeColor = (Some { r = 0; g = 0; b = 0 })
+               };
+             styleStack = [];
+             matrix = (Matrix.createIdentity ());
+             matrixStack = [];
+             frame = { count = 1; rate = 10 };
+             size = { height; width; resizeable = true }
+           })))))))) : glEnv)
 let drawGeometry
   ~vertexArray:(vertexArray : (float,Gl.Bigarray.float32_elt) Gl.Bigarray.t) 
   ~elementArray:(elementArray :
@@ -1379,34 +1658,35 @@ let drawGeometry
   Gl.drawElements ~context:(env.gl) ~mode ~count
     ~type_:Constants.unsigned_short ~offset:0
 let flushGlobalBatch env =
-  if ((!env).batch).elementPtr > 0
+  if (env.batch).elementPtr > 0
   then
     let textureBuffer =
-      match ((!env).batch).currTex with
-      | None  -> ((!env).batch).nullTex
+      match (env.batch).currTex with
+      | None  -> (env.batch).nullTex
       | ((Some (textureBuffer))[@explicit_arity ]) -> textureBuffer in
     (drawGeometry
-       ~vertexArray:(Gl.Bigarray.sub ((!env).batch).vertexArray ~offset:0
-                       ~len:(((!env).batch).vertexPtr))
-       ~elementArray:(Gl.Bigarray.sub ((!env).batch).elementArray ~offset:0
-                        ~len:(((!env).batch).elementPtr))
-       ~mode:Constants.triangles ~count:(((!env).batch).elementPtr)
-       ~textureBuffer (!env);
-     ((!env).batch).currTex <- None;
-     ((!env).batch).vertexPtr <- 0;
-     ((!env).batch).elementPtr <- 0)
+       ~vertexArray:(Gl.Bigarray.sub (env.batch).vertexArray ~offset:0
+                       ~len:((env.batch).vertexPtr))
+       ~elementArray:(Gl.Bigarray.sub (env.batch).elementArray ~offset:0
+                        ~len:((env.batch).elementPtr))
+       ~mode:Constants.triangles ~count:((env.batch).elementPtr)
+       ~textureBuffer env;
+     (env.batch).currTex <- None;
+     (env.batch).vertexPtr <- 0;
+     (env.batch).elementPtr <- 0)
 let maybeFlushBatch env texture adding =
   if
-    ((((!env).batch).elementPtr + adding) >= circularBufferSize) ||
-      ((((!env).batch).elementPtr > 0) && (((!env).batch).currTex != texture))
+    (((env.batch).elementPtr + adding) >= circularBufferSize) ||
+      (((env.batch).elementPtr > 0) && ((env.batch).currTex != texture))
   then flushGlobalBatch env
-let addRectToGlobalBatch env (x1,y1) (x2,y2) (x3,y3) (x4,y4) { r; g; b } =
+let toColorFloat i = (float_of_int i) /. 255.
+let addRectToGlobalBatch env ~bottomRight:(x1,y1)  ~bottomLeft:(x2,y2) 
+  ~topRight:(x3,y3)  ~topLeft:(x4,y4)  ~color:{ r; g; b }  =
   maybeFlushBatch env None 6;
   (let set = Gl.Bigarray.set in
-   let toColorFloat i = (float_of_int i) /. 255. in
    let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
-   let i = ((!env).batch).vertexPtr in
-   let vertexArrayToMutate = ((!env).batch).vertexArray in
+   let i = (env.batch).vertexPtr in
+   let vertexArrayToMutate = (env.batch).vertexArray in
    set vertexArrayToMutate (i + 0) x1;
    set vertexArrayToMutate (i + 1) y1;
    set vertexArrayToMutate (i + 2) r;
@@ -1440,35 +1720,100 @@ let addRectToGlobalBatch env (x1,y1) (x2,y2) (x3,y3) (x4,y4) { r; g; b } =
    set vertexArrayToMutate (i + 30) 0.0;
    set vertexArrayToMutate (i + 31) 0.0;
    (let ii = i / vertexSize in
-    let j = ((!env).batch).elementPtr in
-    let elementArrayToMutate = ((!env).batch).elementArray in
+    let j = (env.batch).elementPtr in
+    let elementArrayToMutate = (env.batch).elementArray in
     set elementArrayToMutate (j + 0) ii;
     set elementArrayToMutate (j + 1) (ii + 1);
     set elementArrayToMutate (j + 2) (ii + 2);
     set elementArrayToMutate (j + 3) (ii + 1);
     set elementArrayToMutate (j + 4) (ii + 2);
     set elementArrayToMutate (j + 5) (ii + 3);
-    ((!env).batch).vertexPtr <- i + (4 * vertexSize);
-    ((!env).batch).elementPtr <- j + 6))
-let drawEllipseInternal env (xCenterOfCircle : float)
-  (yCenterOfCircle : float) (radx : float) (rady : float) { r; g; b } =
+    (env.batch).vertexPtr <- i + (4 * vertexSize);
+    (env.batch).elementPtr <- j + 6))
+let drawTriangleInternal env (x1,y1) (x2,y2) (x3,y3) ~color:{ r; g; b }  =
+  maybeFlushBatch env None 3;
+  (let set = Gl.Bigarray.set in
+   let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
+   let i = (env.batch).vertexPtr in
+   let vertexArrayToMutate = (env.batch).vertexArray in
+   set vertexArrayToMutate (i + 0) x1;
+   set vertexArrayToMutate (i + 1) y1;
+   set vertexArrayToMutate (i + 2) r;
+   set vertexArrayToMutate (i + 3) g;
+   set vertexArrayToMutate (i + 4) b;
+   set vertexArrayToMutate (i + 5) 1.;
+   set vertexArrayToMutate (i + 6) 0.0;
+   set vertexArrayToMutate (i + 7) 0.0;
+   set vertexArrayToMutate (i + 8) x2;
+   set vertexArrayToMutate (i + 9) y2;
+   set vertexArrayToMutate (i + 10) r;
+   set vertexArrayToMutate (i + 11) g;
+   set vertexArrayToMutate (i + 12) b;
+   set vertexArrayToMutate (i + 13) 1.;
+   set vertexArrayToMutate (i + 14) 0.0;
+   set vertexArrayToMutate (i + 15) 0.0;
+   set vertexArrayToMutate (i + 16) x3;
+   set vertexArrayToMutate (i + 17) y3;
+   set vertexArrayToMutate (i + 18) r;
+   set vertexArrayToMutate (i + 19) g;
+   set vertexArrayToMutate (i + 20) b;
+   set vertexArrayToMutate (i + 21) 1.;
+   set vertexArrayToMutate (i + 22) 0.0;
+   set vertexArrayToMutate (i + 23) 0.0;
+   (let ii = i / vertexSize in
+    let j = (env.batch).elementPtr in
+    let elementArrayToMutate = (env.batch).elementArray in
+    set elementArrayToMutate (j + 0) ii;
+    set elementArrayToMutate (j + 1) (ii + 1);
+    set elementArrayToMutate (j + 2) (ii + 2);
+    (env.batch).vertexPtr <- i + (3 * vertexSize);
+    (env.batch).elementPtr <- j + 3))
+let drawLineInternal env (xx1,yy1) (xx2,yy2) color =
+  let dx = xx2 -. xx1 in
+  let dy = yy2 -. yy1 in
+  let mag = PUtils.distf (xx1, yy1) (xx2, yy2) in
+  let radius = (float_of_int (env.style).strokeWeight) /. 2. in
+  let xthing = (dy /. mag) *. radius in
+  let ything = ((-. dx) /. mag) *. radius in
+  let x1 = xx2 +. xthing in
+  let y1 = yy2 +. ything in
+  let x2 = xx1 +. xthing in
+  let y2 = yy1 +. ything in
+  let x3 = xx2 -. xthing in
+  let y3 = yy2 -. ything in
+  let x4 = xx1 -. xthing in
+  let y4 = yy1 -. ything in
+  addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) color
+let drawArcInternal env ((xCenterOfCircle : float),(yCenterOfCircle : float))
+  (radx : float) (rady : float) (start : float) (stop : float) (isPie : bool)
+  (matrix : float array) { r; g; b } =
+  let transform = Matrix.matptmul matrix in
   let noOfFans = ((int_of_float (radx +. rady)) * 2) + 10 in
   maybeFlushBatch env None (((noOfFans - 3) * 3) + 3);
   (let pi = 4.0 *. (atan 1.0) in
    let anglePerFan = (2. *. pi) /. (float_of_int noOfFans) in
-   let toColorFloat i = (float_of_int i) /. 255. in
    let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
-   let verticesData = ((!env).batch).vertexArray in
-   let elementData = ((!env).batch).elementArray in
+   let verticesData = (env.batch).vertexArray in
+   let elementData = (env.batch).elementArray in
    let set = Gl.Bigarray.set in
    let get = Gl.Bigarray.get in
-   let vertexArrayOffset = ((!env).batch).vertexPtr in
-   let elementArrayOffset = ((!env).batch).elementPtr in
-   for i = 0 to noOfFans - 1 do
-     (let angle = anglePerFan *. (float_of_int (i + 1)) in
-      let xCoordinate = xCenterOfCircle +. ((cos angle) *. radx) in
-      let yCoordinate = yCenterOfCircle +. ((sin angle) *. rady) in
-      let ii = (i * vertexSize) + vertexArrayOffset in
+   let vertexArrayOffset = (env.batch).vertexPtr in
+   let elementArrayOffset = (env.batch).elementPtr in
+   let start_i =
+     if isPie
+     then (int_of_float (start /. anglePerFan)) - 2
+     else (int_of_float (start /. anglePerFan)) - 1 in
+   let stop_i = (int_of_float (stop /. anglePerFan)) - 1 in
+   for i = start_i to stop_i do
+     (let (xCoordinate,yCoordinate) =
+        transform
+          (if isPie && ((i - start_i) = 0)
+           then (xCenterOfCircle, yCenterOfCircle)
+           else
+             (let angle = anglePerFan *. (float_of_int (i + 1)) in
+              ((xCenterOfCircle +. ((cos angle) *. radx)),
+                (yCenterOfCircle +. ((sin angle) *. rady))))) in
+      let ii = ((i - start_i) * vertexSize) + vertexArrayOffset in
       set verticesData (ii + 0) xCoordinate;
       set verticesData (ii + 1) yCoordinate;
       set verticesData (ii + 2) r;
@@ -1477,19 +1822,115 @@ let drawEllipseInternal env (xCenterOfCircle : float)
       set verticesData (ii + 5) 1.0;
       set verticesData (ii + 6) 0.0;
       set verticesData (ii + 7) 0.0;
-      if i < 3
-      then set elementData (i + elementArrayOffset) (ii / vertexSize)
+      if (i - start_i) < 3
+      then
+        set elementData ((i - start_i) + elementArrayOffset)
+          (ii / vertexSize)
       else
-        (let jj = (((i - 3) * 3) + elementArrayOffset) + 3 in
+        (let jj = ((((i - start_i) - 3) * 3) + elementArrayOffset) + 3 in
          set elementData jj (vertexArrayOffset / vertexSize);
          set elementData (jj + 1) (get elementData (jj - 1));
          set elementData (jj + 2) (ii / vertexSize)))
    done;
-   ((!env).batch).vertexPtr <-
-     ((!env).batch).vertexPtr + (noOfFans * vertexSize);
-   ((!env).batch).elementPtr <-
-     (((!env).batch).elementPtr + ((noOfFans - 3) * 3)) + 3)
-let loadImage (env : glEnv ref) filename =
+   (env.batch).vertexPtr <- (env.batch).vertexPtr + (noOfFans * vertexSize);
+   (env.batch).elementPtr <-
+     ((env.batch).elementPtr + (((stop_i - start_i) - 3) * 3)) + 3)
+let drawEllipseInternal env center (radx : float) (rady : float)
+  (matrix : float array) c =
+  drawArcInternal env center radx rady 0. PConstants.tau false matrix c
+type bypassTmpFormatterIssueT = {
+  currInner: int;
+  currOuter: int;}
+let drawArcStroke env ((xCenterOfCircle : float),(yCenterOfCircle : float))
+  (radx : float) (rady : float) (start : float) (stop : float)
+  (isOpen : bool) (isPie : bool) (matrix : float array)
+  ({ r; g; b } as strokeColor) strokeWidth =
+  let transform = Matrix.matptmul matrix in
+  let (r,g,b) = ((toColorFloat r), (toColorFloat g), (toColorFloat b)) in
+  let verticesData = (env.batch).vertexArray in
+  let elementData = (env.batch).elementArray in
+  let set = Gl.Bigarray.set in
+  let noOfFans = ((int_of_float (radx +. rady)) * 2) + 10 in
+  maybeFlushBatch env None (((noOfFans - 3) * 3) + 3);
+  (let pi = 4.0 *. (atan 1.0) in
+   let anglePerFan = (2. *. pi) /. (float_of_int noOfFans) in
+   let start_i = (int_of_float (start /. anglePerFan)) - 1 in
+   let stop_i = (int_of_float (stop /. anglePerFan)) - 1 in
+   let prevEl: bypassTmpFormatterIssueT option ref = ref None in
+   let halfwidth = (float_of_int strokeWidth) /. 2. in
+   for i = start_i to stop_i do
+     (let angle = anglePerFan *. (float_of_int (i + 1)) in
+      let (xCoordinateInner,yCoordinateInner) =
+        transform
+          ((xCenterOfCircle +. ((cos angle) *. (radx -. halfwidth))),
+            (yCenterOfCircle +. ((sin angle) *. (rady -. halfwidth)))) in
+      let (xCoordinateOuter,yCoordinateOuter) =
+        transform
+          ((xCenterOfCircle +. ((cos angle) *. (radx +. halfwidth))),
+            (yCenterOfCircle +. ((sin angle) *. (rady +. halfwidth)))) in
+      let ii = (env.batch).vertexPtr in
+      set verticesData (ii + 0) xCoordinateInner;
+      set verticesData (ii + 1) yCoordinateInner;
+      set verticesData (ii + 2) r;
+      set verticesData (ii + 3) g;
+      set verticesData (ii + 4) b;
+      set verticesData (ii + 5) 1.0;
+      set verticesData (ii + 6) 0.0;
+      set verticesData (ii + 7) 0.0;
+      (let ii = ii + vertexSize in
+       set verticesData (ii + 0) xCoordinateOuter;
+       set verticesData (ii + 1) yCoordinateOuter;
+       set verticesData (ii + 2) r;
+       set verticesData (ii + 3) g;
+       set verticesData (ii + 4) b;
+       set verticesData (ii + 5) 1.0;
+       set verticesData (ii + 6) 0.0;
+       set verticesData (ii + 7) 0.0;
+       (env.batch).vertexPtr <- (env.batch).vertexPtr + (vertexSize * 2);
+       (let currOuter = ii / vertexSize in
+        let currInner = (ii / vertexSize) - 1 in
+        let currEl = Some { currInner; currOuter } in
+        match !prevEl with
+        | None  -> prevEl := currEl
+        | ((Some
+            ({ currInner = prevInner; currOuter = prevOuter }))[@explicit_arity
+                                                                 ])
+            ->
+            let elementArrayOffset = (env.batch).elementPtr in
+            (set elementData elementArrayOffset prevInner;
+             set elementData (elementArrayOffset + 1) prevOuter;
+             set elementData (elementArrayOffset + 2) currOuter;
+             set elementData (elementArrayOffset + 3) currOuter;
+             set elementData (elementArrayOffset + 4) prevInner;
+             set elementData (elementArrayOffset + 5) currInner;
+             (env.batch).elementPtr <- (env.batch).elementPtr + 6;
+             prevEl := currEl))))
+   done;
+   if not isOpen
+   then
+     (let (startX,startY) =
+        transform
+          ((xCenterOfCircle +. ((cos start) *. radx)),
+            (yCenterOfCircle +. ((sin start) *. rady))) in
+      let (stopX,stopY) =
+        transform
+          ((xCenterOfCircle +. ((cos stop) *. radx)),
+            (yCenterOfCircle +. ((sin stop) *. rady))) in
+      if isPie
+      then
+        (drawLineInternal env (startX, startY)
+           (xCenterOfCircle, yCenterOfCircle) strokeColor;
+         drawLineInternal env (stopX, stopY)
+           (xCenterOfCircle, yCenterOfCircle) strokeColor;
+         drawEllipseInternal env
+           (transform (xCenterOfCircle, yCenterOfCircle)) halfwidth halfwidth
+           matrix strokeColor)
+      else drawLineInternal env (startX, startY) (stopX, stopY) strokeColor;
+      drawEllipseInternal env (startX, startY) halfwidth halfwidth matrix
+        strokeColor;
+      drawEllipseInternal env (stopX, stopY) halfwidth halfwidth matrix
+        strokeColor))
+let loadImage (env : glEnv) filename =
   (let imageRef = ref None in
    Gl.loadImage ~filename
      ~callback:(fun imageData  ->
@@ -1497,7 +1938,7 @@ let loadImage (env : glEnv ref) filename =
                   | None  ->
                       failwith ("Could not load image '" ^ (filename ^ "'."))
                   | ((Some (img))[@explicit_arity ]) ->
-                      let env = !env in
+                      let env = env in
                       let textureBuffer = Gl.createTexture ~context:(env.gl) in
                       let height = Gl.getImageHeight img in
                       let width = Gl.getImageWidth img in
@@ -1529,8 +1970,8 @@ let drawImageInternal { width; height; textureBuffer } ~x  ~y  ~subx  ~suby
    let (x3,y3) = ((float_of_int @@ (x + subw)), (float_of_int y)) in
    let (x4,y4) = ((float_of_int x), (float_of_int y)) in
    let set = Gl.Bigarray.set in
-   let ii = ((!env).batch).vertexPtr in
-   let vertexArray = ((!env).batch).vertexArray in
+   let ii = (env.batch).vertexPtr in
+   let vertexArray = (env.batch).vertexArray in
    set vertexArray (ii + 0) x1;
    set vertexArray (ii + 1) y1;
    set vertexArray (ii + 2) 0.0;
@@ -1563,26 +2004,27 @@ let drawImageInternal { width; height; textureBuffer } ~x  ~y  ~subx  ~suby
    set vertexArray (ii + 29) 0.0;
    set vertexArray (ii + 30) fsubx;
    set vertexArray (ii + 31) fsuby;
-   (let jj = ((!env).batch).elementPtr in
-    let elementArray = ((!env).batch).elementArray in
+   (let jj = (env.batch).elementPtr in
+    let elementArray = (env.batch).elementArray in
     set elementArray jj (ii / vertexSize);
     set elementArray (jj + 1) ((ii / vertexSize) + 1);
     set elementArray (jj + 2) ((ii / vertexSize) + 2);
     set elementArray (jj + 3) ((ii / vertexSize) + 1);
     set elementArray (jj + 4) ((ii / vertexSize) + 2);
     set elementArray (jj + 5) ((ii / vertexSize) + 3);
-    ((!env).batch).vertexPtr <- ii + (4 * vertexSize);
-    ((!env).batch).elementPtr <- jj + 6;
-    ((!env).batch).currTex <- Some textureBuffer))
+    (env.batch).vertexPtr <- ii + (4 * vertexSize);
+    (env.batch).elementPtr <- jj + 6;
+    (env.batch).currTex <- Some textureBuffer))
 let resetSize env width height =
-  env := { (!env) with size = { ((!env).size) with width; height } };
-  Gl.viewport ~context:((!env).gl) ~x:0 ~y:0 ~width ~height;
-  Gl.clearColor ~context:((!env).gl) ~r:0. ~g:0. ~b:0. ~a:1.;
-  Gl.Mat4.ortho ~out:(((!env).camera).projectionMatrix) ~left:0.
+  (env.size).width <- width;
+  (env.size).height <- height;
+  Gl.viewport ~context:(env.gl) ~x:0 ~y:0 ~width ~height;
+  Gl.clearColor ~context:(env.gl) ~r:0. ~g:0. ~b:0. ~a:1.;
+  Gl.Mat4.ortho ~out:((env.camera).projectionMatrix) ~left:0.
     ~right:(float_of_int width) ~bottom:(float_of_int height) ~top:0.
     ~near:0. ~far:1.;
-  Gl.uniformMatrix4fv ~context:((!env).gl) ~location:((!env).pMatrixUniform)
-    ~value:(((!env).camera).projectionMatrix)
+  Gl.uniformMatrix4fv ~context:(env.gl) ~location:(env.pMatrixUniform)
+    ~value:((env.camera).projectionMatrix)
 end
 module Font
 = struct
@@ -1718,8 +2160,8 @@ module Font =
           failwith
             ("Could not find character " ^
                ((string_of_int code) ^ " in font."))
-    let drawChar (env : glEnv ref) fnt image (ch : char) (last : char option)
-      x y =
+    let drawChar (env : glEnv) fnt image (ch : char) (last : char option) x y
+      =
       let c = getChar fnt ch in
       let kernAmount =
         match last with
@@ -1735,7 +2177,7 @@ module Font =
              ~subh:(c.height) env;
            c.xadvance + kernAmount)
       | None  -> c.xadvance + kernAmount
-    let drawString (env : glEnv ref) fnt (str : string) x y =
+    let drawString (env : glEnv) fnt (str : string) x y =
       match !fnt with
       | None  -> ()
       | ((Some (fnt))[@explicit_arity ]) ->
@@ -1771,91 +2213,167 @@ open Utils
 open Font
 module P =
   struct
-    let width env = ((!env).size).width
-    let height env = ((!env).size).height
-    let mouse env = ((!env).mouse).pos
-    let pmouse env = ((!env).mouse).prevPos
-    let mousePressed env = ((!env).mouse).pressed
-    let fill (env : glEnv ref) (c : colorT) =
-      env := { (!env) with currFill = (Some c) }
-    let noFill (env : glEnv ref) = env := { (!env) with currFill = None }
-    let frameRate (env : glEnv ref) = ((!env).frame).rate
-    let frameCount (env : glEnv ref) = ((!env).frame).count
-    let size (env : glEnv ref) width height =
-      Gl.Window.setWindowSize ~window:((!env).window) ~width ~height;
+    let width env = (env.size).width
+    let height env = (env.size).height
+    let mouse env = (env.mouse).pos
+    let pmouse env = (env.mouse).prevPos
+    let mousePressed env = (env.mouse).pressed
+    let keyCode env = (env.keyboard).keyCode
+    let translate dx dy env =
+      let open Matrix in matmatmul env.matrix (createTranslation dx dy)
+    let rotate theta env =
+      let open Matrix in matmatmul env.matrix (createRotation theta)
+    let fill (c : colorT) (env : glEnv) =
+      env.style <- { (env.style) with fillColor = (Some c) }
+    let noFill (env : glEnv) =
+      env.style <- { (env.style) with fillColor = None }
+    let stroke color env =
+      env.style <- { (env.style) with strokeColor = (Some color) }
+    let noStroke env = env.style <- { (env.style) with strokeColor = None }
+    let strokeWeight weight env =
+      env.style <- { (env.style) with strokeWeight = weight }
+    let pushStyle env = env.styleStack <- (env.style) :: (env.styleStack)
+    let popStyle env =
+      match env.styleStack with
+      | [] -> failwith "Too many `popStyle` without enough `pushStyle`."
+      | hd::tl -> (env.style <- hd; env.styleStack <- tl)
+    let frameRate (env : glEnv) = (env.frame).rate
+    let frameCount (env : glEnv) = (env.frame).count
+    let size width height (env : glEnv) =
+      Gl.Window.setWindowSize ~window:(env.window) ~width ~height;
       resetSize env width height
-    let resizeable (env : glEnv ref) resizeable =
-      env := { (!env) with size = { ((!env).size) with resizeable } }
+    let resizeable resizeable (env : glEnv) =
+      (env.size).resizeable <- resizeable
     let loadImage = loadImage
-    let image (env : glEnv ref) img x y =
+    let image img x y (env : glEnv) =
       match !img with
       | None  -> print_endline "image not ready yet, just doing nothing :D"
       | ((Some (({ width; height } as i)))[@explicit_arity ]) ->
           drawImageInternal i x y 0 0 width height env
     let clear env =
-      Gl.clear (!env).gl
+      Gl.clear env.gl
         (Constants.color_buffer_bit lor Constants.depth_buffer_bit)
-    let stroke env color =
-      env := { (!env) with stroke = { ((!env).stroke) with color } }
-    let strokeWeight env weight =
-      env := { (!env) with stroke = { ((!env).stroke) with weight } }
-    let linef env ((xx1 : float),(yy1 : float)) ((xx2 : float),(yy2 : float))
-      =
-      let dx = xx2 -. xx1 in
-      let dy = yy2 -. yy1 in
-      let mag = PUtils.distf (xx1, yy1) (xx2, yy2) in
-      let radius = (float_of_int ((!env).stroke).weight) /. 2. in
-      let xthing = (dy /. mag) *. radius in
-      let ything = ((-. dx) /. mag) *. radius in
-      let x1 = xx2 +. xthing in
-      let y1 = yy2 +. ything in
-      let x2 = xx1 +. xthing in
-      let y2 = yy1 +. ything in
-      let x3 = xx2 -. xthing in
-      let y3 = yy2 -. ything in
-      let x4 = xx1 -. xthing in
-      let y4 = yy1 -. ything in
-      addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4)
-        ((!env).stroke).color
-    let line env (x1,y1) (x2,y2) =
-      linef env ((float_of_int x1), (float_of_int y1))
-        ((float_of_int x2), (float_of_int y2))
-    let ellipsef env (a : float) (b : float) (c : float) (d : float) =
-      match (!env).currFill with
-      | ((Some (fill))[@explicit_arity ]) ->
-          drawEllipseInternal env a b c d fill
+    let linef p1 p2 (env : glEnv) =
+      match (env.style).strokeColor with
       | None  -> ()
-    let ellipse env a b c d =
-      ellipsef env (float_of_int a) (float_of_int b) (float_of_int c)
-        (float_of_int d)
-    let rectf (env : glEnv ref) x y width height =
-      (match (!env).currFill with
+      | ((Some (color))[@explicit_arity ]) ->
+          let transform = Matrix.matptmul env.matrix in
+          let ((xx1,yy1),(xx2,yy2)) = ((transform p1), (transform p2)) in
+          let dx = xx2 -. xx1 in
+          let dy = yy2 -. yy1 in
+          let mag = PUtils.distf (xx1, yy1) (xx2, yy2) in
+          let radius = (float_of_int (env.style).strokeWeight) /. 2. in
+          let xthing = (dy /. mag) *. radius in
+          let ything = ((-. dx) /. mag) *. radius in
+          let x1 = xx2 +. xthing in
+          let y1 = yy2 +. ything in
+          let x2 = xx1 +. xthing in
+          let y2 = yy1 +. ything in
+          let x3 = xx2 -. xthing in
+          let y3 = yy2 -. ything in
+          let x4 = xx1 -. xthing in
+          let y4 = yy1 -. ything in
+          addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) color
+    let line (x1,y1) (x2,y2) (env : glEnv) =
+      linef ((float_of_int x1), (float_of_int y1))
+        ((float_of_int x2), (float_of_int y2)) env
+    let ellipsef (center : (float* float)) (rx : float) (ry : float)
+      (env : glEnv) =
+      (match (env.style).fillColor with
+       | None  -> ()
        | ((Some (fill))[@explicit_arity ]) ->
-           addRectToGlobalBatch env ((x +. width), (y +. height))
-             (x, (y +. height)) ((x +. width), y) (x, y) fill
-       | None  -> ());
-      linef env ((x +. width), y) (x, y);
-      linef env ((x +. width), y) ((x +. width), (y +. height));
-      linef env ((x +. width), (y +. height)) (x, (y +. width));
-      linef env (x, (y +. height)) (x, y);
-      (let r = (float_of_int ((!env).stroke).weight) /. 2. in
-       let c = ((!env).stroke).color in ())
-    let rect (env : glEnv ref) x y width height =
-      rectf env (float_of_int x) (float_of_int y) (float_of_int width)
-        (float_of_int height)
-    let pixel env x y color =
-      addRectToGlobalBatch env
-        ((float_of_int @@ (x + ((!env).stroke).weight)),
-          (float_of_int @@ (y + ((!env).stroke).weight)))
-        ((float_of_int x), (float_of_int @@ (y + ((!env).stroke).weight)))
-        ((float_of_int @@ (x + ((!env).stroke).weight)), (float_of_int y))
-        ((float_of_int x), (float_of_int y)) color
-    let loadFont env filename = Font.parseFontFormat env filename
-    let text env fnt str x y = Font.drawString env fnt str x y
-    let background env color =
+           drawEllipseInternal env center rx ry env.matrix fill);
+      (match (env.style).strokeColor with
+       | None  -> ()
+       | ((Some (stroke))[@explicit_arity ]) ->
+           drawArcStroke env center rx ry 0. PConstants.tau false false
+             env.matrix stroke (env.style).strokeWeight)
+    let ellipse ((cx : int),(cy : int)) rx ry (env : glEnv) =
+      ellipsef ((float_of_int cx), (float_of_int cy)) (float_of_int rx)
+        (float_of_int ry) env
+    let quadf p1 p2 p3 p4 (env : glEnv) =
+      let transform = Matrix.matptmul env.matrix in
+      let (p1,p2,p3,p4) =
+        ((transform p1), (transform p2), (transform p3), (transform p4)) in
+      (match (env.style).fillColor with
+       | None  -> ()
+       | ((Some (fill))[@explicit_arity ]) ->
+           addRectToGlobalBatch env ~topLeft:p1 ~topRight:p2 ~bottomRight:p3
+             ~bottomLeft:p4 ~color:fill);
+      (match (env.style).strokeColor with
+       | None  -> ()
+       | ((Some (color))[@explicit_arity ]) ->
+           (linef p1 p2 env;
+            linef p2 p3 env;
+            linef p3 p4 env;
+            linef p4 p1 env;
+            (let r = (float_of_int (env.style).strokeWeight) /. 2. in
+             let m = Matrix.identity in
+             drawEllipseInternal env p1 r r m color;
+             drawEllipseInternal env p2 r r m color;
+             drawEllipseInternal env p3 r r m color;
+             drawEllipseInternal env p4 r r m color)))
+    let quad (x1,y1) (x2,y2) (x3,y3) (x4,y4) (env : glEnv) =
+      quadf ((float_of_int x1), (float_of_int y1))
+        ((float_of_int x2), (float_of_int y2))
+        ((float_of_int x3), (float_of_int y3))
+        ((float_of_int x4), (float_of_int y4)) env
+    let rectf x y width height (env : glEnv) =
+      quadf (x, y) ((x +. width), y) ((x +. width), (y +. height))
+        (x, (y +. height)) env
+    let rect x y width height (env : glEnv) =
+      rectf (float_of_int x) (float_of_int y) (float_of_int width)
+        (float_of_int height) env
+    let pixelf (x : float) (y : float) color (env : glEnv) =
+      let w = float_of_int (env.style).strokeWeight in
+      addRectToGlobalBatch env ~bottomRight:((x +. w), (y +. w))
+        ~bottomLeft:(x, (y +. w)) ~topRight:((x +. w), y) ~topLeft:(x, y)
+        ~color
+    let pixel x y color (env : glEnv) =
+      pixelf (float_of_int x) (float_of_int y) color env
+    let trianglef p1 p2 p3 (env : glEnv) =
+      let transform = Matrix.matptmul env.matrix in
+      let (p1,p2,p3) = ((transform p1), (transform p2), (transform p3)) in
+      (match (env.style).fillColor with
+       | None  -> ()
+       | ((Some (color))[@explicit_arity ]) ->
+           drawTriangleInternal env p1 p2 p3 ~color);
+      (match (env.style).strokeColor with
+       | None  -> ()
+       | ((Some (color))[@explicit_arity ]) ->
+           (linef p1 p2 env;
+            linef p2 p3 env;
+            linef p3 p1 env;
+            (let r = (float_of_int (env.style).strokeWeight) /. 2. in
+             let m = Matrix.identity in
+             drawEllipseInternal env p1 r r m color;
+             drawEllipseInternal env p2 r r m color;
+             drawEllipseInternal env p3 r r m color)))
+    let triangle (x1,y1) (x2,y2) (x3,y3) (env : glEnv) =
+      trianglef ((float_of_int x1), (float_of_int y1))
+        ((float_of_int x2), (float_of_int y2))
+        ((float_of_int x3), (float_of_int y3)) env
+    let arcf centerPt rx ry start stop isOpen isPie (env : glEnv) =
+      (match (env.style).fillColor with
+       | None  -> ()
+       | ((Some (color))[@explicit_arity ]) ->
+           drawArcInternal env centerPt rx ry start stop isPie env.matrix
+             color);
+      (match (env.style).strokeColor with
+       | None  -> ()
+       | ((Some (stroke))[@explicit_arity ]) ->
+           drawArcStroke env centerPt rx ry start stop isOpen isPie
+             env.matrix stroke (env.style).strokeWeight)
+    let arc (cx,cy) rx ry start stop isOpen isPie (env : glEnv) =
+      arcf ((float_of_int cx), (float_of_int cy)) (float_of_int rx)
+        (float_of_int ry) start stop isOpen isPie env
+    let loadFont filename (env : glEnv) = Font.parseFontFormat env filename
+    let text fnt str x y (env : glEnv) = Font.drawString env fnt str x y
+    let background color (env : glEnv) =
       let w = float_of_int (width env) in
       let h = float_of_int (height env) in
-      addRectToGlobalBatch env (w, h) (0., h) (w, 0.) (0., 0.) color
+      addRectToGlobalBatch env ~bottomRight:(w, h) ~bottomLeft:(0., h)
+        ~topRight:(w, 0.) ~topLeft:(0., 0.) ~color
   end
 end
 module Reprocessing
@@ -1869,42 +2387,39 @@ module PUtils = PUtils
 module PConstants = PConstants
 module P = Drawfunctions.P
 type 'a userCallbackT = 'a -> glState ref -> ('a* glState)
-let afterDraw f (env : glEnv ref) =
+let afterDraw f (env : glEnv) =
   let rate = int_of_float (1000. /. f) in
-  env :=
-    {
-      (!env) with
-      mouse = { ((!env).mouse) with prevPos = (((!env).mouse).pos) };
-      frame = { count = (((!env).frame).count + 1); rate }
-    };
-  if ((!env).batch).elementPtr > 0 then flushGlobalBatch env
+  (env.mouse).prevPos <- (env.mouse).pos;
+  env.frame <- { count = ((env.frame).count + 1); rate };
+  Matrix.copyInto ~src:Matrix.identity ~dst:(env.matrix);
+  if (env.batch).elementPtr > 0 then flushGlobalBatch env
 module ReProcessor : ReProcessorT =
   struct
-    type t = glEnv ref
+    type t = glEnv
     let run ~setup  ?draw  ?mouseMove  ?mouseDragged  ?mouseDown  ?mouseUp 
-      () =
+      ?keyPressed  ?keyReleased  ?keyTyped  () =
       Random.self_init ();
       PUtils.noiseSeed (Random.int ((PUtils.pow 2 30) - 1));
-      (let env = ref (createCanvas (ClientWrapper.init ~argv:Sys.argv) 200 200) in
+      (let env = createCanvas (ClientWrapper.init ~argv:Sys.argv) 200 200 in
        let userState = ref (setup env) in
        let reDrawPreviousBufferOnSecondFrame =
-         let width = Gl.Window.getWidth (!env).window in
-         let height = Gl.Window.getHeight (!env).window in
+         let width = Gl.Window.getWidth env.window in
+         let height = Gl.Window.getHeight env.window in
          let data =
-           Gl.readPixelsRGBA ~context:((!env).gl) ~x:0 ~y:0 ~width ~height in
-         let textureBuffer = Gl.createTexture ~context:((!env).gl) in
-         Gl.bindTexture ~context:((!env).gl) ~target:Constants.texture_2d
+           Gl.readPixelsRGBA ~context:(env.gl) ~x:0 ~y:0 ~width ~height in
+         let textureBuffer = Gl.createTexture ~context:(env.gl) in
+         Gl.bindTexture ~context:(env.gl) ~target:Constants.texture_2d
            ~texture:textureBuffer;
-         Gl.texImage2D ~context:((!env).gl) ~target:Constants.texture_2d
+         Gl.texImage2D ~context:(env.gl) ~target:Constants.texture_2d
            ~level:0 ~internalFormat:Constants.rgba ~width ~height
            ~format:Constants.rgba ~type_:Constants.unsigned_byte ~data;
-         Gl.texParameteri ~context:((!env).gl) ~target:Constants.texture_2d
+         Gl.texParameteri ~context:(env.gl) ~target:Constants.texture_2d
            ~pname:Constants.texture_mag_filter ~param:Constants.linear;
-         Gl.texParameteri ~context:((!env).gl) ~target:Constants.texture_2d
+         Gl.texParameteri ~context:(env.gl) ~target:Constants.texture_2d
            ~pname:Constants.texture_min_filter ~param:Constants.linear;
-         Gl.texParameteri ~context:((!env).gl) ~target:Constants.texture_2d
+         Gl.texParameteri ~context:(env.gl) ~target:Constants.texture_2d
            ~pname:Constants.texture_wrap_s ~param:Constants.clamp_to_edge;
-         Gl.texParameteri ~context:((!env).gl) ~target:Constants.texture_2d
+         Gl.texParameteri ~context:(env.gl) ~target:Constants.texture_2d
            ~pname:Constants.texture_wrap_t ~param:Constants.clamp_to_edge;
          (fun ()  ->
             let (x,y) = (0, 0) in
@@ -1921,10 +2436,10 @@ module ReProcessor : ReProcessorT =
                               verticesColorAndTexture)
               ~elementArray:(Gl.Bigarray.of_array Gl.Bigarray.Uint16
                                [|0;1;2;1;2;3|]) ~mode:Constants.triangles
-              ~count:6 ~textureBuffer (!env)) in
-       Gl.render ~window:((!env).window)
+              ~count:6 ~textureBuffer env) in
+       Gl.render ~window:(env.window)
          ~displayFunc:(fun f  ->
-                         if ((!env).frame).count == 2
+                         if (env.frame).count == 2
                          then reDrawPreviousBufferOnSecondFrame ();
                          (match draw with
                           | ((Some (draw))[@explicit_arity ]) ->
@@ -1935,16 +2450,8 @@ module ReProcessor : ReProcessorT =
                        fun ~state  ->
                          fun ~x  ->
                            fun ~y  ->
-                             env :=
-                               {
-                                 (!env) with
-                                 mouse =
-                                   {
-                                     ((!env).mouse) with
-                                     pos = (x, y);
-                                     pressed = true
-                                   }
-                               };
+                             (env.mouse).pos <- (x, y);
+                             (env.mouse).pressed <- true;
                              (match mouseDown with
                               | ((Some (mouseDown))[@explicit_arity ]) ->
                                   userState := (mouseDown (!userState) env)
@@ -1953,28 +2460,16 @@ module ReProcessor : ReProcessorT =
                      fun ~state  ->
                        fun ~x  ->
                          fun ~y  ->
-                           env :=
-                             {
-                               (!env) with
-                               mouse =
-                                 {
-                                   ((!env).mouse) with
-                                   pos = (x, y);
-                                   pressed = false
-                                 }
-                             };
+                           (env.mouse).pos <- (x, y);
+                           (env.mouse).pressed <- false;
                            (match mouseUp with
                             | ((Some (mouseUp))[@explicit_arity ]) ->
                                 userState := (mouseUp (!userState) env)
                             | None  -> ()))
          ~mouseMove:(fun ~x  ->
                        fun ~y  ->
-                         env :=
-                           {
-                             (!env) with
-                             mouse = { ((!env).mouse) with pos = (x, y) }
-                           };
-                         if ((!env).mouse).pressed
+                         (env.mouse).pos <- (x, y);
+                         if (env.mouse).pressed
                          then
                            (match mouseDragged with
                             | ((Some (mouseDragged))[@explicit_arity ]) ->
@@ -1986,12 +2481,31 @@ module ReProcessor : ReProcessorT =
                                 userState := (mouseMove (!userState) env)
                             | None  -> ()))
          ~windowResize:(fun ()  ->
-                          if ((!env).size).resizeable
+                          if (env.size).resizeable
                           then
-                            let height = Gl.Window.getHeight (!env).window in
-                            let width = Gl.Window.getWidth (!env).window in
+                            let height = Gl.Window.getHeight env.window in
+                            let width = Gl.Window.getWidth env.window in
                             resetSize env width height
-                          else P.size env (P.width env) (P.height env)) ())
+                          else P.size (P.width env) (P.height env) env)
+         ~keyDown:(fun ~keycode  ->
+                     fun ~repeat  ->
+                       (env.keyboard).keyCode <- keycode;
+                       if not repeat
+                       then
+                         (match keyPressed with
+                          | ((Some (keyPressed))[@explicit_arity ]) ->
+                              userState := (keyPressed (!userState) env)
+                          | None  -> ());
+                       (match keyTyped with
+                        | ((Some (keyTyped))[@explicit_arity ]) ->
+                            userState := (keyTyped (!userState) env)
+                        | None  -> ()))
+         ~keyUp:(fun ~keycode  ->
+                   (env.keyboard).keyCode <- keycode;
+                   (match keyReleased with
+                    | ((Some (keyReleased))[@explicit_arity ]) ->
+                        userState := (keyReleased (!userState) env)
+                    | None  -> ())) ())
   end 
 
 end
