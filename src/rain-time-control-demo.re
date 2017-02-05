@@ -1,7 +1,3 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Reprocessing;
 
 open P;
@@ -38,15 +34,16 @@ let rec init n f acc =>
 let init n f => init n f [];
 
 let setup env => {
-  size env 640 360;
-  fill env (color 255 0 0);
+  size 640 360 env;
+  fill (color 255 0 0) env;
+  noStroke env;
   let lst = init 500 (fun v => make (width env) ((-500), (-50)) 0);
   {lst, time: 0, running: true}
 };
 
 let draw {lst, running, time} env => {
-  background env (color 230 230 250);
-  fill env (color 255 0 0);
+  background (color 230 230 250) env;
+  fill (color 255 0 0) env;
   randomSeed time;
   let lst =
     List.map
@@ -62,13 +59,12 @@ let draw {lst, running, time} env => {
   List.iter
     (
       fun drop => {
-        fill env drop.color;
+        fill drop.color env;
         ellipse
-          env
-          drop.x
-          (drop.y + drop.yspeed * (time - drop.time))
+          (drop.x, drop.y + drop.yspeed * (time - drop.time))
           (remap drop.z 0 20 1 3)
           drop.yspeed
+          env
       }
     )
     lst;

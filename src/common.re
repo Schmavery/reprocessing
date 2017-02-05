@@ -1,7 +1,3 @@
-/*
- * vim: set ft=rust:
- * vim: set ft=reason:
- */
 open Glloader;
 
 module Constants = Reglinterface.Constants;
@@ -12,13 +8,15 @@ type glCamera = {projectionMatrix: Gl.Mat4.t};
 
 type colorT = {r: int, g: int, b: int};
 
-type strokeT = {color: colorT, weight: int};
+type styleT = {strokeColor: option colorT, strokeWeight: int, fillColor: option colorT};
 
-type mouseT = {pos: (int, int), prevPos: (int, int), pressed: bool};
+type mouseT = {mutable pos: (int, int), mutable prevPos: (int, int), mutable pressed: bool};
+
+type keyboardT = {mutable keyCode: Gl.Events.keycodeT};
 
 type frameT = {count: int, rate: int};
 
-type sizeT = {height: int, width: int, resizeable: bool};
+type sizeT = {mutable height: int, mutable width: int, mutable resizeable: bool};
 
 let circularBufferSize = 6 * 10000;
 
@@ -49,23 +47,28 @@ type glEnv = {
   pMatrixUniform: Gl.uniformT,
   uSampler: Gl.uniformT,
   batch: batchT,
-  currFill: option colorT,
-  currBackground: colorT,
+  keyboard: keyboardT,
   mouse: mouseT,
-  stroke: strokeT,
-  frame: frameT,
+  mutable style: styleT,
+  mutable styleStack: list styleT,
+  mutable frame: frameT,
+  matrix: array float,
+  mutable matrixStack: list (array float),
   size: sizeT
 };
 
 module type ReProcessorT = {
   type t;
   let run:
-    setup::(ref glEnv => 'a) =>
-    draw::('a => ref glEnv => 'a)? =>
-    mouseMove::('a => ref glEnv => 'a)? =>
-    mouseDragged::('a => ref glEnv => 'a)? =>
-    mouseDown::('a => ref glEnv => 'a)? =>
-    mouseUp::('a => ref glEnv => 'a)? =>
+    setup::(glEnv => 'a) =>
+    draw::('a => glEnv => 'a)? =>
+    mouseMove::('a => glEnv => 'a)? =>
+    mouseDragged::('a => glEnv => 'a)? =>
+    mouseDown::('a => glEnv => 'a)? =>
+    mouseUp::('a => glEnv => 'a)? =>
+    keyPressed::('a => glEnv => 'a)? =>
+    keyReleased::('a => glEnv => 'a)? =>
+    keyTyped::('a => glEnv => 'a)? =>
     unit =>
     unit;
 };
