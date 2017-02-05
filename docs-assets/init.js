@@ -30,7 +30,7 @@ function loadGist (gist) {
     if(gist){
         contentFromResponse(gist)
     }
-    
+
     $.
     ajax(
     {url : "examples/examples.json",
@@ -41,9 +41,18 @@ function loadGist (gist) {
         for(var k in examplesDataSet){
             examplesDropdown.appendChild(createExample(k))
         }
-        if(location && location.hash ){
+        if (location && location.hash ){
             var id =  location.hash.substr(1)
             switchExample(id)
+        } else {
+          // If there is no location we load the default example and eval it
+          $.ajax({
+            url: "examples/defaultPacked.js",
+            cache: true
+          })
+          .done(function (response) {
+            evalCode(response);
+          });
         }
     })
     .fail(function(xhr, textStatus, thrown){
@@ -58,6 +67,6 @@ var clientGist = queryGist();
 
 if(clientGist){
     start(clientGist)
-}else{        
+}else{
  start()
 }
