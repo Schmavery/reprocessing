@@ -14,7 +14,8 @@
     "whereisocamlmerlin": "eval $(dependencyEnv) && which ocamlmerlin-reason",
     "whereisrebel": "eval $(dependencyEnv) && which rebel",
     "mlre": "pbpaste | ./node_modules/reason/refmt_impl.native -parse ml -print re -use-stdin true -is-interface-pp false",
-    "reml": "pbpaste | ./node_modules/reason/refmt_impl.native -parse re -print ml -use-stdin true -is-interface-pp false"
+    "reml": "pbpaste | ./node_modules/reason/refmt_impl.native -parse re -print ml -use-stdin true -is-interface-pp false",
+    "compileExamples": "./eject.sh && ./compileAllExamples.sh"
   },
   "dependencies": {
     "@opam-alpha/merlin": "^ 2.5.0",

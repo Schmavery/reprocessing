@@ -483,6 +483,7 @@ let drawArcInternal
 let drawEllipseInternal env center (radx: float) (rady: float) (matrix: array float) c =>
   drawArcInternal env center radx rady 0. PConstants.tau false matrix c;
 
+type bypassTmpFormatterIssueT = {currInner: int, currOuter: int};
 let drawArcStroke
     env
     (xCenterOfCircle: float, yCenterOfCircle: float)
@@ -510,7 +511,7 @@ let drawArcStroke
      */
   let start_i = int_of_float (start /. anglePerFan) - 1;
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
-  let prevEl: ref (option (int, int)) = ref None;
+  let prevEl: ref (option bypassTmpFormatterIssueT) = ref None;
   let halfwidth = float_of_int strokeWidth /. 2.;
   for i in start_i to (stop_i) {
     let angle = anglePerFan *. float_of_int (i + 1);
@@ -545,10 +546,10 @@ let drawArcStroke
     env.batch.vertexPtr = env.batch.vertexPtr + vertexSize * 2;
     let currOuter = ii / vertexSize;
     let currInner = ii / vertexSize - 1;
-    let currEl = Some (currInner, currOuter);
+    let currEl = Some {currInner, currOuter};
     switch !prevEl {
     | None => prevEl := currEl
-    | Some (prevInner, prevOuter) =>
+    | Some {currInner: prevInner, currOuter: prevOuter} =>
       let elementArrayOffset = env.batch.elementPtr;
       set elementData elementArrayOffset prevInner;
       set elementData (elementArrayOffset + 1) prevOuter;

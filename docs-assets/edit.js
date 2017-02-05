@@ -140,25 +140,31 @@ var examplesDataSet ;
 $('#examplesDropdown').click(clickHandler);
 
 function switchExample(id){
-    var filename = "";
-    var example = examplesDataSet [id];
-    if (example){
-        changeEvalButton(example.eval)
-        filename = "examples/" + example.file
-    }
-    //make ajax request
-    $
-    .ajax({
-        url: filename,
-        cache: true
-    })
-    .done(function (response) {
-        myCode1Mirror.setValue(response);
-    });
+  var filename = "";
+  var jsfilename = "";
+  var example = examplesDataSet [id];
+  if (example){
+      changeEvalButton(example.eval);
+      filename = "examples/" + example.file;
+      jsfilename = "examples/" + example.jsfile;
+  }
+  $.ajax({
+    url: filename,
+    cache: true
+  })
+  .done(function (response) {
+    myCode1Mirror.setValue(response);
+  });
+  $.ajax({
+    url: jsfilename,
+    cache: true
+  })
+  .done(function (response) {
+    evalCode(response);
+  });
 
-    //update dropdown label
-    $('#examplesLabel').html(id + ' <span class="caret"></span>');
-
+  //update dropdown label
+  $('#examplesLabel').html(id + ' <span class="caret"></span>');
 }
 
 function clickHandler(e) {
