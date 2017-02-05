@@ -36,6 +36,7 @@ let init n f => init n f [];
 let setup env => {
   size 640 360 env;
   fill (color 255 0 0) env;
+  noStroke env;
   let lst = init 500 (fun v => make (width env) ((-500), (-50)) 0);
   {lst, time: 0, running: true}
 };
@@ -60,8 +61,7 @@ let draw {lst, running, time} env => {
       fun drop => {
         fill drop.color env;
         ellipse
-          drop.x
-          (drop.y + drop.yspeed * (time - drop.time))
+          (drop.x, drop.y + drop.yspeed * (time - drop.time))
           (remap drop.z 0 20 1 3)
           drop.yspeed
           env
