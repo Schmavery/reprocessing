@@ -3325,6 +3325,7 @@
 	        /* g */0,
 	        /* b */0
 	      ], env);
+	  strokeWeight(2, env);
 	  return /* record */[/* squarePos : tuple */[
 	            0,
 	            0

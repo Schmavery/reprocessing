@@ -13,6 +13,7 @@ let squareHeight = 300;
 let setup env => {
   size 600 600 env;
   fill (color 255 0 0) env;
+  strokeWeight 2 env;
   {squarePos: (0, 0)}
 };
 
