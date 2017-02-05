@@ -515,10 +515,6 @@ module Constants = Constants
 
 module Gl = Gl
 
-module Constants = Constants
-
-module Gl = Gl
-
 
 end
 module Glloader
