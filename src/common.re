@@ -12,7 +12,7 @@ type styleT = {strokeColor: option colorT, strokeWeight: int, fillColor: option 
 
 type mouseT = {mutable pos: (int, int), mutable prevPos: (int, int), mutable pressed: bool};
 
-type keyboardT = {mutable keyCode: int};
+type keyboardT = {mutable keyCode: Gl.Events.keycodeT};
 
 type frameT = {count: int, rate: int};
 
