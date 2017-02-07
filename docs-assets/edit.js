@@ -58,31 +58,32 @@ function get_error_output(){
   return old;
 }
 var compile_code ;
-var evalButton = document.getElementById('option-eval');
-var shakeButton = document.getElementById('option-non-export');
+// var evalButton = document.getElementById('option-eval');
+// var shakeButton = document.getElementById('option-non-export');
 
 function shouldEval(){
-  return evalButton.checked;
+  // return evalButton.checked;
+  return true;
 }
-function onEvalButtonChange(){
-  if(!shouldEval()){
-    outputMirror.setValue(PROMPT);
-  } else {
-    onEditChanges();
-  }
-}
-evalButton.addEventListener('change', onEvalButtonChange);
+// function onEvalButtonChange(){
+//   if(!shouldEval()){
+//     outputMirror.setValue(PROMPT);
+//   } else {
+//     onEditChanges();
+//   }
+// }
+// evalButton.addEventListener('change', onEvalButtonChange);
 
-function onShakeButtonChange(){
-  if(shakeButton.checked){
-    compile_code = ocaml.shake_compile;
-  }else{
-    compile_code = ocaml.compile;
-  }
-  onEditChanges();
-}
-
-shakeButton.addEventListener('change', onShakeButtonChange);
+// function onShakeButtonChange(){
+//   if(shakeButton.checked){
+//     compile_code = ocaml.shake_compile;
+//   }else{
+//     compile_code = ocaml.compile;
+//   }
+//   // onEditChanges();
+// }
+//
+// shakeButton.addEventListener('change', onShakeButtonChange);
 var original_log = console.log;
 var original_err = console.error;
 
@@ -144,7 +145,7 @@ function switchExample(id){
   var jsfilename = "";
   var example = examplesDataSet [id];
   if (example){
-      changeEvalButton(example.eval);
+      // changeEvalButton(example.eval);
       filename = "examples/" + example.file;
       jsfilename = "examples/" + example.jsfile;
   }
@@ -200,6 +201,7 @@ function onEditChanges(cm, change) {
   }
   console.error = redirect_err;
   if (predefinedStuff !== null) {
+    console.log("Running compilerrrr");
     var raw = compile_code(predefinedStuff + document.refmt(myCode1Mirror.getValue()).c);
     errorMirror.setValue(get_error_output());
     console.error = original_err;
@@ -207,10 +209,7 @@ function onEditChanges(cm, change) {
     var rsp = JSON.parse(raw); // can we save this from parsing?
     if (rsp.js_code !== undefined) {
       // jsCode1Mirror.setValue(rsp.js_code);
-      // eval
-      if(shouldEval()) {
-        evalCode(rsp.js_code)
-      }
+      evalCode(rsp.js_code)
     } else {
       jsCode1Mirror.setValue(rsp.js_error_msg);
 
@@ -224,10 +223,10 @@ jsCode1Mirror.setSize(null,codeMirrorDefaultHeight);
 
 
 //checks or unchecks the eval button
-function changeEvalButton(bool) {
-  $('#option-eval').prop('checked', bool);
-  onEvalButtonChange();
-}
+// function changeEvalButton(bool) {
+//   $('#option-eval').prop('checked', bool);
+//   onEvalButtonChange();
+// }
 
 //creates a gist from OCaml code
 $('#share').click(function (e) {
