@@ -4,32 +4,31 @@
   "description": "Processing library for Reason",
   "scripts": {
     "start": "_build/native/src/app.native",
-    "build": "eval $(dependencyEnv) && nopam && rebel && webpack -d _build/web/src/index.js _build/web/src/app.js",
-    "run": "eval $(dependencyEnv) && nopam && rebel && _build/native/src/app.native",
-    "top": "eval $(dependencyEnv) && rtop",
-    "env": "eval $(dependencyEnv) && env",
-    "ocamldep": "eval $(dependencyEnv) && ocamldep",
-    "editor": "eval $(dependencyEnv) && GL_BACKEND=native atom .",
-    "whereisocamlmerlin": "eval $(dependencyEnv) && which ocamlmerlin-reason",
-    "whereisrebel": "eval $(dependencyEnv) && which rebel",
-    "mlre": "pbpaste | ./node_modules/reason/refmt_impl.native -parse ml -print re -use-stdin true -is-interface-pp false",
-    "reml": "pbpaste | ./node_modules/reason/refmt_impl.native -parse re -print ml -use-stdin true -is-interface-pp false",
-    "compileExamples": "./eject.sh && ./compileAllExamples.sh"
+    "build": "esy rebel && webpack -d _build/web/src/index.js _build/web/src/app.js",
+    "run": "esy rebel && _build/native/src/app.native",
+    "editor": "GL_BACKEND=native esy atom .",
+    "whereisocamlmerlin": "esy which ocamlmerlin-reason",
+    "mlre": "pbpaste | esy refmt -parse ml -print re -use-stdin true -is-interface-pp false",
+    "reml": "pbpaste | esy refmt -parse re -print ml -use-stdin true -is-interface-pp false",
+    "compileexamples": "./eject.sh && ./compileAllExamples.sh"
   },
   "esy": {
     "build": [
-      "rebel -show-actions-run-verbose -verbose -show-error-dependency-paths -brief-error-summary -show-buildable-discovery",
+      "rebel",
+      "webpack -d _build/web/src/index.js _build/web/src/app.js",
       "echo 'FLG -ppx $matchenv__bin/ppx_matchenv.exe' >> .merlin"
     ]
   },
   "dependencies": {
-    "@opam-alpha/merlin": "*",
     "reason": "facebook/reason#esy",
     "rebel": "bsansouci/rebel#esy",
     "reglinterface": "*",
     "reglnative": "*",
     "reglweb": "*",
-    "matchenv": "bsansouci/matchenv"
+    "matchenv": "bsansouci/matchenv",
+    "bs-platform": "esy-ocaml/bucklescript#esy",
+    "tgls-actual": "bsansouci/tgls#esy",
+    "tsdl-actual": "bsansouci/tsdl#esy"
   },
   "rebel": {
     "targets": [
@@ -65,6 +64,8 @@
   "devDependencies": {
     "webpack": "^1.14.0",
     "ocaml": "esy-ocaml/ocaml#esy",
-    "@opam-alpha/utop": "*"
+    "@opam-alpha/utop": "*",
+    "@opam-alpha/merlin": "*",
+    "@opam-alpha/topkg": "*"
   }
 }
