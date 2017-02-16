@@ -24,6 +24,18 @@ ReProcessor.run ::setup ::draw ();
 ```
 This will draw a simple red square on a black background.  Compare this to [reglexampleproject](https://github.com/bsansouci/reglexampleproject/blob/master/src/index.re), which takes 200+ lines to do the exact same thing.  This difference is even more notable on bigger projects.  Check out the code for a [draggable red square](https://github.com/Schmavery/reprocessing/blob/master/src/redsquare.re).
 
+# Installing
+This library depends on [esy](https://github.com/reasonml/esy).  This needs to be installed globally for ReProcessing to install.
+```
+npm install -g "git://github.com/reasonml/esy.git#beta-v0.0.2
+
+# Then to clone and install this repo:
+git clone https://github.com/Schmavery/reprocessing.git
+cd reprocessing
+esy install
+esy build
+```
+
 # Differences from Processing
 - There is no magic - everything is proper Reason code.  This means that you have to call `ReProcessor.run` with the functions that you want to use.  You also have a couple of options about which utility modules to open.  It is recommended to `open Reprocessing` at the top, and then you can optionally open `P` and `PUtils` to gain more functionality and make it look more like Processing code.  An example of this can be seen above.
 

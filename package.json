@@ -4,7 +4,7 @@
   "description": "Processing library for Reason",
   "scripts": {
     "start": "_build/native/src/app.native",
-    "build": "esy rebel && webpack -d _build/web/src/index.js _build/web/src/app.js",
+    "build": "esy rebel && node_modules/.bin/webpack -d _build/web/src/index.js _build/web/src/app.js",
     "run": "esy rebel && _build/native/src/app.native",
     "editor": "GL_BACKEND=native esy atom .",
     "whereisocamlmerlin": "esy which ocamlmerlin-reason",
@@ -15,7 +15,7 @@
   "esy": {
     "build": [
       "rebel",
-      "webpack -d _build/web/src/index.js _build/web/src/app.js",
+      "node_modules/.bin/webpack -d _build/web/src/index.js _build/web/src/app.js",
       "echo 'FLG -ppx $matchenv__bin/ppx_matchenv.exe' >> .merlin"
     ]
   },
