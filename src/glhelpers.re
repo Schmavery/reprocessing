@@ -501,7 +501,7 @@ let drawArcStroke
   let elementData = env.batch.elementArray;
   let set = Gl.Bigarray.set;
   let noOfFans = int_of_float (radx +. rady) * 2 + 10;
-  maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
+  maybeFlushBatch env None (((noOfFans - 3) * 3 + 3) * 2);
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   /* I calculated this roughly by doing:
