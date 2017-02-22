@@ -16,7 +16,7 @@
     "build": [
       "rebel",
       "node_modules/.bin/webpack -d _build/web/src/index.js _build/web/src/app.js",
-      "echo 'FLG -ppx $matchenv__bin/ppx_matchenv.exe' >> .merlin"
+      "echo FLG -ppx $matchenv__bin/ppx_matchenv.exe >> .merlin"
     ]
   },
   "dependencies": {
