@@ -1,5 +1,5 @@
 {
-  "name": "ReProcessing",
+  "name": "Reprocessing",
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
@@ -18,14 +18,14 @@
   },
   "dependencies": {
     "@opam-alpha/merlin": "^ 2.5.0",
-    "dependency-env": "https://github.com/npm-ml/dependency-env.git",
-    "nopam": "https://github.com/yunxing/nopam.git",
-    "reason": "https://github.com/facebook/reason.git",
-    "rebel": "https://github.com/bsansouci/jengaboot.git#add-env-vars",
-    "reglinterface": "*",
-    "reglnative": "*",
-    "reglweb": "*",
-    "matchenv": "https://github.com/bsansouci/matchenv.git"
+    "dependency-env": "npm-ml/dependency-env",
+    "nopam": "yunxing/nopam",
+    "reason": "facebook/reason",
+    "rebel": "bsansouci/rebel#add-env-vars",
+    "reasongl-interface": "bsansouci/reasongl-interface",
+    "reasongl-native": "bsansouci/reasongl-native",
+    "reasongl-web": "bsansouci/reasongl-web",
+    "matchenv": "bsansouci/matchenv"
   },
   "rebel": {
     "targets": [
@@ -34,8 +34,8 @@
         "engine": "bucklescript",
         "entry": "src/index.re",
         "unstable_flags": {
-          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -I _build/web/reglweb -I _build/web/reglinterface",
-          "link": "-I _build/web/reglweb",
+          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -I _build/web/reasongl-web -I _build/web/reasongl-interface",
+          "link": "-I _build/web/reasongl-web",
           "envvars": "GL_BACKEND=web",
           "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
         }
@@ -45,8 +45,8 @@
         "engine": "native",
         "entry": "src/index.re",
         "unstable_flags": {
-          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -package tgls.tgl3,tsdl -I _build/web/reglinterface -I _build/native/reglnative",
-          "link": "-linkpkg -package tgls.tgl3,tsdl -cclib \"$(pkg-config --libs reglnative)\"",
+          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -package tgls.tgl3,tsdl -I _build/web/reasongl-interface -I _build/native/reasongl-native",
+          "link": "-linkpkg -package tgls.tgl3,tsdl -cclib \"$(pkg-config --libs reasongl-native)\"",
           "envvars": "GL_BACKEND=native",
           "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
         }
@@ -55,7 +55,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bsansouci/ocaml-re.git"
+    "url": "git+https://github.com/bsansouci/reprocessing.git"
   },
   "author": "bsansouci & schmavery",
   "devDependencies": {

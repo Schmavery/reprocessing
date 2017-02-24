@@ -1,6 +1,6 @@
 open Glloader;
 
-module Constants = Reglinterface.Constants;
+module Constants = ReasonglInterface.Constants;
 
 type glState = Gl.Window.t;
 

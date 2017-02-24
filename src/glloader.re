@@ -1,7 +1,7 @@
 include
   [%matchenv
     switch (GL_BACKEND) {
-      | "native" => Reglnative.Opengl
-      | "web" => Reglweb.Webgl
+      | "native" => ReasonglNative.Opengl
+      | "web" => ReasonglWeb.Webgl
     }
     ];
