@@ -43,7 +43,7 @@ let setup env => {
 
 let draw {lst, running, time} env => {
   background (color 230 230 250) env;
-  fill (color 255 0 0) env;
+  /* fill (color 255 0 0) env;
   randomSeed time;
   let lst =
     List.map
@@ -67,7 +67,10 @@ let draw {lst, running, time} env => {
           env
       }
     )
-    lst;
+    lst; */
+  stroke (color 0 0 0) env;
+  strokeWeight 1   env;
+  bezier (0., 0.) (100., 100.) (200., 100.) (200., 200.0) env;
   {lst, running, time: running ? time + 1 : time}
 };
 

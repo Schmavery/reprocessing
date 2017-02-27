@@ -117,6 +117,15 @@ module P = {
     quadf (x, y) (x +. width, y) (x +. width, y +. height) (x, y +. height) env;
   let rect x y width height (env: glEnv) =>
     rectf (float_of_int x) (float_of_int y) (float_of_int width) (float_of_int height) env;
+  let bezier (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (env: glEnv) => {
+    let bezier_point t => {
+      (((1. -. t) ** 3.) *. xx1 +. 3. *. ((1. -. t) ** 2.) *. t *. xx2 +. 3. *. (1. -. t) *. (t ** 2.) *. xx3 +. (t ** 3.) *. xx4,
+       ((1. -. t) ** 3.) *. yy1 +. 3. *. ((1. -. t) ** 2.) *. t *. yy2 +. 3. *. (1. -. t) *. (t ** 2.) *. yy3 +. (t ** 3.) *. yy4)
+    };
+    for i in 0 to 99 {
+      linef (bezier_point ((float_of_int i) /. 100.0)) (bezier_point ((float_of_int (i + 1)) /. 100.0)) env;
+    }
+  };
   let pixelf (x: float) (y: float) color (env: glEnv) => {
     let w = float_of_int env.style.strokeWeight;
     addRectToGlobalBatch
