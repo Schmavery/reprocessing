@@ -1,6 +1,6 @@
 # ReProcessing
 
-This is a high-level drawing library, heavily inspired by [Processing](https://processing.org) and built on top of [bsansouci/regl](https://github.com/bsansouci/regl).  This means you can write graphics code once, and have the (exact) same code compile to run on web (webgl) and native (opengl).
+This is a high-level drawing library, heavily inspired by [Processing](https://processing.org) and built on top of [bsansouci/reasongl](https://github.com/bsansouci/reasongl).  This means you can write graphics code once, and have the (exact) same code compile to run on web (webgl) and native (opengl).
 
 ### Example:
 ```reason
