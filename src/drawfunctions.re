@@ -117,13 +117,57 @@ module P = {
     quadf (x, y) (x +. width, y) (x +. width, y +. height) (x, y +. height) env;
   let rect x y width height (env: glEnv) =>
     rectf (float_of_int x) (float_of_int y) (float_of_int width) (float_of_int height) env;
+  let bezierPoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => {
+    (((1. -. t) ** 3.) *. xx1 +. 3. *. ((1. -. t) ** 2.) *. t *. xx2 +. 3. *. (1. -. t) *. (t ** 2.) *. xx3 +. (t ** 3.) *. xx4,
+     ((1. -. t) ** 3.) *. yy1 +. 3. *. ((1. -. t) ** 2.) *. t *. yy2 +. 3. *. (1. -. t) *. (t ** 2.) *. yy3 +. (t ** 3.) *. yy4)
+  };
+  let bezierTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => {
+    (-3. *.(1. -. t) ** 2. *. xx1 +. 3. *. (1. -. t) ** 2. *. xx2 -. 6. *. t *. (1. -. t) *. xx2 -. 3. *. t ** 2. *. xx3 +. 6. *. t *. (1. -. t) *. xx3 +. 3. *. t ** 2. *. xx4,
+     -3. *.(1. -. t) ** 2. *. yy1 +. 3. *. (1. -. t) ** 2. *. yy2 -. 6. *. t *. (1. -. t) *. yy2 -. 3. *. t ** 2. *. yy3 +. 6. *. t *. (1. -. t) *. yy3 +. 3. *. t ** 2. *. yy4)
+  };
   let bezier (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (env: glEnv) => {
-    let bezier_point t => {
-      (((1. -. t) ** 3.) *. xx1 +. 3. *. ((1. -. t) ** 2.) *. t *. xx2 +. 3. *. (1. -. t) *. (t ** 2.) *. xx3 +. (t ** 3.) *. xx4,
-       ((1. -. t) ** 3.) *. yy1 +. 3. *. ((1. -. t) ** 2.) *. t *. yy2 +. 3. *. (1. -. t) *. (t ** 2.) *. yy3 +. (t ** 3.) *. yy4)
-    };
-    for i in 0 to 99 {
-      linef (bezier_point ((float_of_int i) /. 100.0)) (bezier_point ((float_of_int (i + 1)) /. 100.0)) env;
+    /* @speed this thing can reuse points*/
+    for i in 0 to 19 {
+      let (x1, y1) = (bezierPoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int i) /. 20.0));
+      let (x2, y2) = (bezierPoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int (i + 1)) /. 20.0));
+      let (tangent_x1, tangent_y1) = (bezierTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int i) /. 20.0));
+      let (tangent_x2, tangent_y2) = (bezierTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int (i + 1)) /. 20.0));
+      let a1 = (PUtils.atan2 tangent_y1 tangent_x1) -. PConstants.half_pi;
+      let a2 = (PUtils.atan2 tangent_y2 tangent_x2) -. PConstants.half_pi;
+      quadf (x1 +. (PUtils.cos a1) *. (float_of_int env.style.strokeWeight) /. 2., y1 +. (PUtils.sin a1) *. (float_of_int env.style.strokeWeight) /. 2.)
+            (x1 -. (PUtils.cos a1) *. (float_of_int env.style.strokeWeight) /. 2., y1 -. (PUtils.sin a1) *. (float_of_int env.style.strokeWeight) /. 2.)
+            (x2 -. (PUtils.cos a2) *. (float_of_int env.style.strokeWeight) /. 2., y2 -. (PUtils.sin a2) *. (float_of_int env.style.strokeWeight) /. 2.)
+            (x2 +. (PUtils.cos a2) *. (float_of_int env.style.strokeWeight) /. 2., y2 +. (PUtils.sin a2) *. (float_of_int env.style.strokeWeight) /. 2.) env;
+    }
+  };
+  let curvePoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => {
+    let mx0 = (1. -. 0.5) *. (xx3 -. xx1); /* @feature tightness will be defined as the 0 here */
+    let my0 = (1. -. 0.5) *. (yy3 -. yy1);
+    let mx1 = (1. -. 0.5) *. (xx4 -. xx2);
+    let my1 = (1. -. 0.5) *. (yy4 -. yy2);
+    ((2. *. t ** 3. -. 3. *. t ** 2. +. 1.) *. xx2 +. (t ** 3. -. 2. *. t ** 2. +. t) *. mx0 +. (-2. *. t ** 3. +. 3. *. t ** 2.) *. xx3 +. (t ** 3. -. t ** 2.) *. mx1,
+     (2. *. t ** 3. -. 3. *. t ** 2. +. 1.) *. yy2 +. (t ** 3. -. 2. *. t ** 2. +. t) *. my0 +. (-2. *. t ** 3. +. 3. *. t ** 2.) *. yy3 +. (t ** 3. -. t ** 2.) *. my1)
+  };
+  let curveTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => {
+    let mx0 = (1. -. 0.5) *. (xx3 -. xx1); /* @feature tightness will be defined as the 0 here */
+    let my0 = (1. -. 0.5) *. (yy3 -. yy1);
+    let mx1 = (1. -. 0.5) *. (xx4 -. xx2);
+    let my1 = (1. -. 0.5) *. (yy4 -. yy2);
+    ((6. *. t ** 2. -. 6. *. t) *. xx2 +. (3. *. t ** 2. -. 4. *. t +. 1.) *. mx0 +. (-6. *. t ** 2. +. 6. *. t) *. xx3 +. (3. *. t ** 2. -. 2. *. t) *. mx1,
+     (6. *. t ** 2. -. 6. *. t) *. yy2 +. (3. *. t ** 2. -. 4. *. t +. 1.) *. my0 +. (-6. *. t ** 2. +. 6. *. t) *. yy3 +. (3. *. t ** 2. -. 2. *. t) *. my1)
+  };
+  let curve (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (env: glEnv) => {
+    for i in 0 to 19 {
+      let (x1, y1) = (curvePoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int i) /. 20.0));
+      let (x2, y2) = (curvePoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int (i + 1)) /. 20.0));
+      let (tangent_x1, tangent_y1) = (curveTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int i) /. 20.0));
+      let (tangent_x2, tangent_y2) = (curveTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) ((float_of_int (i + 1)) /. 20.0));
+      let a1 = (PUtils.atan2 tangent_y1 tangent_x1) -. PConstants.half_pi;
+      let a2 = (PUtils.atan2 tangent_y2 tangent_x2) -. PConstants.half_pi;
+      quadf (x1 +. (PUtils.cos a1) *. (float_of_int env.style.strokeWeight) /. 2., y1 +. (PUtils.sin a1) *. (float_of_int env.style.strokeWeight) /. 2.)
+            (x1 -. (PUtils.cos a1) *. (float_of_int env.style.strokeWeight) /. 2., y1 -. (PUtils.sin a1) *. (float_of_int env.style.strokeWeight) /. 2.)
+            (x2 -. (PUtils.cos a2) *. (float_of_int env.style.strokeWeight) /. 2., y2 -. (PUtils.sin a2) *. (float_of_int env.style.strokeWeight) /. 2.)
+            (x2 +. (PUtils.cos a2) *. (float_of_int env.style.strokeWeight) /. 2., y2 +. (PUtils.sin a2) *. (float_of_int env.style.strokeWeight) /. 2.) env;
     }
   };
   let pixelf (x: float) (y: float) color (env: glEnv) => {
