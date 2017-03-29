@@ -1,0 +1,7 @@
+{
+  "name" : "reprocessing",
+  "sources" : "src",
+  "bs-dependencies": ["reasongl-interface", "reasongl-web"],
+  "entries": [{"kind": "js", "main": "Index"}],
+}
+

@@ -17,7 +17,7 @@ let setup env => {
 };
 
 let draw state env => {
-  background env (color 150 255 255);
+  background (color 150 255 255) env;
   let (sx, sy) = state.squarePos;
   let (px, py) = pmouse env;
   let (x, y) as squarePos =
