@@ -7,14 +7,15 @@ open PUtils;
 open PConstants;
 
 let setup env => {
-  size 640 360 env;
+  size 640 640 env;
   fill (color 255 0 0) env;
+  noStroke env;
   0.01
 };
 
 let draw z env => {
   background (color 230 230 250) env;
-  let res = 50;
+  let res = 100;
   let w = float_of_int (width env) /. float_of_int res;
   let h = float_of_int (height env) /. float_of_int res;
   for i in 0 to (res - 1) {
