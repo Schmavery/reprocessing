@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
-    "build": "bsb.exe -make-world && webpack -d lib/js/src/index.js lib/js/src/app.js"
+    "buildweb": "bsb -make-world && webpack -d lib/js/src/index.js lib/js/src/app.js"
   },
   "dependencies": {
     "ReasonglInterface": "bsansouci/reasongl-interface#bsb-support",
@@ -17,6 +17,6 @@
   "author": "bsansouci & schmavery",
   "devDependencies": {
     "webpack": "^1.14.0",
-    "bs-platform": "bsansouci/bucklescript#simple-native-compilation",
+    "bs-platform": "bsansouci/bucklescript#simple-native-compilation"
   }
 }
