@@ -1,7 +1,8 @@
 {
   "name" : "reprocessing",
   "sources" : "src",
-  "bs-dependencies": ["ReasonglInterface", "ReasonglNative"],
-  "entries": [{"kind": "bytecode", "main": "Index"}],
+  "bs-dependencies": ["ReasonglInterface", "ReasonglWeb", "ReasonglNative"],
+  "entries": [{"kind": "js", "main": "Index"}],
+  "package-specs" : ["es6"],
 }
 

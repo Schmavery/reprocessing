@@ -1,11 +1,10 @@
-include Opengl;
-/*include WGLWebgl;*/
+include Reasongl;
 
-/* include 
-   [%matchenv 
-     switch (GL_BACKEND) { 
-       | "native" => ReasonglNative.Opengl 
-       | "web" => ReasonglWeb.Webgl 
-     } 
-     ]; 
+/* include
+   [%matchenv
+     switch (GL_BACKEND) {
+       | "native" => ReasonglNative.Opengl
+       | "web" => ReasonglWeb.Webgl
+     }
+     ];
 */
