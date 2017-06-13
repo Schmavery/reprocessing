@@ -8,7 +8,7 @@
   "dependencies": {
     "ReasonglInterface": "github:bsansouci/reasongl-interface#bsb-support-new",
     "ReasonglNative": "github:bsansouci/reasongl-native#bsb-support-new",
-    "ReasonglWeb": "bsansouci/reasongl-web#bsb-support"
+    "ReasonglWeb": "github:bsansouci/reasongl-web#bsb-support-new"
   },
   "repository": {
     "type": "git",
