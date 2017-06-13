@@ -52,18 +52,15 @@ module ReProcessor: ReProcessorT = {
     let reDrawPreviousBufferOnSecondFrame = {
       let width = Gl.Window.getWidth env.window;
       let height = Gl.Window.getHeight env.window;
-      let data = Gl.readPixelsRGBA context::env.gl x::0 y::0 ::width ::height;
+      let data = Gl.readPixels_RGBA context::env.gl x::0 y::0 ::width ::height;
       let textureBuffer = Gl.createTexture context::env.gl;
       Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
-      Gl.texImage2D
+      Gl.texImage2D_RGBA
         context::env.gl
         target::Constants.texture_2d
         level::0
-        internalFormat::Constants.rgba
         ::width
         ::height
-        format::Constants.rgba
-        type_::Constants.unsigned_byte
         ::data;
       Gl.texParameteri
         context::env.gl

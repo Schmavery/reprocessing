@@ -2,7 +2,7 @@
   "name" : "reprocessing",
   "sources" : "src",
   "bs-dependencies": ["ReasonglInterface", "ReasonglWeb", "ReasonglNative"],
-  "entries": [{"kind": "js", "main": "Index"}],
+  "entries": [{"kind": "bytecode", "main": "Index"}],
   "package-specs" : ["es6"],
 }
 

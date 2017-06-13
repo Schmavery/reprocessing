@@ -93,16 +93,14 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   let uSampler = Gl.getUniformLocation gl program "uSampler";
 
   /** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
-  Gl.texImage2D
+  Gl.texImage2D_RGBA
     context::gl
     target::Constants.texture_2d
     level::0
-    internalFormat::Constants.rgba
     width::1
     height::1
-    format::Constants.rgba
-    type_::Constants.unsigned_byte
-    data::(Gl.toTextureData [|0, 0, 0, 0|]);
+    border::0
+    data::(Gl.Bigarray.of_array Gl.Bigarray.Uint8 [|0, 0, 0, 0|]);
   Gl.texParameteri
     context::gl
     target::Constants.texture_2d
@@ -186,7 +184,7 @@ let drawGeometry
     attribute::env.aVertexPosition
     size::2
     type_::Constants.float_
-    normalize::false
+    normalized::false
     stride::(vertexSize * 4)
     offset::0;
 
@@ -196,7 +194,7 @@ let drawGeometry
     attribute::env.aVertexColor
     size::4
     type_::Constants.float_
-    normalize::false
+    normalized::false
     stride::(vertexSize * 4)
     offset::(2 * 4);
 
@@ -206,7 +204,7 @@ let drawGeometry
     attribute::env.aTextureCoord
     size::2
     type_::Constants.float_
-    normalize::false
+    normalized::false
     stride::(vertexSize * 4)
     offset::(6 * 4);
 
