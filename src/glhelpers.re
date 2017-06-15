@@ -5,96 +5,96 @@ open Glloader;
 open Utils;
 
 let getProgram
-    gl::(gl: Gl.contextT)
+    ::context
     vertexShader::(vertexShaderSource: string)
     fragmentShader::(fragmentShaderSource: string)
     :option Gl.programT => {
-  let vertexShader = Gl.createShader gl Constants.vertex_shader;
-  Gl.shaderSource gl vertexShader vertexShaderSource;
-  Gl.compileShader gl vertexShader;
+  let vertexShader = Gl.createShader ::context Constants.vertex_shader;
+  Gl.shaderSource ::context shader::vertexShader source::vertexShaderSource;
+  Gl.compileShader ::context vertexShader;
   let compiledCorrectly =
-    Gl.getShaderParameter context::gl shader::vertexShader paramName::Gl.Compile_status == 1;
+    Gl.getShaderParameter ::context shader::vertexShader paramName::Gl.Compile_status == 1;
   if compiledCorrectly {
-    let fragmentShader = Gl.createShader gl Constants.fragment_shader;
-    Gl.shaderSource gl fragmentShader fragmentShaderSource;
-    Gl.compileShader gl fragmentShader;
+    let fragmentShader = Gl.createShader ::context Constants.fragment_shader;
+    Gl.shaderSource ::context shader::fragmentShader source::fragmentShaderSource;
+    Gl.compileShader ::context fragmentShader;
     let compiledCorrectly =
-      Gl.getShaderParameter context::gl shader::fragmentShader paramName::Gl.Compile_status == 1;
+      Gl.getShaderParameter ::context shader::fragmentShader paramName::Gl.Compile_status == 1;
     if compiledCorrectly {
-      let program = Gl.createProgram gl;
-      Gl.attachShader context::gl ::program shader::vertexShader;
-      Gl.deleteShader context::gl shader::vertexShader;
-      Gl.attachShader context::gl ::program shader::fragmentShader;
-      Gl.deleteShader context::gl shader::fragmentShader;
-      Gl.linkProgram gl program;
+      let program = Gl.createProgram ::context;
+      Gl.attachShader ::context ::program shader::vertexShader;
+      Gl.deleteShader ::context vertexShader;
+      Gl.attachShader ::context ::program shader::fragmentShader;
+      Gl.deleteShader ::context fragmentShader;
+      Gl.linkProgram ::context program;
       let linkedCorrectly =
-        Gl.getProgramParameter context::gl ::program paramName::Gl.Link_status == 1;
+        Gl.getProgramParameter ::context ::program paramName::Gl.Link_status == 1;
       if linkedCorrectly {
         Some program
       } else {
-        print_endline @@ "Linking error: " ^ Gl.getProgramInfoLog context::gl ::program;
+        print_endline @@ "Linking error: " ^ Gl.getProgramInfoLog ::context program;
         None
       }
     } else {
-      print_endline @@
-      "Fragment shader error: " ^ Gl.getShaderInfoLog context::gl shader::fragmentShader;
+      print_endline @@ "Fragment shader error: " ^ Gl.getShaderInfoLog ::context fragmentShader;
       None
     }
   } else {
-    print_endline @@
-    "Vertex shader error: " ^ Gl.getShaderInfoLog context::gl shader::vertexShader;
+    print_endline @@ "Vertex shader error: " ^ Gl.getShaderInfoLog ::context vertexShader;
     None
   }
 };
 
 let createCanvas window (height: int) (width: int) :glEnv => {
   Gl.Window.setWindowSize ::window ::width ::height;
-  let gl = Gl.Window.getContext window;
-  Gl.viewport context::gl x::(-1) y::(-1) ::width ::height;
-  Gl.clearColor context::gl r::0. g::0. b::0. a::1.;
-  Gl.clear context::gl mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
+  let context = Gl.Window.getContext window;
+  Gl.viewport ::context x::(-1) y::(-1) ::width ::height;
+  Gl.clearColor ::context r::0. g::0. b::0. a::1.;
+  Gl.clear ::context mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 
   /** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
   let camera = {projectionMatrix: Gl.Mat4.create ()};
-  let vertexBuffer = Gl.createBuffer gl;
-  let elementBuffer = Gl.createBuffer gl;
+  let vertexBuffer = Gl.createBuffer ::context;
+  let elementBuffer = Gl.createBuffer ::context;
   let program =
     switch (
       getProgram
-        ::gl vertexShader::Shaders.vertexShaderSource fragmentShader::Shaders.fragmentShaderSource
+        ::context
+        vertexShader::Shaders.vertexShaderSource
+        fragmentShader::Shaders.fragmentShaderSource
     ) {
     | None => failwith "Could not create the program and/or the shaders. Aborting."
     | Some program => program
     };
-  Gl.useProgram gl program;
+  Gl.useProgram ::context program;
 
   /** Get the attribs ahead of time to be used inside the render function **/
-  let aVertexPosition = Gl.getAttribLocation context::gl ::program name::"aVertexPosition";
-  Gl.enableVertexAttribArray context::gl attribute::aVertexPosition;
-  let aVertexColor = Gl.getAttribLocation context::gl ::program name::"aVertexColor";
-  Gl.enableVertexAttribArray context::gl attribute::aVertexColor;
-  let pMatrixUniform = Gl.getUniformLocation gl program "uPMatrix";
-  Gl.uniformMatrix4fv context::gl location::pMatrixUniform value::camera.projectionMatrix;
+  let aVertexPosition = Gl.getAttribLocation ::context ::program name::"aVertexPosition";
+  Gl.enableVertexAttribArray ::context attribute::aVertexPosition;
+  let aVertexColor = Gl.getAttribLocation ::context ::program name::"aVertexColor";
+  Gl.enableVertexAttribArray ::context attribute::aVertexColor;
+  let pMatrixUniform = Gl.getUniformLocation ::context ::program name::"uPMatrix";
+  Gl.uniformMatrix4fv ::context location::pMatrixUniform value::camera.projectionMatrix;
 
   /** Get attribute and uniform locations for later usage in the draw code. **/
-  let aTextureCoord = Gl.getAttribLocation context::gl ::program name::"aTextureCoord";
-  Gl.enableVertexAttribArray context::gl attribute::aTextureCoord;
+  let aTextureCoord = Gl.getAttribLocation ::context ::program name::"aTextureCoord";
+  Gl.enableVertexAttribArray ::context attribute::aTextureCoord;
 
   /** Generate texture buffer that we'll use to pass image data around. **/
-  let texture = Gl.createTexture gl;
+  let texture = Gl.createTexture ::context;
 
   /** This tells OpenGL that we're going to be using texture0. OpenGL imposes a limit on the number of
       texture we can manipulate at the same time. That limit depends on the device. We don't care as we'll just
       always use texture0. **/
-  Gl.activeTexture context::gl target::Constants.texture0;
+  Gl.activeTexture ::context Constants.texture0;
 
   /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
-  Gl.bindTexture context::gl target::Constants.texture_2d ::texture;
-  let uSampler = Gl.getUniformLocation gl program "uSampler";
+  Gl.bindTexture ::context target::Constants.texture_2d ::texture;
+  let uSampler = Gl.getUniformLocation ::context ::program name::"uSampler";
 
   /** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
   Gl.texImage2D_RGBA
-    context::gl
+    ::context
     target::Constants.texture_2d
     level::0
     width::1
@@ -102,19 +102,19 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     border::0
     data::(Gl.Bigarray.of_array Gl.Bigarray.Uint8 [|0, 0, 0, 0|]);
   Gl.texParameteri
-    context::gl
+    ::context
     target::Constants.texture_2d
     pname::Constants.texture_mag_filter
     param::Constants.linear;
   Gl.texParameteri
-    context::gl
+    ::context
     target::Constants.texture_2d
     pname::Constants.texture_min_filter
     param::Constants.linear_mipmap_nearest;
 
   /** Enable blend and tell OpenGL how to blend. */
-  Gl.enable context::gl Constants.blend;
-  Gl.blendFunc context::gl Constants.src_alpha Constants.one_minus_src_alpha;
+  Gl.enable ::context Constants.blend;
+  Gl.blendFunc ::context Constants.src_alpha Constants.one_minus_src_alpha;
 
   /**
    * Will mutate the projectionMatrix to be an ortho matrix with the given boundaries.
@@ -132,7 +132,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   {
     camera,
     window,
-    gl,
+    gl: context,
     batch: {
       vertexArray: Gl.Bigarray.create Gl.Bigarray.Float32 (circularBufferSize * vertexSize),
       elementArray: Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize,
@@ -210,7 +210,7 @@ let drawGeometry
 
   /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
       texture0 represent.  **/
-  Gl.uniform1i context::env.gl location::env.uSampler 0;
+  Gl.uniform1i context::env.gl location::env.uSampler val::0;
 
   /** Bind `elementBuffer`, a pointer to GPU memory to `element_array_buffer`. That "register" is used for
       the data representing the indices of the vertex. **/
@@ -510,7 +510,7 @@ let drawArcStroke
   let stop_i = int_of_float (stop /. anglePerFan) - 1;
   let prevEl: ref (option (int, int)) = ref None;
   let halfwidth = float_of_int strokeWidth /. 2.;
-  for i in start_i to (stop_i) {
+  for i in start_i to stop_i {
     let angle = anglePerFan *. float_of_int (i + 1);
     let (xCoordinateInner, yCoordinateInner) =
       transform (
