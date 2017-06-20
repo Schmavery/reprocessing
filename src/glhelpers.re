@@ -13,13 +13,16 @@ let getProgram
   Gl.shaderSource ::context shader::vertexShader source::vertexShaderSource;
   Gl.compileShader ::context vertexShader;
   let compiledCorrectly =
-    Gl.getShaderParameter ::context shader::vertexShader paramName::Gl.Compile_status == 1;
+    Gl.getShaderParameter
+      ::context shader::vertexShader paramName::Gl.Compile_status == 1;
   if compiledCorrectly {
     let fragmentShader = Gl.createShader ::context Constants.fragment_shader;
-    Gl.shaderSource ::context shader::fragmentShader source::fragmentShaderSource;
+    Gl.shaderSource
+      ::context shader::fragmentShader source::fragmentShaderSource;
     Gl.compileShader ::context fragmentShader;
     let compiledCorrectly =
-      Gl.getShaderParameter ::context shader::fragmentShader paramName::Gl.Compile_status == 1;
+      Gl.getShaderParameter
+        ::context shader::fragmentShader paramName::Gl.Compile_status == 1;
     if compiledCorrectly {
       let program = Gl.createProgram ::context;
       Gl.attachShader ::context ::program shader::vertexShader;
@@ -32,15 +35,18 @@ let getProgram
       if linkedCorrectly {
         Some program
       } else {
-        print_endline @@ "Linking error: " ^ Gl.getProgramInfoLog ::context program;
+        print_endline @@
+        "Linking error: " ^ Gl.getProgramInfoLog ::context program;
         None
       }
     } else {
-      print_endline @@ "Fragment shader error: " ^ Gl.getShaderInfoLog ::context fragmentShader;
+      print_endline @@
+      "Fragment shader error: " ^ Gl.getShaderInfoLog ::context fragmentShader;
       None
     }
   } else {
-    print_endline @@ "Vertex shader error: " ^ Gl.getShaderInfoLog ::context vertexShader;
+    print_endline @@
+    "Vertex shader error: " ^ Gl.getShaderInfoLog ::context vertexShader;
     None
   }
 };
@@ -50,7 +56,9 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   let context = Gl.Window.getContext window;
   Gl.viewport ::context x::(-1) y::(-1) ::width ::height;
   Gl.clearColor ::context r::0. g::0. b::0. a::1.;
-  Gl.clear ::context mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
+  Gl.clear
+    ::context
+    mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 
   /** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
   let camera = {projectionMatrix: Gl.Mat4.create ()};
@@ -63,21 +71,27 @@ let createCanvas window (height: int) (width: int) :glEnv => {
         vertexShader::Shaders.vertexShaderSource
         fragmentShader::Shaders.fragmentShaderSource
     ) {
-    | None => failwith "Could not create the program and/or the shaders. Aborting."
+    | None =>
+      failwith "Could not create the program and/or the shaders. Aborting."
     | Some program => program
     };
   Gl.useProgram ::context program;
 
   /** Get the attribs ahead of time to be used inside the render function **/
-  let aVertexPosition = Gl.getAttribLocation ::context ::program name::"aVertexPosition";
+  let aVertexPosition =
+    Gl.getAttribLocation ::context ::program name::"aVertexPosition";
   Gl.enableVertexAttribArray ::context attribute::aVertexPosition;
-  let aVertexColor = Gl.getAttribLocation ::context ::program name::"aVertexColor";
+  let aVertexColor =
+    Gl.getAttribLocation ::context ::program name::"aVertexColor";
   Gl.enableVertexAttribArray ::context attribute::aVertexColor;
-  let pMatrixUniform = Gl.getUniformLocation ::context ::program name::"uPMatrix";
-  Gl.uniformMatrix4fv ::context location::pMatrixUniform value::camera.projectionMatrix;
+  let pMatrixUniform =
+    Gl.getUniformLocation ::context ::program name::"uPMatrix";
+  Gl.uniformMatrix4fv
+    ::context location::pMatrixUniform value::camera.projectionMatrix;
 
   /** Get attribute and uniform locations for later usage in the draw code. **/
-  let aTextureCoord = Gl.getAttribLocation ::context ::program name::"aTextureCoord";
+  let aTextureCoord =
+    Gl.getAttribLocation ::context ::program name::"aTextureCoord";
   Gl.enableVertexAttribArray ::context attribute::aTextureCoord;
 
   /** Generate texture buffer that we'll use to pass image data around. **/
@@ -134,7 +148,9 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     window,
     gl: context,
     batch: {
-      vertexArray: Gl.Bigarray.create Gl.Bigarray.Float32 (circularBufferSize * vertexSize),
+      vertexArray:
+        Gl.Bigarray.create
+          Gl.Bigarray.Float32 (circularBufferSize * vertexSize),
       elementArray: Gl.Bigarray.create Gl.Bigarray.Uint16 circularBufferSize,
       vertexPtr: 0,
       elementPtr: 0,
@@ -165,18 +181,24 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 
 let drawGeometry
     vertexArray::(vertexArray: Gl.Bigarray.t float Gl.Bigarray.float32_elt)
-    elementArray::(elementArray: Gl.Bigarray.t int Gl.Bigarray.int16_unsigned_elt)
+    elementArray::(
+      elementArray: Gl.Bigarray.t int Gl.Bigarray.int16_unsigned_elt
+    )
     ::mode
     ::count
     ::textureBuffer
     env => {
   /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
      `array_buffer` */
-  Gl.bindBuffer context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
+  Gl.bindBuffer
+    context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
 
   /** Copy all of the data over into whatever's in `array_buffer` (so here it's `vertexBuffer`) **/
   Gl.bufferData
-    context::env.gl target::Constants.array_buffer data::vertexArray usage::Constants.stream_draw;
+    context::env.gl
+    target::Constants.array_buffer
+    data::vertexArray
+    usage::Constants.stream_draw;
 
   /** Tell the GPU about the shader attribute called `aVertexPosition` so it can access the data per vertex */
   Gl.vertexAttribPointer
@@ -214,7 +236,10 @@ let drawGeometry
 
   /** Bind `elementBuffer`, a pointer to GPU memory to `element_array_buffer`. That "register" is used for
       the data representing the indices of the vertex. **/
-  Gl.bindBuffer context::env.gl target::Constants.element_array_buffer buffer::env.elementBuffer;
+  Gl.bindBuffer
+    context::env.gl
+    target::Constants.element_array_buffer
+    buffer::env.elementBuffer;
 
   /** Copy the `elementArray` into whatever buffer is in `element_array_buffer` **/
   Gl.bufferData
@@ -224,10 +249,12 @@ let drawGeometry
     usage::Constants.stream_draw;
 
   /** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
-  Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
+  Gl.bindTexture
+    context::env.gl target::Constants.texture_2d texture::textureBuffer;
 
   /** Final call which actually tells the GPU to draw. **/
-  Gl.drawElements context::env.gl ::mode ::count type_::Constants.unsigned_short offset::0
+  Gl.drawElements
+    context::env.gl ::mode ::count type_::Constants.unsigned_short offset::0
 };
 
 /*
@@ -245,8 +272,14 @@ let flushGlobalBatch env =>
       | Some textureBuffer => textureBuffer
       };
     drawGeometry
-      vertexArray::(Gl.Bigarray.sub env.batch.vertexArray offset::0 len::env.batch.vertexPtr)
-      elementArray::(Gl.Bigarray.sub env.batch.elementArray offset::0 len::env.batch.elementPtr)
+      vertexArray::(
+        Gl.Bigarray.sub
+          env.batch.vertexArray offset::0 len::env.batch.vertexPtr
+      )
+      elementArray::(
+        Gl.Bigarray.sub
+          env.batch.elementArray offset::0 len::env.batch.elementPtr
+      )
       mode::Constants.triangles
       count::env.batch.elementPtr
       ::textureBuffer
@@ -445,7 +478,10 @@ let drawArcInternal
           )
         } else {
           let angle = anglePerFan *. float_of_int (i + 1);
-          (xCenterOfCircle +. cos angle *. radx, yCenterOfCircle +. sin angle *. rady)
+          (
+            xCenterOfCircle +. cos angle *. radx,
+            yCenterOfCircle +. sin angle *. rady
+          )
         }
       );
     let ii = (i - start_i) * vertexSize + vertexArrayOffset;
@@ -478,7 +514,13 @@ let drawArcInternal
   env.batch.elementPtr = env.batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
 };
 
-let drawEllipseInternal env center (radx: float) (rady: float) (matrix: array float) c =>
+let drawEllipseInternal
+    env
+    center
+    (radx: float)
+    (rady: float)
+    (matrix: array float)
+    c =>
   drawArcInternal env center radx rady 0. PConstants.tau false matrix c;
 
 let drawArcStroke
@@ -560,19 +602,34 @@ let drawArcStroke
   };
   if (not isOpen) {
     let (startX, startY) =
-      transform (xCenterOfCircle +. cos start *. radx, yCenterOfCircle +. sin start *. rady);
+      transform (
+        xCenterOfCircle +. cos start *. radx,
+        yCenterOfCircle +. sin start *. rady
+      );
     let (stopX, stopY) =
-      transform (xCenterOfCircle +. cos stop *. radx, yCenterOfCircle +. sin stop *. rady);
+      transform (
+        xCenterOfCircle +. cos stop *. radx,
+        yCenterOfCircle +. sin stop *. rady
+      );
     if isPie {
-      drawLineInternal env (startX, startY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
-      drawLineInternal env (stopX, stopY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
+      drawLineInternal
+        env (startX, startY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
+      drawLineInternal
+        env (stopX, stopY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
       drawEllipseInternal
-        env (transform (xCenterOfCircle, yCenterOfCircle)) halfwidth halfwidth matrix strokeColor
+        env
+        (transform (xCenterOfCircle, yCenterOfCircle))
+        halfwidth
+        halfwidth
+        matrix
+        strokeColor
     } else {
       drawLineInternal env (startX, startY) (stopX, stopY) strokeColor
     };
-    drawEllipseInternal env (startX, startY) halfwidth halfwidth matrix strokeColor;
-    drawEllipseInternal env (stopX, stopY) halfwidth halfwidth matrix strokeColor
+    drawEllipseInternal
+      env (startX, startY) halfwidth halfwidth matrix strokeColor;
+    drawEllipseInternal
+      env (stopX, stopY) halfwidth halfwidth matrix strokeColor
   }
 };
 
@@ -590,8 +647,12 @@ let loadImage (env: glEnv) filename :imageT => {
           let height = Gl.getImageHeight img;
           let width = Gl.getImageWidth img;
           imageRef := Some {img, textureBuffer, height, width};
-          Gl.bindTexture context::env.gl target::Constants.texture_2d texture::textureBuffer;
-          Gl.texImage2DWithImage context::env.gl target::Constants.texture_2d level::0 image::img;
+          Gl.bindTexture
+            context::env.gl
+            target::Constants.texture_2d
+            texture::textureBuffer;
+          Gl.texImage2DWithImage
+            context::env.gl target::Constants.texture_2d level::0 image::img;
           Gl.texParameteri
             context::env.gl
             target::Constants.texture_2d
@@ -601,14 +662,32 @@ let loadImage (env: glEnv) filename :imageT => {
             context::env.gl
             target::Constants.texture_2d
             pname::Constants.texture_min_filter
-            param::Constants.linear
+            param::Constants.linear;
+          Gl.texParameteri
+            context::env.gl
+            target::Constants.texture_2d
+            pname::Constants.texture_wrap_s
+            param::Constants.clamp_to_edge;
+          Gl.texParameteri
+            context::env.gl
+            target::Constants.texture_2d
+            pname::Constants.texture_wrap_t
+            param::Constants.clamp_to_edge
         }
     )
     ();
   imageRef
 };
 
-let drawImageInternal {width, height, textureBuffer} ::x ::y ::subx ::suby ::subw ::subh env => {
+let drawImageInternal
+    {width, height, textureBuffer}
+    ::x
+    ::y
+    ::subx
+    ::suby
+    ::subw
+    ::subh
+    env => {
   maybeFlushBatch env (Some textureBuffer) 6;
   let (fsubx, fsuby, fsubw, fsubh) = (
     float_of_int subx /. float_of_int width,
@@ -686,5 +765,7 @@ let resetSize env width height => {
 
   /** Tell OpenGL about what the uniform called `pMatrixUniform` is, here it's the projectionMatrix. **/
   Gl.uniformMatrix4fv
-    context::env.gl location::env.pMatrixUniform value::env.camera.projectionMatrix
+    context::env.gl
+    location::env.pMatrixUniform
+    value::env.camera.projectionMatrix
 };
