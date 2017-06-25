@@ -424,7 +424,7 @@ let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
 let drawLineInternal env (xx1, yy1) (xx2, yy2) color => {
   let dx = xx2 -. xx1;
   let dy = yy2 -. yy1;
-  let mag = PUtils.distf (xx1, yy1) (xx2, yy2);
+  let mag = Reprocessing_Utils.distf p1::(xx1, yy1) p2::(xx2, yy2);
   let radius = float_of_int env.style.strokeWeight /. 2.;
   let xthing = dy /. mag *. radius;
   let ything = -. dx /. mag *. radius;
@@ -523,7 +523,7 @@ let drawEllipseInternal
     (rady: float)
     (matrix: array float)
     c =>
-  drawArcInternal env center radx rady 0. PConstants.tau false matrix c;
+  drawArcInternal env center radx rady 0. Reprocessing_Constants.tau false matrix c;
 
 let drawArcStroke
     env

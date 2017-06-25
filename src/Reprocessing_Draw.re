@@ -59,7 +59,7 @@ let linef ::p1 ::p2 (env: glEnv) =>
     let ((xx1, yy1), (xx2, yy2)) = (transform p1, transform p2);
     let dx = xx2 -. xx1;
     let dy = yy2 -. yy1;
-    let mag = PUtils.distf (xx1, yy1) (xx2, yy2);
+    let mag = Reprocessing_Utils.distf p1::(xx1, yy1) p2::(xx2, yy2);
     let radius = float_of_int env.style.strokeWeight /. 2.;
     let xthing = dy /. mag *. radius;
     let ything = -. dx /. mag *. radius;
@@ -92,7 +92,7 @@ let ellipsef ::center ::radx ::rady (env: glEnv) => {
       radx
       rady
       0.
-      PConstants.tau
+      Reprocessing_Constants.tau
       false
       false
       env.matrix

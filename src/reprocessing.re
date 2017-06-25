@@ -4,9 +4,9 @@ open Reprocessing_Internal;
 
 open Reprocessing_Utils;
 
-module Utils = Reprocessing_Utils.PUtils;
+module Utils = Reprocessing_Utils;
 
-module Constants = Reprocessing_Utils.PConstants;
+module Constants = Reprocessing_Constants;
 
 module Draw = Reprocessing_Draw;
 
@@ -40,7 +40,7 @@ let run
     ::keyTyped=?
     () => {
   Random.self_init ();
-  PUtils.noiseSeed (Random.int (PUtils.pow 2 30 - 1));
+  Reprocessing_Utils.noiseSeed (Random.int (Reprocessing_Utils.pow base::2 exp::(30 - 1)));
   let env = Reprocessing_Internal.createCanvas (Gl.Window.init argv::Sys.argv) 200 200;
   let userState = ref (setup env);
 

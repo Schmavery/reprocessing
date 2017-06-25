@@ -104,7 +104,7 @@ module Font = {
       parse_kern_fmt stream (num - 1) new_map
     };
   let replaceFilename path filename => {
-    let splitStr = PUtils.split path '/';
+    let splitStr = Reprocessing_Utils.split path sep::'/';
     let revLst = List.rev splitStr;
     let newRevLst =
       switch revLst {
