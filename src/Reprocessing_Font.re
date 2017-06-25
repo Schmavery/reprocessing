@@ -1,10 +1,10 @@
-open Common;
+open Reasongl;
 
-open Glloader;
+open Reprocessing_Internal;
 
-open Glhelpers;
+open Reprocessing_Utils;
 
-open Utils;
+open Reprocessing_Common;
 
 module Font = {
   module IntMap =
@@ -20,7 +20,7 @@ module Font = {
         if (first != 0) {
           first
         } else {
-          compare a1 b2
+          compare a2 b2
         }
       };
     };
@@ -33,12 +33,17 @@ module Font = {
     yoffset: int,
     xadvance: int
   };
-  type internalType = {chars: IntMap.t charT, kerning: IntPairMap.t int, image: imageT};
+  type internalType = {
+    chars: IntMap.t charT,
+    kerning: IntPairMap.t int,
+    image: imageT
+  };
   type t = ref (option internalType);
   let rec parse_num (stream: Stream.t) acc :(Stream.t, int) =>
     switch (Stream.peekch stream) {
     | Some ('-' as c)
-    | Some ('0'..'9' as c) => parse_num (Stream.popch stream) (append_char acc c)
+    | Some ('0'..'9' as c) =>
+      parse_num (Stream.popch stream) (append_char acc c)
     | _ =>
       try (stream, int_of_string acc) {
       | _ => failwith ("Could not parse number [" ^ acc ^ "].")
@@ -55,7 +60,7 @@ module Font = {
   let rec pop_line stream =>
     switch (Stream.peekch stream) {
     | Some '\n' => Stream.popch stream
-    | Some c => pop_line (Stream.popch stream)
+    | Some _ => pop_line (Stream.popch stream)
     | None => failwith "could not pop line"
     };
   let rec parse_char_fmt stream num map =>
@@ -79,7 +84,9 @@ module Font = {
       let stream = Stream.match stream " xadvance=";
       let (stream, xadvance) = parse_num stream;
       let stream = pop_line stream;
-      let new_map = IntMap.add char_id {x, y, width, height, xoffset, yoffset, xadvance} map;
+      let new_map =
+        IntMap.add
+          char_id {x, y, width, height, xoffset, yoffset, xadvance} map;
       parse_char_fmt stream (num - 1) new_map
     };
   let rec parse_kern_fmt stream num map =>
@@ -101,7 +108,7 @@ module Font = {
     let revLst = List.rev splitStr;
     let newRevLst =
       switch revLst {
-      | [hd, ...tl] => [filename, ...tl]
+      | [_, ...tl] => [filename, ...tl]
       | [] => []
       };
     let newLst = List.rev newRevLst;
@@ -110,8 +117,8 @@ module Font = {
   let parseFontFormat env path => {
     let ret = ref None;
     Gl.File.readFile
-      path
-      (
+      filename::path
+      cb::(
         fun str => {
           let stream = Stream.create (str ^ "\n");
           let stream = stream |> pop_line |> pop_line;
@@ -121,13 +128,19 @@ module Font = {
           let stream = Stream.match stream "chars count=";
           let (stream, num_chars) = parse_num stream;
           let stream = pop_line stream;
-          let (stream, char_map) = parse_char_fmt stream num_chars IntMap.empty;
+          let (stream, char_map) =
+            parse_char_fmt stream num_chars IntMap.empty;
           let stream = Stream.match stream "kernings count=";
           let (stream, num_kerns) = parse_num stream;
           let stream = pop_line stream;
           let (_, kern_map) = parse_kern_fmt stream num_kerns IntPairMap.empty;
           let img_filename = replaceFilename path filename;
-          ret := Some {chars: char_map, kerning: kern_map, image: loadImage env img_filename}
+          ret :=
+            Some {
+              chars: char_map,
+              kerning: kern_map,
+              image: loadImage env img_filename
+            }
         }
       );
     ret
@@ -135,7 +148,8 @@ module Font = {
   let getChar fnt ch => {
     let code = Char.code ch;
     try (IntMap.find code fnt.chars) {
-    | _ => failwith ("Could not find character " ^ string_of_int code ^ " in font.")
+    | _ =>
+      failwith ("Could not find character " ^ string_of_int code ^ " in font.")
     }
   };
   let drawChar (env: glEnv) fnt image (ch: char) (last: option char) x y => {

@@ -1,8 +1,10 @@
-open Common;
+open Reprocessing_Common;
 
-open Glloader;
+open Reasongl;
 
-open Utils;
+open Reprocessing_Utils;
+
+module Matrix = Reprocessing_Matrix;
 
 let getProgram
     ::context
@@ -68,8 +70,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     switch (
       getProgram
         ::context
-        vertexShader::Shaders.vertexShaderSource
-        fragmentShader::Shaders.fragmentShaderSource
+        vertexShader::Reprocessing_Shaders.vertexShaderSource
+        fragmentShader::Reprocessing_Shaders.fragmentShaderSource
     ) {
     | None =>
       failwith "Could not create the program and/or the shaders. Aborting."
@@ -434,7 +436,7 @@ let drawLineInternal env (xx1, yy1) (xx2, yy2) color => {
   let y3 = yy2 -. ything;
   let x4 = xx1 -. xthing;
   let y4 = yy1 -. ything;
-  addRectToGlobalBatch env (x1, y1) (x2, y2) (x3, y3) (x4, y4) color
+  addRectToGlobalBatch env bottomRight::(x1, y1) bottomLeft::(x2, y2) topRight::(x3, y3) topLeft::(x4, y4) ::color
 };
 
 let drawArcInternal

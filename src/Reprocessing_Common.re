@@ -1,4 +1,4 @@
-open Glloader;
+open Reasongl;
 
 module Constants = RGLConstants;
 
