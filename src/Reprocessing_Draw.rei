@@ -1,6 +1,3 @@
-type fontT = ref (option Reprocessing_Font.Font.internalType);
-
-
 /** Specifies an amount to displace objects within the display window.
    * The dx parameter specifies left/right translation, the dy parameter
    * specifies up/down translation.
@@ -13,7 +10,7 @@ type fontT = ref (option Reprocessing_Font.Font.internalType);
    * when the loop begins again. This function can be further controlled
    * by using `pushMatrix` and `popMatrix`.
  */
-let translate: x::float => y::float => Reprocessing_Common.glEnv => unit;
+let translate: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Rotates the amount specified by the angle parameter. Angles must be
@@ -33,33 +30,33 @@ let translate: x::float => y::float => Reprocessing_Common.glEnv => unit;
  * rotation matrix. This function can be further controlled by `pushMatrix`
  * and `popMatrix`.
  */
-let rotate: float => Reprocessing_Common.glEnv => unit;
+let rotate: float => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Sets the color used to fill shapes.*/
-let fill: Reprocessing_Common.colorT => Reprocessing_Common.glEnv => unit;
+let fill: Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Disables filling geometry. If both `noStroke` and `noFill` are called,
    * nothing will be drawn to the screen.
  */
-let noFill: Reprocessing_Common.glEnv => unit;
+let noFill: Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Sets the color used to draw lines and borders around shapes. */
-let stroke: Reprocessing_Common.colorT => Reprocessing_Common.glEnv => unit;
+let stroke: Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Disables drawing the stroke (outline). If both noStroke() and noFill()
    * are called, nothing will be drawn to the screen.
  */
-let noStroke: Reprocessing_Common.glEnv => unit;
+let noStroke: Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Sets the width of the stroke used for lines, points, and the border around
    * shapes. All widths are set in units of pixels.
  */
-let strokeWeight: int => Reprocessing_Common.glEnv => unit;
+let strokeWeight: int => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** The `pushStyle` function saves the current style settings and `popStyle`
@@ -72,7 +69,7 @@ let strokeWeight: int => Reprocessing_Common.glEnv => unit;
    * The style information controlled by the following functions are included in
    * the style: fill, stroke, strokeWeight
  */
-let pushStyle: Reprocessing_Common.glEnv => unit;
+let pushStyle: Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** The `pushStyle` function saves the current style settings and
@@ -85,7 +82,7 @@ let pushStyle: Reprocessing_Common.glEnv => unit;
    * The style information controlled by the following functions are included in
    * the style: fill, stroke, strokeWeight
  */
-let popStyle: Reprocessing_Common.glEnv => unit;
+let popStyle: Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Loads an image and returns a handle to it. This will lazily load and
@@ -95,7 +92,7 @@ let popStyle: Reprocessing_Common.glEnv => unit;
    * the start of the program.
  */
 let loadImage:
-  filename::string => Reprocessing_Common.glEnv => Reprocessing_Common.imageT;
+  filename::string => Reprocessing_Types.Types.glEnvT => Reprocessing_Types.Types.imageT;
 
 
 /** The `image` function draws an image to the display window.
@@ -103,12 +100,12 @@ let loadImage:
    * The image is displayed at its original size.
  */
 let image:
-  Reprocessing_Common.imageT =>
+  Reprocessing_Types.Types.imageT =>
   pos::(int, int) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
-/* let clear: Reprocessing_Common.glEnv => unit; */
+/* let clear: Reprocessing_Types.Types.glEnvT => unit; */
 
 /** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.
@@ -117,7 +114,7 @@ let rectf:
   pos::(float, float) =>
   width::float =>
   height::float =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -131,7 +128,7 @@ let rect:
   pos::(int, int) =>
   width::int =>
   height::int =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -142,7 +139,7 @@ let rect:
    * the `strokeWeight` function.
  */
 let linef:
-  p1::(float, float) => p2::(float, float) => Reprocessing_Common.glEnv => unit;
+  p1::(float, float) => p2::(float, float) => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Draws a line (a direct path between two points) to the screen.
@@ -155,7 +152,7 @@ let linef:
    * as a convenience.
  */
 let line:
-  p1::(int, int) => p2::(int, int) => Reprocessing_Common.glEnv => unit;
+  p1::(int, int) => p2::(int, int) => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Draws an ellipse (oval) to the screen. An ellipse with equal width and
@@ -165,7 +162,7 @@ let ellipsef:
   center::(float, float) =>
   radx::float =>
   rady::float =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -179,7 +176,7 @@ let ellipse:
   center::(int, int) =>
   radx::int =>
   rady::int =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -193,7 +190,7 @@ let quadf:
   p2::(float, float) =>
   p3::(float, float) =>
   p4::(float, float) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -210,15 +207,15 @@ let quad:
   p2::(int, int) =>
   p3::(int, int) =>
   p4::(int, int) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
 /** Adds a single point with a radius defined by strokeWeight */
 let pixelf:
   pos::(float, float) =>
-  color::Reprocessing_Common.colorT =>
-  Reprocessing_Common.glEnv =>
+  color::Reprocessing_Types.Types.colorT =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -229,8 +226,8 @@ let pixelf:
  */
 let pixel:
   pos::(int, int) =>
-  color::Reprocessing_Common.colorT =>
-  Reprocessing_Common.glEnv =>
+  color::Reprocessing_Types.Types.colorT =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -239,7 +236,7 @@ let trianglef:
   p1::(float, float) =>
   p2::(float, float) =>
   p3::(float, float) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -252,7 +249,7 @@ let triangle:
   p1::(int, int) =>
   p2::(int, int) =>
   p3::(int, int) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -268,7 +265,7 @@ let bezier:
   p2::(float, float) =>
   p3::(float, float) =>
   p4::(float, float) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -288,7 +285,7 @@ let arcf:
   stop::float =>
   isOpen::bool =>
   isPie::bool =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -311,7 +308,7 @@ let arc:
   stop::float =>
   isOpen::bool =>
   isPie::bool =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -321,17 +318,18 @@ let arc:
    * In general, all fonts should be loaded in `setup` to preload them at
    * the start of the program.
  */
-let loadFont: filename::string => Reprocessing_Common.glEnv => fontT;
+let loadFont:
+  filename::string => Reprocessing_Types.Types.glEnvT => Reprocessing_Font.fontT;
 
 
 /** Draws text to the screen.
    * The font should be loaded using the `loadFont` function.
  */
 let text:
-  font::fontT =>
+  font::Reprocessing_Font.fontT =>
   body::string =>
   pos::(int, int) =>
-  Reprocessing_Common.glEnv =>
+  Reprocessing_Types.Types.glEnvT =>
   unit;
 
 
@@ -342,4 +340,4 @@ let text:
    * first frame of animation or if the backgound need only be set once.
  */
 let background:
-  Reprocessing_Common.colorT => Reprocessing_Common.glEnv => unit;
+  Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;

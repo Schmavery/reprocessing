@@ -1,5 +1,5 @@
 /** Creates colors for storing in variables of the color datatype. */
-let color: r::int => g::int => b::int => Reprocessing_Common.colorT;
+let color: r::int => g::int => b::int => Reprocessing_Types.Types.colorT;
 
 /** Calculates the integer closest to the input. For example,
   * `round 133.8` returns the value 134.
@@ -59,7 +59,7 @@ let norm: value::float => low::float => high::float => float;
    * returns an unexpected value within the specified range. The top number is
    * not included.
  */
-let randomf: low::float => high::float => float;
+let randomf: min::float => max::float => float;
 
 
 /** Generates random numbers. Each time the `random` function is called, it
@@ -69,7 +69,7 @@ let randomf: low::float => high::float => float;
    * This is the same as `randomf`, but converts all its integer arguments to floats
    * as a convenience.
  */
-let random: low::int => high::int => int;
+let random: min::int => max::int => int;
 
 
 /** Sets the seed value for `random` and `randomf`. By default, `random`
@@ -113,10 +113,10 @@ let lerpf: low::float => high::float => value::float => float;
 let lerp: low::int => high::int => value::float => int;
 
 let lerpColor:
-  low::Reprocessing_Common.colorT =>
-  high::Reprocessing_Common.colorT =>
+  low::Reprocessing_Types.Types.colorT =>
+  high::Reprocessing_Types.Types.colorT =>
   amt::float =>
-  Reprocessing_Common.colorT;
+  Reprocessing_Types.Types.colorT;
 
 /** Calculates the distance between two points. */
 let distf: p1::(float, float) => p2::(float, float) => float;

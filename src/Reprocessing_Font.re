@@ -2,8 +2,6 @@ open Reasongl;
 
 open Reprocessing_Internal;
 
-open Reprocessing_Utils;
-
 open Reprocessing_Common;
 
 module Font = {
@@ -104,7 +102,7 @@ module Font = {
       parse_kern_fmt stream (num - 1) new_map
     };
   let replaceFilename path filename => {
-    let splitStr = Reprocessing_Utils.split path sep::'/';
+    let splitStr = Reprocessing_Common.split path sep::'/';
     let revLst = List.rev splitStr;
     let newRevLst =
       switch revLst {
@@ -213,3 +211,5 @@ module Font = {
     !offset
   };
 };
+
+type fontT = ref (option Font.internalType);

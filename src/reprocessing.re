@@ -16,6 +16,8 @@ module Common = Reprocessing_Common;
 
 module Events = Reasongl.Gl.Events;
 
+include Reprocessing_Types.Types;
+
 let afterDraw f (env: Common.glEnv) => {
   open Common;
   let rate = int_of_float (1000. /. f);
@@ -40,8 +42,11 @@ let run
     ::keyTyped=?
     () => {
   Random.self_init ();
-  Reprocessing_Utils.noiseSeed (Random.int (Reprocessing_Utils.pow base::2 exp::(30 - 1)));
-  let env = Reprocessing_Internal.createCanvas (Gl.Window.init argv::Sys.argv) 200 200;
+  Reprocessing_Utils.noiseSeed (
+    Random.int (Reprocessing_Utils.pow base::2 exp::(30 - 1))
+  );
+  let env =
+    Reprocessing_Internal.createCanvas (Gl.Window.init argv::Sys.argv) 200 200;
   let userState = ref (setup env);
 
   /** This is a basically a hack to get around the default behavior of drawing something inside setup.

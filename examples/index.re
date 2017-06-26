@@ -2,22 +2,38 @@ open Reprocessing;
 
 /* https://www.youtube.com/watch?v=KkyIDI6rQJI
    Purple rain processing demo */
-type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: Common.colorT, time: int};
+type dropT = {
+  x: int,
+  y: int,
+  z: int,
+  len: int,
+  yspeed: int,
+  color: colorT,
+  time: int
+};
 
 let make w (ymin, ymax) time => {
-  let z = Utils.random 0 20;
+  let z = Utils.random min::0 max::20;
   {
-    x: Utils.random 0 w,
-    y: Utils.random ymin ymax,
+    x: Utils.random min::0 max::w,
+    y: Utils.random min::ymin max::ymax,
     z,
-    len: Utils.remap z 0 20 10 20,
-    yspeed: Utils.remap z 0 20 5 15,
-    color: Utils.lerpColor Constants.white (Utils.color r::138 g::43 b::226) (Utils.randomf 0.3 1.),
+    len: Utils.remap value::z low1::0 high1::20 low2::10 high2::20,
+    yspeed: Utils.remap value::z low1::0 high1::20 low2::5 high2::15,
+    color:
+      Utils.lerpColor
+        low::Constants.white
+        high::(Utils.color r::138 g::43 b::226)
+        amt::(Utils.randomf min::0.3 max::1.),
     time
   }
 };
 
-type state = {lst: array dropT, running: bool, time: int};
+type state = {
+  lst: array dropT,
+  running: bool,
+  time: int
+};
 
 let setup env => {
   Env.size width::640 height::360 env;
@@ -36,8 +52,11 @@ let draw {lst, running, time} env => {
       (
         fun drop =>
           switch (drop.y + drop.yspeed * (time - drop.time)) {
-          | y when y > Env.height env + 500 => make (Env.width env) ((-500), (-50)) time
-          | y when y < (-500) => make (Env.width env) (Env.height env + 50, Env.height env + 500) time
+          | y when y > Env.height env + 500 =>
+            make (Env.width env) ((-500), (-50)) time
+          | y when y < (-500) =>
+            make
+              (Env.width env) (Env.height env + 50, Env.height env + 500) time
           | _ => drop
           }
       )
@@ -48,7 +67,7 @@ let draw {lst, running, time} env => {
         Draw.fill drop.color env;
         Draw.ellipse
           center::(drop.x, drop.y + drop.yspeed * (time - drop.time))
-          radx::(Utils.remap drop.z 0 20 1 3)
+          radx::(Utils.remap value::drop.z low1::0 high1::20 low2::1 high2::3)
           rady::drop.yspeed
           env
       }

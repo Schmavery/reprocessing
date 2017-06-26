@@ -2,8 +2,6 @@ open Reprocessing_Common;
 
 open Reasongl;
 
-open Reprocessing_Utils;
-
 module Matrix = Reprocessing_Matrix;
 
 let getProgram
@@ -11,14 +9,14 @@ let getProgram
     vertexShader::(vertexShaderSource: string)
     fragmentShader::(fragmentShaderSource: string)
     :option Gl.programT => {
-  let vertexShader = Gl.createShader ::context Constants.vertex_shader;
+  let vertexShader = Gl.createShader ::context RGLConstants.vertex_shader;
   Gl.shaderSource ::context shader::vertexShader source::vertexShaderSource;
   Gl.compileShader ::context vertexShader;
   let compiledCorrectly =
     Gl.getShaderParameter
       ::context shader::vertexShader paramName::Gl.Compile_status == 1;
   if compiledCorrectly {
-    let fragmentShader = Gl.createShader ::context Constants.fragment_shader;
+    let fragmentShader = Gl.createShader ::context RGLConstants.fragment_shader;
     Gl.shaderSource
       ::context shader::fragmentShader source::fragmentShaderSource;
     Gl.compileShader ::context fragmentShader;
@@ -60,7 +58,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   Gl.clearColor ::context r::0. g::0. b::0. a::1.;
   Gl.clear
     ::context
-    mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
+    mask::(RGLConstants.color_buffer_bit lor RGLConstants.depth_buffer_bit);
 
   /** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
   let camera = {projectionMatrix: Gl.Mat4.create ()};
@@ -102,16 +100,16 @@ let createCanvas window (height: int) (width: int) :glEnv => {
   /** This tells OpenGL that we're going to be using texture0. OpenGL imposes a limit on the number of
       texture we can manipulate at the same time. That limit depends on the device. We don't care as we'll just
       always use texture0. **/
-  Gl.activeTexture ::context Constants.texture0;
+  Gl.activeTexture ::context RGLConstants.texture0;
 
   /** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
-  Gl.bindTexture ::context target::Constants.texture_2d ::texture;
+  Gl.bindTexture ::context target::RGLConstants.texture_2d ::texture;
   let uSampler = Gl.getUniformLocation ::context ::program name::"uSampler";
 
   /** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
   Gl.texImage2D_RGBA
     ::context
-    target::Constants.texture_2d
+    target::RGLConstants.texture_2d
     level::0
     width::1
     height::1
@@ -119,18 +117,18 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     data::(Gl.Bigarray.of_array Gl.Bigarray.Uint8 [|0, 0, 0, 0|]);
   Gl.texParameteri
     ::context
-    target::Constants.texture_2d
-    pname::Constants.texture_mag_filter
-    param::Constants.linear;
+    target::RGLConstants.texture_2d
+    pname::RGLConstants.texture_mag_filter
+    param::RGLConstants.linear;
   Gl.texParameteri
     ::context
-    target::Constants.texture_2d
-    pname::Constants.texture_min_filter
-    param::Constants.linear_mipmap_nearest;
+    target::RGLConstants.texture_2d
+    pname::RGLConstants.texture_min_filter
+    param::RGLConstants.linear_mipmap_nearest;
 
   /** Enable blend and tell OpenGL how to blend. */
-  Gl.enable ::context Constants.blend;
-  Gl.blendFunc ::context Constants.src_alpha Constants.one_minus_src_alpha;
+  Gl.enable ::context RGLConstants.blend;
+  Gl.blendFunc ::context RGLConstants.src_alpha RGLConstants.one_minus_src_alpha;
 
   /**
    * Will mutate the projectionMatrix to be an ortho matrix with the given boundaries.
@@ -193,21 +191,21 @@ let drawGeometry
   /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
      `array_buffer` */
   Gl.bindBuffer
-    context::env.gl target::Constants.array_buffer buffer::env.vertexBuffer;
+    context::env.gl target::RGLConstants.array_buffer buffer::env.vertexBuffer;
 
   /** Copy all of the data over into whatever's in `array_buffer` (so here it's `vertexBuffer`) **/
   Gl.bufferData
     context::env.gl
-    target::Constants.array_buffer
+    target::RGLConstants.array_buffer
     data::vertexArray
-    usage::Constants.stream_draw;
+    usage::RGLConstants.stream_draw;
 
   /** Tell the GPU about the shader attribute called `aVertexPosition` so it can access the data per vertex */
   Gl.vertexAttribPointer
     context::env.gl
     attribute::env.aVertexPosition
     size::2
-    type_::Constants.float_
+    type_::RGLConstants.float_
     normalized::false
     stride::(vertexSize * 4)
     offset::0;
@@ -217,7 +215,7 @@ let drawGeometry
     context::env.gl
     attribute::env.aVertexColor
     size::4
-    type_::Constants.float_
+    type_::RGLConstants.float_
     normalized::false
     stride::(vertexSize * 4)
     offset::(2 * 4);
@@ -227,7 +225,7 @@ let drawGeometry
     context::env.gl
     attribute::env.aTextureCoord
     size::2
-    type_::Constants.float_
+    type_::RGLConstants.float_
     normalized::false
     stride::(vertexSize * 4)
     offset::(6 * 4);
@@ -240,23 +238,23 @@ let drawGeometry
       the data representing the indices of the vertex. **/
   Gl.bindBuffer
     context::env.gl
-    target::Constants.element_array_buffer
+    target::RGLConstants.element_array_buffer
     buffer::env.elementBuffer;
 
   /** Copy the `elementArray` into whatever buffer is in `element_array_buffer` **/
   Gl.bufferData
     context::env.gl
-    target::Constants.element_array_buffer
+    target::RGLConstants.element_array_buffer
     data::elementArray
-    usage::Constants.stream_draw;
+    usage::RGLConstants.stream_draw;
 
   /** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
   Gl.bindTexture
-    context::env.gl target::Constants.texture_2d texture::textureBuffer;
+    context::env.gl target::RGLConstants.texture_2d texture::textureBuffer;
 
   /** Final call which actually tells the GPU to draw. **/
   Gl.drawElements
-    context::env.gl ::mode ::count type_::Constants.unsigned_short offset::0
+    context::env.gl ::mode ::count type_::RGLConstants.unsigned_short offset::0
 };
 
 /*
@@ -282,7 +280,7 @@ let flushGlobalBatch env =>
         Gl.Bigarray.sub
           env.batch.elementArray offset::0 len::env.batch.elementPtr
       )
-      mode::Constants.triangles
+      mode::RGLConstants.triangles
       count::env.batch.elementPtr
       ::textureBuffer
       env;
@@ -424,7 +422,7 @@ let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
 let drawLineInternal env (xx1, yy1) (xx2, yy2) color => {
   let dx = xx2 -. xx1;
   let dy = yy2 -. yy1;
-  let mag = Reprocessing_Utils.distf p1::(xx1, yy1) p2::(xx2, yy2);
+  let mag = sqrt (dx *. dx +. dy *. dy);
   let radius = float_of_int env.style.strokeWeight /. 2.;
   let xthing = dy /. mag *. radius;
   let ything = -. dx /. mag *. radius;

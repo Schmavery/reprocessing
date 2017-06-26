@@ -57,9 +57,9 @@ let remap ::value ::low1 ::high1 ::low2 ::high2 =>
 
 let norm ::value ::low ::high => remapf value low high 0. 1.;
 
-let randomf ::low ::high => Random.float (high -. low) +. low;
+let randomf ::min ::max => Random.float (max -. min) +. min;
 
-let random ::low ::high => Random.int (high - low) + low;
+let random ::min ::max => Random.int (max - min) + min;
 
 let randomSeed seed => Random.init seed;
 
@@ -193,11 +193,4 @@ let noiseSeed seed => {
   Random.set_state state
 };
 
-let rec split stream sep accstr acc =>
-  switch (Stream.peekch stream) {
-  | Some c when c == sep => split (Stream.popch stream) sep "" [accstr, ...acc]
-  | Some c => split (Stream.popch stream) sep (append_char accstr c) acc
-  | None => List.rev [accstr, ...acc]
-  };
-
-let split str ::sep => split (Stream.create str) sep "" [];
+let split = Reprocessing_Common.split;

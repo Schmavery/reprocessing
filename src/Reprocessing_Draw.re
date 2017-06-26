@@ -10,8 +10,6 @@ module Env = Reprocessing_Env;
 
 open Reprocessing_Font;
 
-type fontT = ref (option Font.internalType);
-
 let translate ::x ::y env =>
   Matrix.(matmatmul env.matrix (createTranslation x y));
 
