@@ -1,6 +1,9 @@
 {
-  "name" : "reprocessing",
-  "sources" : "src",
+  "name" : "Reprocessing",
+  "sources" :[
+    { "dir": "src" },
+    { "dir": "examples", "type": "dev"}
+  ],
   "bs-dependencies": ["ReasonglInterface", "ReasonglWeb", "ReasonglNative"],
   "entries": [{"kind": "js", "main": "Index"}],
 }

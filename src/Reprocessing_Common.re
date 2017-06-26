@@ -1,4 +1,4 @@
-open Glloader;
+open Reasongl;
 
 module Constants = RGLConstants;
 
@@ -120,3 +120,12 @@ let read (name: string) => {
 };
 
 let append_char (s: string) (c: char) :string => s ^ String.make 1 c;
+
+let rec split stream sep accstr acc =>
+  switch (Stream.peekch stream) {
+  | Some c when c == sep => split (Stream.popch stream) sep "" [accstr, ...acc]
+  | Some c => split (Stream.popch stream) sep (append_char accstr c) acc
+  | None => List.rev [accstr, ...acc]
+  };
+
+let split str ::sep => split (Stream.create str) sep "" [];

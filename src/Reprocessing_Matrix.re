@@ -4,7 +4,17 @@ let createIdentity () => [|1., 0., 0., 0., 1., 0., 0., 0., 1.|];
 
 let createTranslation dx dy => [|1., 0., dx, 0., 1., dy, 0., 0., 1.|];
 
-let createRotation theta => [|cos theta, -. sin theta, 0., sin theta, cos theta, 0., 0., 0., 1.|];
+let createRotation theta => [|
+  cos theta,
+  -. sin theta,
+  0.,
+  sin theta,
+  cos theta,
+  0.,
+  0.,
+  0.,
+  1.
+|];
 
 let copyInto ::src ::dst => {
   dst.(0) = src.(0);
@@ -24,19 +34,23 @@ let copyInto ::src ::dst => {
  [3 4 5] * [d e f] = [a3 + d4 + g5, b3 + e4 + h5, c3 + f4 + i5]
  [6 7 8]   [g h i]   [a6 + d7 + g8, b6 + e7 + h8, c6 + f7 + i8]
  */
-let matmatmul (mat1: array float) (mat2: array float) => {
-  let [|m0, m1, m2, m3, m4, m5, m6, m7, m8|] = mat1;
-  let [|ma, mb, mc, md, me, mf, mg, mh, mi|] = mat2;
-  mat1.(0) = ma *. m0 +. md *. m1 +. mg *. m2;
-  mat1.(1) = mb *. m0 +. me *. m1 +. mh *. m2;
-  mat1.(2) = mc *. m0 +. mf *. m1 +. mi *. m2;
-  mat1.(3) = ma *. m3 +. md *. m4 +. mg *. m5;
-  mat1.(4) = mb *. m3 +. me *. m4 +. mh *. m5;
-  mat1.(5) = mc *. m3 +. mf *. m4 +. mi *. m5;
-  mat1.(6) = ma *. m6 +. md *. m7 +. mg *. m8;
-  mat1.(7) = mb *. m6 +. me *. m7 +. mh *. m8;
-  mat1.(8) = mc *. m6 +. mf *. m7 +. mi *. m8
-};
+let matmatmul (mat1: array float) (mat2: array float) =>
+  switch (mat1, mat2) {
+  | (
+      [|m0, m1, m2, m3, m4, m5, m6, m7, m8|],
+      [|ma, mb, mc, md, me, mf, mg, mh, mi|]
+    ) =>
+    mat1.(0) = ma *. m0 +. md *. m1 +. mg *. m2;
+    mat1.(1) = mb *. m0 +. me *. m1 +. mh *. m2;
+    mat1.(2) = mc *. m0 +. mf *. m1 +. mi *. m2;
+    mat1.(3) = ma *. m3 +. md *. m4 +. mg *. m5;
+    mat1.(4) = mb *. m3 +. me *. m4 +. mh *. m5;
+    mat1.(5) = mc *. m3 +. mf *. m4 +. mi *. m5;
+    mat1.(6) = ma *. m6 +. md *. m7 +. mg *. m8;
+    mat1.(7) = mb *. m6 +. me *. m7 +. mh *. m8;
+    mat1.(8) = mc *. m6 +. mf *. m7 +. mi *. m8
+  | _ => assert false
+  };
 
 
 /**
@@ -59,4 +73,7 @@ let matvecmul m v => {
  [3 4 5] * [y] = [x3 + y4 + 5]
  [6 7 8]   [1]   [ who cares ]
  */
-let matptmul m (x, y) => (x *. m.(0) +. y *. m.(1) +. m.(2), x *. m.(3) +. y *. m.(4) +. m.(5));
+let matptmul m (x, y) => (
+  x *. m.(0) +. y *. m.(1) +. m.(2),
+  x *. m.(3) +. y *. m.(4) +. m.(5)
+);
