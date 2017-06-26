@@ -115,7 +115,7 @@ let lerp: low::int => high::int => value::float => int;
 let lerpColor:
   low::Reprocessing_Types.Types.colorT =>
   high::Reprocessing_Types.Types.colorT =>
-  amt::float =>
+  value::float =>
   Reprocessing_Types.Types.colorT;
 
 /** Calculates the distance between two points. */

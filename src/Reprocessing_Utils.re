@@ -9,20 +9,6 @@ let color ::r ::g ::b :colorT => {r, g, b};
 /*Calculation Functions*/
 let round i => floor (i +. 0.5);
 
-let max = max;
-
-let min = min;
-
-let sqrt = sqrt;
-
-let abs = abs;
-
-let ceil = ceil;
-
-let exp = exp;
-
-let log = log;
-
 let sq x => x * x;
 
 let rec pow ::base ::exp =>
@@ -30,7 +16,7 @@ let rec pow ::base ::exp =>
   | 0 => 1
   | 1 => base
   | n =>
-    let b = pow base (n / 2);
+    let b = pow ::base exp::(n / 2);
     b * b * (
       if (n mod 2 == 0) {
         1
@@ -55,7 +41,8 @@ let remap ::value ::low1 ::high1 ::low2 ::high2 =>
       high2::(foi high2)
   );
 
-let norm ::value ::low ::high => remapf value low high 0. 1.;
+let norm ::value ::low ::high =>
+  remapf ::value low1::low high1::high low2::0. high2::1.;
 
 let randomf ::min ::max => Random.float (max -. min) +. min;
 
@@ -91,29 +78,15 @@ let magf vec => distf p1::(0., 0.) p2::vec;
 
 let mag vec => dist p1::(0, 0) p2::vec;
 
-let lerpColor ::low ::high ::amt => {
-  r: lerp low.r high.r amt,
-  g: lerp low.g high.g amt,
-  b: lerp low.b high.b amt
+let lerpColor ::low ::high ::value => {
+  r: lerp low::low.r high::high.r ::value,
+  g: lerp low::low.g high::high.g ::value,
+  b: lerp low::low.b high::high.b ::value
 };
-
-let acos = acos;
-
-let asin = asin;
-
-let atan = atan;
-
-let atan2 = atan2;
-
-let cos = cos;
 
 let degrees x => 180.0 /. Reprocessing_Constants.pi *. x;
 
 let radians x => Reprocessing_Constants.pi /. 180.0 *. x;
-
-let sin = sin;
-
-let tan = tan;
 
 let noise x y z => {
   let p = !lookup_table;
@@ -155,19 +128,26 @@ let noise x y z => {
   let bba = p.(p.(p.(xi + 1) + (yi + 1)) + zi);
   let bab = p.(p.(p.(xi + 1) + yi) + (zi + 1));
   let bbb = p.(p.(p.(xi + 1) + (yi + 1)) + (zi + 1));
-  let x1 = lerpf (grad aaa xf yf zf) (grad baa (xf -. 1.0) yf zf) u;
-  let x2 =
-    lerpf (grad aba xf (yf -. 1.0) zf) (grad bba (xf -. 1.0) (yf -. 1.0) zf) u;
-  let y1 = lerpf x1 x2 v;
   let x1 =
-    lerpf (grad aab xf yf (zf -. 1.0)) (grad bab (xf -. 1.0) yf (zf -. 1.0)) u;
+    lerpf low::(grad aaa xf yf zf) high::(grad baa (xf -. 1.0) yf zf) value::u;
   let x2 =
     lerpf
-      (grad abb xf (yf -. 1.0) (zf -. 1.0))
-      (grad bbb (xf -. 1.0) (yf -. 1.0) (zf -. 1.0))
-      u;
-  let y2 = lerpf x1 x2 v;
-  (lerpf y1 y2 w +. 1.0) /. 2.0
+      low::(grad aba xf (yf -. 1.0) zf)
+      high::(grad bba (xf -. 1.0) (yf -. 1.0) zf)
+      value::u;
+  let y1 = lerpf low::x1 high::x2 value::v;
+  let x1 =
+    lerpf
+      low::(grad aab xf yf (zf -. 1.0))
+      high::(grad bab (xf -. 1.0) yf (zf -. 1.0))
+      value::u;
+  let x2 =
+    lerpf
+      low::(grad abb xf (yf -. 1.0) (zf -. 1.0))
+      high::(grad bbb (xf -. 1.0) (yf -. 1.0) (zf -. 1.0))
+      value::u;
+  let y2 = lerpf low::x1 high::x2 value::v;
+  lerpf low::y1 high::y2 value::(w +. 1.0) /. 2.0
 };
 
 let shuffle array => {

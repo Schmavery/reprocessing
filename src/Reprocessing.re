@@ -2,8 +2,6 @@ open Reasongl;
 
 open Reprocessing_Internal;
 
-open Reprocessing_Utils;
-
 module Utils = Reprocessing_Utils;
 
 module Constants = Reprocessing_Constants;

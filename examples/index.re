@@ -24,7 +24,7 @@ let make w (ymin, ymax) time => {
       Utils.lerpColor
         low::Constants.white
         high::(Utils.color r::138 g::43 b::226)
-        amt::(Utils.randomf min::0.3 max::1.),
+        value::(Utils.randomf min::0.3 max::1.),
     time
   }
 };

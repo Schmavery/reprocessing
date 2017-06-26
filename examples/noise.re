@@ -1,6 +1,9 @@
 open Reprocessing.Utils;
+
 open Reprocessing.Draw;
+
 open Reprocessing.Env;
+
 open Reprocessing.Constants;
 
 let setup env => {
@@ -19,9 +22,9 @@ let draw z env => {
       fill
         (
           lerpColor
-            white
-            black
-            (noise (0.03 *. float_of_int i) (0.03 *. float_of_int j) z)
+            low::white
+            high::black
+            value::(noise (0.03 *. float_of_int i) (0.03 *. float_of_int j) z)
         )
         env;
       rectf

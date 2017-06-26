@@ -4,8 +4,6 @@ open Reasongl;
 
 open Reprocessing_Internal;
 
-open Reprocessing_Utils;
-
 module Env = Reprocessing_Env;
 
 open Reprocessing_Font;
