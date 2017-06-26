@@ -12,8 +12,6 @@ npm install Schmavery/reprocessing#bsb-support-new
 
 This is a library, meant to be installed as a dependency (though you can also clone and play in the `examples` directory).  It builds using [bsb-native](https://github.com/bsansouci/bsb-native), and you will need to install this as a devDependency of your project if you want to try out the native version. If you only want webgl support, regular [bs-platform](https://github.com/BuckleScript/bucklescript) should be fine.
 
-If you're having trouble installing the native dependencies, you might be missing pkg-config (`brew install pkg-config` on Mac).
-
 ## Example:
 ```reason
 open Reprocessing;

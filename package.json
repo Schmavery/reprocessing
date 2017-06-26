@@ -17,6 +17,6 @@
   "author": "bsansouci & schmavery",
   "devDependencies": {
     "webpack": "^1.14.0",
-    "bs-platform": "bsansouci/bucklescript#simple-native-compilation"
+    "bs-platform": "bsansouci/bsb-native"
   }
 }
