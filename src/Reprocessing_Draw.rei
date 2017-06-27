@@ -60,6 +60,7 @@ let noStroke: Reprocessing_Types.Types.glEnvT => unit;
  */
 let strokeWeight: int => Reprocessing_Types.Types.glEnvT => unit;
 
+
 /** Sets the style for rendering line endings. These ends are either squared,
   * extended, or rounded.
  */
@@ -117,7 +118,6 @@ let image:
   Reprocessing_Types.Types.glEnvT =>
   unit;
 
-/* let clear: Reprocessing_Types.Types.glEnvT => unit; */
 
 /** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.
