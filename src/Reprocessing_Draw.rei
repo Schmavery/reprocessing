@@ -117,7 +117,8 @@ let image:
   Reprocessing_Types.Types.glEnvT =>
   unit;
 
-/* let clear: Reprocessing_Types.Types.glEnvT => unit; */
+/** Clears the whole screen */
+let clear: Reprocessing_Types.Types.glEnvT => unit;
 
 /** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.
