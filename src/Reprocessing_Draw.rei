@@ -34,7 +34,8 @@ let rotate: float => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Sets the color used to fill shapes.*/
-let fill: Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
+let fill:
+  Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Disables filling geometry. If both `noStroke` and `noFill` are called,
@@ -44,7 +45,8 @@ let noFill: Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Sets the color used to draw lines and borders around shapes. */
-let stroke: Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
+let stroke:
+  Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
 
 
 /** Disables drawing the stroke (outline). If both noStroke() and noFill()
@@ -57,6 +59,14 @@ let noStroke: Reprocessing_Types.Types.glEnvT => unit;
    * shapes. All widths are set in units of pixels.
  */
 let strokeWeight: int => Reprocessing_Types.Types.glEnvT => unit;
+
+/** Sets the style for rendering line endings. These ends are either squared,
+  * extended, or rounded.
+ */
+let strokeCap:
+  Reprocessing_Types.Types.strokeCapT =>
+  Reprocessing_Types.Types.glEnvT =>
+  unit;
 
 
 /** The `pushStyle` function saves the current style settings and `popStyle`
@@ -92,7 +102,9 @@ let popStyle: Reprocessing_Types.Types.glEnvT => unit;
    * the start of the program.
  */
 let loadImage:
-  filename::string => Reprocessing_Types.Types.glEnvT => Reprocessing_Types.Types.imageT;
+  filename::string =>
+  Reprocessing_Types.Types.glEnvT =>
+  Reprocessing_Types.Types.imageT;
 
 
 /** The `image` function draws an image to the display window.
@@ -139,7 +151,10 @@ let rect:
    * the `strokeWeight` function.
  */
 let linef:
-  p1::(float, float) => p2::(float, float) => Reprocessing_Types.Types.glEnvT => unit;
+  p1::(float, float) =>
+  p2::(float, float) =>
+  Reprocessing_Types.Types.glEnvT =>
+  unit;
 
 
 /** Draws a line (a direct path between two points) to the screen.
@@ -319,7 +334,9 @@ let arc:
    * the start of the program.
  */
 let loadFont:
-  filename::string => Reprocessing_Types.Types.glEnvT => Reprocessing_Font.fontT;
+  filename::string =>
+  Reprocessing_Types.Types.glEnvT =>
+  Reprocessing_Font.fontT;
 
 
 /** Draws text to the screen.

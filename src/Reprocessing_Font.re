@@ -1,6 +1,6 @@
 open Reasongl;
 
-open Reprocessing_Internal;
+module Internal = Reprocessing_Internal;
 
 open Reprocessing_Common;
 
@@ -137,7 +137,7 @@ module Font = {
             Some {
               chars: char_map,
               kerning: kern_map,
-              image: loadImage env img_filename
+              image: Internal.loadImage env img_filename
             }
         }
       );
@@ -164,7 +164,7 @@ module Font = {
       };
     switch image {
     | Some img =>
-      drawImageInternal
+      Internal.drawImage
         img
         x::(x + c.xoffset + kernAmount)
         y::(y + c.yoffset)

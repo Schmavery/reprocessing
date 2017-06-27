@@ -16,7 +16,8 @@ let getProgram
     Gl.getShaderParameter
       ::context shader::vertexShader paramName::Gl.Compile_status == 1;
   if compiledCorrectly {
-    let fragmentShader = Gl.createShader ::context RGLConstants.fragment_shader;
+    let fragmentShader =
+      Gl.createShader ::context RGLConstants.fragment_shader;
     Gl.shaderSource
       ::context shader::fragmentShader source::fragmentShaderSource;
     Gl.compileShader ::context fragmentShader;
@@ -128,7 +129,8 @@ let createCanvas window (height: int) (width: int) :glEnv => {
 
   /** Enable blend and tell OpenGL how to blend. */
   Gl.enable ::context RGLConstants.blend;
-  Gl.blendFunc ::context RGLConstants.src_alpha RGLConstants.one_minus_src_alpha;
+  Gl.blendFunc
+    ::context RGLConstants.src_alpha RGLConstants.one_minus_src_alpha;
 
   /**
    * Will mutate the projectionMatrix to be an ortho matrix with the given boundaries.
@@ -169,6 +171,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     style: {
       fillColor: Some {r: 0, g: 0, b: 0},
       strokeWeight: 10,
+      strokeCap: Round,
       strokeColor: Some {r: 0, g: 0, b: 0}
     },
     styleStack: [],
@@ -379,7 +382,7 @@ let addRectToGlobalBatch
   env.batch.elementPtr = j + 6
 };
 
-let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
+let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   maybeFlushBatch env None 3;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
@@ -419,25 +422,36 @@ let drawTriangleInternal env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   env.batch.elementPtr = j + 3
 };
 
-let drawLineInternal env (xx1, yy1) (xx2, yy2) color => {
+let drawLine p1::(xx1, yy1) p2::(xx2, yy2) ::color ::width ::project env => {
   let dx = xx2 -. xx1;
   let dy = yy2 -. yy1;
   let mag = sqrt (dx *. dx +. dy *. dy);
-  let radius = float_of_int env.style.strokeWeight /. 2.;
+  let radius = width /. 2.;
   let xthing = dy /. mag *. radius;
   let ything = -. dx /. mag *. radius;
-  let x1 = xx2 +. xthing;
-  let y1 = yy2 +. ything;
-  let x2 = xx1 +. xthing;
-  let y2 = yy1 +. ything;
-  let x3 = xx2 -. xthing;
-  let y3 = yy2 -. ything;
-  let x4 = xx1 -. xthing;
-  let y4 = yy1 -. ything;
-  addRectToGlobalBatch env bottomRight::(x1, y1) bottomLeft::(x2, y2) topRight::(x3, y3) topLeft::(x4, y4) ::color
+  let (projectx, projecty) = switch project {
+  | true => (dx /. mag *. radius, xthing)
+  | false => (0.,0.)
+  };
+  let x1 = xx2 +. xthing +. projectx;
+  let y1 = yy2 +. ything +. projecty;
+  let x2 = xx1 +. xthing -. projectx;
+  let y2 = yy1 +. ything -. projecty;
+  let x3 = xx2 -. xthing +. projectx;
+  let y3 = yy2 -. ything +. projecty;
+  let x4 = xx1 -. xthing -. projectx;
+  let y4 = yy1 -. ything -. projecty;
+  print_endline @@ string_of_float x1;
+  addRectToGlobalBatch
+    env
+    bottomRight::(x1, y1)
+    bottomLeft::(x2, y2)
+    topRight::(x3, y3)
+    topLeft::(x4, y4)
+    ::color
 };
 
-let drawArcInternal
+let drawArc
     env
     (xCenterOfCircle: float, yCenterOfCircle: float)
     (radx: float)
@@ -514,14 +528,8 @@ let drawArcInternal
   env.batch.elementPtr = env.batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
 };
 
-let drawEllipseInternal
-    env
-    center
-    (radx: float)
-    (rady: float)
-    (matrix: array float)
-    c =>
-  drawArcInternal env center radx rady 0. Reprocessing_Constants.tau false matrix c;
+let drawEllipse env center (radx: float) (rady: float) (matrix: array float) c =>
+  drawArc env center radx rady 0. Reprocessing_Constants.tau false matrix c;
 
 let drawArcStroke
     env
@@ -612,11 +620,21 @@ let drawArcStroke
         yCenterOfCircle +. sin stop *. rady
       );
     if isPie {
-      drawLineInternal
-        env (startX, startY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
-      drawLineInternal
-        env (stopX, stopY) (xCenterOfCircle, yCenterOfCircle) strokeColor;
-      drawEllipseInternal
+      drawLine
+        p1::(startX, startY)
+        p2::(xCenterOfCircle, yCenterOfCircle)
+        color::strokeColor
+        width::halfwidth
+        project::false
+        env;
+      drawLine
+        p1::(stopX, stopY)
+        p2::(xCenterOfCircle, yCenterOfCircle)
+        color::strokeColor
+        width::halfwidth
+        project::false
+        env;
+      drawEllipse
         env
         (transform (xCenterOfCircle, yCenterOfCircle))
         halfwidth
@@ -624,12 +642,16 @@ let drawArcStroke
         matrix
         strokeColor
     } else {
-      drawLineInternal env (startX, startY) (stopX, stopY) strokeColor
+      drawLine
+        p1::(startX, startY)
+        p2::(stopX, stopY)
+        color::strokeColor
+        width::halfwidth
+        project::false
+        env
     };
-    drawEllipseInternal
-      env (startX, startY) halfwidth halfwidth matrix strokeColor;
-    drawEllipseInternal
-      env (stopX, stopY) halfwidth halfwidth matrix strokeColor
+    drawEllipse env (startX, startY) halfwidth halfwidth matrix strokeColor;
+    drawEllipse env (stopX, stopY) halfwidth halfwidth matrix strokeColor
   }
 };
 
@@ -679,7 +701,7 @@ let loadImage (env: glEnv) filename :imageT => {
   imageRef
 };
 
-let drawImageInternal
+let drawImage
     {width, height, textureBuffer}
     ::x
     ::y

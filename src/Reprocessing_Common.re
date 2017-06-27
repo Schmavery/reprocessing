@@ -2,27 +2,57 @@ open Reasongl;
 
 module Constants = RGLConstants;
 
+type strokeCapT =
+  | Round
+  | Square
+  | Project;
+
 type glState = Gl.Window.t;
 
 type glCamera = {projectionMatrix: Gl.Mat4.t};
 
-type colorT = {r: int, g: int, b: int};
+type colorT = {
+  r: int,
+  g: int,
+  b: int
+};
 
-type styleT = {strokeColor: option colorT, strokeWeight: int, fillColor: option colorT};
+type styleT = {
+  strokeColor: option colorT,
+  strokeWeight: int,
+  strokeCap: strokeCapT,
+  fillColor: option colorT
+};
 
-type mouseT = {mutable pos: (int, int), mutable prevPos: (int, int), mutable pressed: bool};
+type mouseT = {
+  mutable pos: (int, int),
+  mutable prevPos: (int, int),
+  mutable pressed: bool
+};
 
 type keyboardT = {mutable keyCode: Gl.Events.keycodeT};
 
-type frameT = {count: int, rate: int};
+type frameT = {
+  count: int,
+  rate: int
+};
 
-type sizeT = {mutable height: int, mutable width: int, mutable resizeable: bool};
+type sizeT = {
+  mutable height: int,
+  mutable width: int,
+  mutable resizeable: bool
+};
 
 let circularBufferSize = 6 * 10000;
 
 let vertexSize = 8;
 
-type _imageT = {textureBuffer: Gl.textureT, img: Gl.imageT, height: int, width: int};
+type _imageT = {
+  textureBuffer: Gl.textureT,
+  img: Gl.imageT,
+  height: int,
+  width: int
+};
 
 type imageT = ref (option _imageT);
 
@@ -94,7 +124,10 @@ module Stream = {
     let len = String.length matchstr;
     switch (peekn stream len) {
     | Some peek when peek == matchstr => popn stream len
-    | Some peek => failwith ("Could not match '" ^ matchstr ^ "', got '" ^ peek ^ "' instead.")
+    | Some peek =>
+      failwith (
+        "Could not match '" ^ matchstr ^ "', got '" ^ peek ^ "' instead."
+      )
     | None => failwith ("Could not match " ^ matchstr)
     }
   };
