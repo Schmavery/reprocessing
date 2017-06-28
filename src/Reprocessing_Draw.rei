@@ -349,6 +349,9 @@ let text:
   Reprocessing_Types.Types.glEnvT =>
   unit;
 
+/** Clears the entire screen. Normally, background is used for this purpose,
+  * clear will have different results in web and native. */
+let clear: Reprocessing_Types.Types.glEnvT => unit;
 
 /** The `background` function sets the color used for the background of the
    * Processing window. The default background is black. This function is

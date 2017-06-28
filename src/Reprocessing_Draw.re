@@ -54,12 +54,13 @@ let linef ::p1 ::p2 (env: glEnv) =>
     let transform = Matrix.matptmul env.matrix;
     let width = float_of_int env.style.strokeWeight;
     let radius = width /. 2.;
-    let project = (env.style.strokeCap == Project);
-    Internal.drawLine p1::(transform p1) p2::(transform p2) ::color ::width ::project env;
+    let project = env.style.strokeCap == Project;
+    Internal.drawLine
+      p1::(transform p1) p2::(transform p2) ::color ::width ::project env;
     if (env.style.strokeCap == Round) {
       Internal.drawEllipse env p1 radius radius env.matrix color;
       Internal.drawEllipse env p2 radius radius env.matrix color
-    };
+    }
   };
 
 let line p1::(x1, y1) p2::(x2, y2) (env: glEnv) =>
@@ -262,6 +263,11 @@ let loadFont ::filename (env: glEnv) => Font.parseFontFormat env filename;
 
 let text ::font ::body pos::(x, y) (env: glEnv) =>
   Font.drawString env font body x y;
+
+let clear env =>
+  Reasongl.Gl.clear
+    context::env.gl
+    mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 
 let background color (env: glEnv) => {
   let w = float_of_int (Env.width env);

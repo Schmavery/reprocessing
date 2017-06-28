@@ -441,7 +441,6 @@ let drawLine p1::(xx1, yy1) p2::(xx2, yy2) ::color ::width ::project env => {
   let y3 = yy2 -. ything +. projecty;
   let x4 = xx1 -. xthing -. projectx;
   let y4 = yy1 -. ything -. projecty;
-  print_endline @@ string_of_float x1;
   addRectToGlobalBatch
     env
     bottomRight::(x1, y1)
