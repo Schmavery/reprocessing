@@ -147,7 +147,7 @@ let noise x y z => {
       high::(grad bbb (xf -. 1.0) (yf -. 1.0) (zf -. 1.0))
       value::u;
   let y2 = lerpf low::x1 high::x2 value::v;
-  lerpf low::y1 high::y2 value::w +. 1.0 /. 2.0
+  (lerpf low::y1 high::y2 value::w +. 1.0) /. 2.0
 };
 
 let shuffle array => {
