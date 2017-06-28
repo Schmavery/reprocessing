@@ -292,9 +292,10 @@ let flushGlobalBatch env =>
     env.batch.elementPtr = 0
   };
 
-let maybeFlushBatch env texture adding =>
+let maybeFlushBatch ::texture ::el ::vert env =>
   if (
-    env.batch.elementPtr + adding >= circularBufferSize ||
+    env.batch.elementPtr + el >= circularBufferSize ||
+    env.batch.vertexPtr + vert >= circularBufferSize ||
     env.batch.elementPtr > 0 && env.batch.currTex !== texture
   ) {
     flushGlobalBatch env
@@ -332,7 +333,7 @@ let addRectToGlobalBatch
     topRight::(x3, y3)
     topLeft::(x4, y4)
     color::{r, g, b} => {
-  maybeFlushBatch env None 6;
+  maybeFlushBatch texture::None el::6 vert::32 env;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let i = env.batch.vertexPtr;
@@ -383,7 +384,7 @@ let addRectToGlobalBatch
 };
 
 let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
-  maybeFlushBatch env None 3;
+  maybeFlushBatch texture::None vert::3 el::24 env;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let i = env.batch.vertexPtr;
@@ -461,8 +462,8 @@ let drawArc
     (matrix: array float)
     {r, g, b} => {
   let transform = Matrix.matptmul matrix;
-  let noOfFans = int_of_float (radx +. rady) * 2 + 10;
-  maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
+  let noOfFans = int_of_float (radx +. rady) / 4 + 10;
+  maybeFlushBatch texture::None vert::(8 * noOfFans) el::(3 * noOfFans) env;
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
@@ -546,9 +547,9 @@ let drawArcStroke
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let verticesData = env.batch.vertexArray;
   let elementData = env.batch.elementArray;
+  let noOfFans = int_of_float (radx +. rady) / 4 + 10;
   let set = Gl.Bigarray.set;
-  let noOfFans = int_of_float (radx +. rady) * 2 + 10;
-  maybeFlushBatch env None ((noOfFans - 3) * 3 + 3);
+  maybeFlushBatch texture::None vert::16 el::6 env;
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
   /* I calculated this roughly by doing:
@@ -709,7 +710,7 @@ let drawImage
     ::subw
     ::subh
     env => {
-  maybeFlushBatch env (Some textureBuffer) 6;
+  maybeFlushBatch texture::(Some textureBuffer) vert::32 el::6 env;
   let (fsubx, fsuby, fsubw, fsubh) = (
     float_of_int subx /. float_of_int width,
     float_of_int suby /. float_of_int height,

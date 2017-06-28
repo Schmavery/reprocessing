@@ -270,6 +270,7 @@ let clear env =>
     mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 
 let background color (env: glEnv) => {
+  clear env;
   let w = float_of_int (Env.width env);
   let h = float_of_int (Env.height env);
   Internal.addRectToGlobalBatch
