@@ -110,11 +110,35 @@ let loadImage:
 
 /** The `image` function draws an image to the display window.
    * The image should be loaded using the `loadImage` function.
-   * The image is displayed at its original size.
+   * The image is displayed at its original size unless width and
+   * height are optionally specified.
  */
 let image:
   Reprocessing_Types.Types.imageT =>
   pos::(int, int) =>
+  width::int? =>
+  height::int? =>
+  Reprocessing_Types.Types.glEnvT =>
+  unit;
+
+/** The `subImage` function draws a section of an image to the
+   * display window. The image should be loaded using the
+   * `loadImage` function. The image is displayed at the size
+   * specified by width and height.  texPos, texWidth, and
+   * texHeight describe the section of the full image that
+   * should be drawn.
+   *
+   * This function is useful for a spritesheet-style of
+   * drawing strategy.
+ */
+let subImage:
+  Reprocessing_Types.Types.imageT =>
+  pos::(int, int) =>
+  width::int =>
+  height::int =>
+  texPos::(int, int) =>
+  texWidth::int =>
+  texHeight::int =>
   Reprocessing_Types.Types.glEnvT =>
   unit;
 

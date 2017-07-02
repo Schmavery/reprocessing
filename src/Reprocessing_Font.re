@@ -168,6 +168,8 @@ module Font = {
         img
         x::(x + c.xoffset + kernAmount)
         y::(y + c.yoffset)
+        width::c.width
+        height::c.height
         subx::c.x
         suby::c.y
         subw::c.width

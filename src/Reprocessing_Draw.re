@@ -40,11 +40,43 @@ let popStyle env =>
 
 let loadImage ::filename env => Internal.loadImage env filename;
 
-let image img pos::(x, y) (env: glEnv) =>
+let subImage
+    img
+    pos::(x, y)
+    ::width
+    ::height
+    texPos::(subx, suby)
+    texWidth::subw
+    texHeight::subh
+    env =>
   switch !img {
   | None => print_endline "image not ready yet, just doing nothing :D"
-  | Some ({width, height} as i) =>
-    Internal.drawImage i ::x ::y subx::0 suby::0 subw::width subh::height env
+  | Some i =>
+    Internal.drawImage
+      i ::x ::y ::width ::height ::subx ::suby ::subw ::subh env
+  };
+
+let image img pos::(x, y) ::width=? ::height=? (env: glEnv) =>
+  switch !img {
+  | None => print_endline "image not ready yet, just doing nothing :D"
+  | Some ({width: imgw, height: imgh} as img) =>
+    switch (width, imgw, height, imgh) {
+    | (None, w, None, h)
+    | (None, w, Some h, _)
+    | (Some w, _, None, h)
+    | (Some w, _, Some h, _) =>
+      Internal.drawImage
+        img
+        ::x
+        ::y
+        width::w
+        height::h
+        subx::0
+        suby::0
+        subw::imgw
+        subh::imgh
+        env
+    }
   };
 
 let linef ::p1 ::p2 (env: glEnv) =>

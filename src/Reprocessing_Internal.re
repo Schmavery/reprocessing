@@ -702,9 +702,11 @@ let loadImage (env: glEnv) filename :imageT => {
 };
 
 let drawImage
-    {width, height, textureBuffer}
+    {width:imgw, height:imgh, textureBuffer}
     ::x
     ::y
+    ::width
+    ::height
     ::subx
     ::suby
     ::subw
@@ -712,14 +714,14 @@ let drawImage
     env => {
   maybeFlushBatch texture::(Some textureBuffer) vert::32 el::6 env;
   let (fsubx, fsuby, fsubw, fsubh) = (
-    float_of_int subx /. float_of_int width,
-    float_of_int suby /. float_of_int height,
-    float_of_int subw /. float_of_int width,
-    float_of_int subh /. float_of_int height
+    float_of_int subx /. float_of_int imgw,
+    float_of_int suby /. float_of_int imgh,
+    float_of_int subw /. float_of_int imgw,
+    float_of_int subh /. float_of_int imgh
   );
-  let (x1, y1) = (float_of_int @@ x + subw, float_of_int @@ y + subh);
-  let (x2, y2) = (float_of_int x, float_of_int @@ y + subh);
-  let (x3, y3) = (float_of_int @@ x + subw, float_of_int y);
+  let (x1, y1) = (float_of_int @@ x + width, float_of_int @@ y + height);
+  let (x2, y2) = (float_of_int x, float_of_int @@ y + height);
+  let (x3, y3) = (float_of_int @@ x + width, float_of_int y);
   let (x4, y4) = (float_of_int x, float_of_int y);
   let set = Gl.Bigarray.set;
   let ii = env.batch.vertexPtr;
