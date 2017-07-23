@@ -12,7 +12,7 @@ module Env = Reprocessing_Env;
 
 module Common = Reprocessing_Common;
 
-module Events = Reasongl.Gl.Events;
+module Events = Reprocessing_Events;
 
 include Reprocessing_Types.Types;
 

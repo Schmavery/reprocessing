@@ -7,7 +7,7 @@ module Draw = Reprocessing_Draw;
 module Env = Reprocessing_Env;
 
 /** Contains types for events. */
-module Events = Reasongl.Gl.Events;
+module Events = Reprocessing_Events;
 
 /** Contains utility functions */
 module Utils = Reprocessing_Utils;

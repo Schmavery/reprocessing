@@ -30,7 +30,7 @@ type mouseT = {
   mutable pressed: bool
 };
 
-type keyboardT = {mutable keyCode: Gl.Events.keycodeT};
+type keyboardT = {mutable keyCode: Reprocessing_Events.keycodeT};
 
 type frameT = {
   count: int,

@@ -166,7 +166,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     aVertexColor,
     pMatrixUniform,
     uSampler,
-    keyboard: {keyCode: Gl.Events.Nothing},
+    keyboard: {keyCode: Reprocessing_Events.Nothing},
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
     style: {
       fillColor: Some {r: 0, g: 0, b: 0},
