@@ -209,7 +209,7 @@ let drawGeometry
     attribute::env.aVertexPosition
     size::2
     type_::RGLConstants.float_
-    normalized::false
+    normalize::false
     stride::(vertexSize * 4)
     offset::0;
 
@@ -219,7 +219,7 @@ let drawGeometry
     attribute::env.aVertexColor
     size::4
     type_::RGLConstants.float_
-    normalized::false
+    normalize::false
     stride::(vertexSize * 4)
     offset::(2 * 4);
 
@@ -229,7 +229,7 @@ let drawGeometry
     attribute::env.aTextureCoord
     size::2
     type_::RGLConstants.float_
-    normalized::false
+    normalize::false
     stride::(vertexSize * 4)
     offset::(6 * 4);
 
