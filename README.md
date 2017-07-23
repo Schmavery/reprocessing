@@ -56,3 +56,11 @@ let draw state env => {
 ```
 
 - This is 100% a work in progress.  Only a small subset of Processing's functionality has been replicated.  Please feel free to contribute as my knowledge of OpenGl is limited at best :)
+
+
+# Using Fonts
+The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it. The above link gives a few different tools that can be used to generate these files.  The assets folder of this repo also has an [example](https://github.com/Schmavery/reprocessing/tree/bsb-support-new/assets/font) of a font that can be copied to your project and used.  In order to use a font once you have the files:
+```
+let font = Draw.loadFont ::filename env;
+Draw.text ::font body::"Test!!!" pos::(10, 10) env
+```
