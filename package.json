@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
-    "buildweb": "bsb -make-world && webpack -d lib/js/src/index.js lib/js/src/app.js"
+    "buildweb": "bsb -make-world -backend js && webpack -d lib/js/src/index.js lib/js/src/app.js"
   },
   "dependencies": {
     "ReasonglInterface": "github:bsansouci/reasongl-interface#bsb-support-new",
