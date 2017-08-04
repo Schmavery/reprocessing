@@ -20,21 +20,26 @@ git stash
 git checkout gh-pages
 cp ./webenv-artifacts/reprocessing-bundle.js reprocessing.js
 cp ./webenv-artifacts/Reprocessing_Ext.re Reprocessing_Ext.re
-after_page=$(git rev-parse --abbrev-ref HEAD)
 
-if [ $0 == "--non-interactive" ] then
+if [ $1 == "--non-interactive" ]
+then
   git add reprocessing.js Reprocessing_Ext.re
   git commit -m "Update reprocessing bundle."
   git push
-else
-  echo "Committing update to $after_page\n"
-  read -p "Are you sure? " -n 1 -r
-  echo    # (optional) move to a new line
-  if [[ $REPLY =~ ^[Yy]$ ]] then
-    git add reprocessing.js Reprocessing_Ext.re
-    git commit -m "Update reprocessing bundle."
-    git push
-  fi
+  git checkout $curr_branch
+  git stash pop
+  exit 0
+fi
+
+after=$(git rev-parse --abbrev-ref HEAD)
+echo "Committing update to $after\n"
+read -p "Are you sure? " -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  git add reprocessing.js Reprocessing_Ext.re
+  git commit -m "Update reprocessing bundle."
+  git push
 fi
 
 git checkout $curr_branch
