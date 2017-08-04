@@ -170,9 +170,9 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
     style: {
       fillColor: Some {r: 0, g: 0, b: 0},
-      strokeWeight: 10,
+      strokeWeight: 3,
       strokeCap: Round,
-      strokeColor: Some {r: 0, g: 0, b: 0}
+      strokeColor: None
     },
     styleStack: [],
     matrix: Matrix.createIdentity (),
