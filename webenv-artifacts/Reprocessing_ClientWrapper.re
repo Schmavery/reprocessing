@@ -1,3 +1,5 @@
+open Reasongl;
+
 external removeFromDOM : 'a => unit = "remove" [@@bs.send];
 external setID : 'a => string => unit = "id" [@@bs.set];
 external appendChild : 'a => 'b => unit = "appendChild" [@@bs.send];
