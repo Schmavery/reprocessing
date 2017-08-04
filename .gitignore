@@ -4,3 +4,4 @@ node_modules
 .merlin
 npm-debug.log
 lib
+webenv-artifacts/webenv-build
