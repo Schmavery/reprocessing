@@ -1,37 +1,35 @@
-open Reprocessing;
+open Reprocessing.Draw;
+open Reprocessing.Env;
+open Reprocessing.Utils;
 
-open P;
+type state = (int, int);
 
-open PUtils;
-
-type state = {squarePos: (int, int)};
-
-let squareWidth = 300;
-
-let squareHeight = 300;
+let squareSize = 300;
 
 let setup env => {
-  size 600 600 env;
-  fill (color 255 0 0) env;
-  strokeWeight 2 env;
-  {squarePos: (0, 0)}
+  size width::600 height::600 env;
+  fill Reprocessing.Constants.red env;
+  (0, 0)
 };
 
-let draw state env => {
-  background (color 150 255 255) env;
-  let (sx, sy) = state.squarePos;
+let draw squarePos env => {
+  background (color r::150 g::255 b::255) env;
+  let (sx, sy) = squarePos;
   let (px, py) = pmouse env;
   let (x, y) as squarePos =
-    if (mousePressed env && px > sx && px < sx + squareHeight && py > sy && py < sy + squareWidth) {
+    if (
+      mousePressed env &&
+      px > sx && px < sx + squareSize && py > sy && py < sy + squareSize
+    ) {
       let (mx, my) = mouse env;
       let dx = mx - px;
       let dy = my - py;
       (sx + dx, sy + dy)
     } else {
-      state.squarePos
+      squarePos
     };
-  rect x y squareWidth squareHeight env;
-  {...state, squarePos}
+  rect pos::(x, y) width::squareSize height::squareSize env;
+  squarePos
 };
 
-ReProcessor.run ::setup ::draw ();
+Reprocessing.run ::setup ::draw ();

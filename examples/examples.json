@@ -1,17 +1,14 @@
 {
-    "Default_Example" :
+    "Red Square" :
     { "file" : "default.re",
-      "jsfile": "defaultPacked.js",
-      "eval" : false
+      "eval" : true
     },
     "Rain Time Control": {
       "file": "rainTimeControl.re",
-      "jsfile": "rainTimeControlPacked.js",
-      "eval": false
+      "eval": true
     },
-    "Key Event Demo": {
-      "file": "keyEventDemo.re",
-      "jsfile": "keyEventDemoPacked.js", 
-      "eval": false
+    "Noise": {
+      "file": "noise.re",
+      "eval": true
     }
 }

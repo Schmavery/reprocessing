@@ -47,13 +47,18 @@ function loadGist (gist) {
         } else {
           // TODO: Load and compile the default exapmple
           // If there is no location we load the default example and eval it
-          // $.ajax({
-          //   url: "examples/defaultPacked.js",
-          //   cache: true
-          // })
-          // .done(function (response) {
-          //   evalCode(response);
-          // });
+          $.ajax({
+            url: "examples/default.re",
+            cache: true
+          })
+          .done(function (response) {
+            var rsp = compile(response)
+            if (rsp.js_code !== undefined) {
+              evalCode(rsp.js_code)
+            } else {
+              jsCode1Mirror.setValue(rsp.js_error_msg);
+            }
+          });
         }
     })
     .fail(function(xhr, textStatus, thrown){

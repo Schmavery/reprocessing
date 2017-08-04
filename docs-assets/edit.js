@@ -1,5 +1,6 @@
 'use strict';
 
+
 var codeMirrorDefaultHeight = 10000;
 var myCode1Mirror = CodeMirror.fromTextArea(
   document.getElementById('ocamlcode#1'),
@@ -145,9 +146,7 @@ function switchExample(id){
   var jsfilename = "";
   var example = examplesDataSet [id];
   if (example){
-      // changeEvalButton(example.eval);
       filename = "examples/" + example.file;
-      jsfilename = "examples/" + example.jsfile;
   }
   $.ajax({
     url: filename,
@@ -155,13 +154,12 @@ function switchExample(id){
   })
   .done(function (response) {
     myCode1Mirror.setValue(response);
-  });
-  $.ajax({
-    url: jsfilename,
-    cache: true
-  })
-  .done(function (response) {
-    evalCode(response);
+    var rsp = compile(response)
+    if (rsp.js_code !== undefined) {
+      evalCode(rsp.js_code)
+    } else {
+      jsCode1Mirror.setValue(rsp.js_error_msg);
+    }
   });
 
   //update dropdown label
@@ -187,6 +185,25 @@ function readFile(filename, cb) {
   return rawFile.send(null);
 }
 
+
+function compile(src){
+  if(typeof compile_code === 'undefined'){
+    console.log('init....');
+    compile_code = ocaml.compile;
+  }
+  console.error = redirect_err;
+  if (predefinedStuff !== null) {
+    console.log("Running compilerrrr");
+    var raw = compile_code(document.refmt(predefinedStuff + src).c);
+    errorMirror.setValue(get_error_output());
+    console.error = original_err;
+    var rsp = JSON.parse(raw); // can we save this from parsing?
+    return rsp;
+  } else {
+    return {js_error_msg: "Reprocessing lib not yet loaded."}
+  }
+}
+
 var predefinedStuff;
 
 readFile('Reprocessing_Ext.re', function(str) {
@@ -195,25 +212,11 @@ readFile('Reprocessing_Ext.re', function(str) {
 });
 
 function onEditChanges(cm, change) {
-  if(typeof compile_code === 'undefined'){
-    console.log('init....');
-    compile_code = ocaml.compile;
-  }
-  console.error = redirect_err;
-  if (predefinedStuff !== null) {
-    console.log("Running compilerrrr");
-    var raw = compile_code(document.refmt(predefinedStuff + myCode1Mirror.getValue()).c);
-    errorMirror.setValue(get_error_output());
-    console.error = original_err;
-    // console.log(raw);
-    var rsp = JSON.parse(raw); // can we save this from parsing?
-    if (rsp.js_code !== undefined) {
-      // jsCode1Mirror.setValue(rsp.js_code);
-      evalCode(rsp.js_code)
-    } else {
-      jsCode1Mirror.setValue(rsp.js_error_msg);
-
-    }
+  var rsp = compile(myCode1Mirror.getValue());
+  if (rsp.js_code !== undefined) {
+    evalCode(rsp.js_code)
+  } else {
+    jsCode1Mirror.setValue(rsp.js_error_msg);
   }
 }
 // myCode2Mirror.on("changes", onEditChanges);

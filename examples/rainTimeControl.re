@@ -1,69 +1,74 @@
 open Reprocessing;
 
-open P;
-
-open PUtils;
-
-open PConstants;
-
 /* https://www.youtube.com/watch?v=KkyIDI6rQJI
    Purple rain processing demo */
-type dropT = {x: int, y: int, z: int, len: int, yspeed: int, color: Common.colorT, time: int};
+type dropT = {
+  x: int,
+  y: int,
+  z: int,
+  len: int,
+  yspeed: int,
+  color: colorT,
+  time: int
+};
 
 let make w (ymin, ymax) time => {
-  let z = random 0 20;
+  let z = Utils.random min::0 max::20;
   {
-    x: random 0 w,
-    y: random ymin ymax,
+    x: Utils.random min::0 max::w,
+    y: Utils.random min::ymin max::ymax,
     z,
-    len: remap z 0 20 10 20,
-    yspeed: remap z 0 20 5 15,
-    color: lerpColor white (color 138 43 226) (randomf 0.3 1.),
+    len: Utils.remap value::z low1::0 high1::20 low2::10 high2::20,
+    yspeed: Utils.remap value::z low1::0 high1::20 low2::5 high2::15,
+    color:
+      Utils.lerpColor
+        low::Constants.white
+        high::(Utils.color r::138 g::43 b::226)
+        value::(Utils.randomf min::0.3 max::1.),
     time
   }
 };
 
-type state = {lst: list dropT, running: bool, time: int};
-
-let rec init n f acc =>
-  switch n {
-  | 0 => List.rev acc
-  | n => init (n - 1) f [f n, ...acc]
-  };
-
-let init n f => init n f [];
+type state = {
+  lst: array dropT,
+  running: bool,
+  time: int
+};
 
 let setup env => {
-  size 640 360 env;
-  fill (color 255 0 0) env;
-  noStroke env;
-  let lst = init 500 (fun v => make (width env) ((-500), (-50)) 0);
+  Env.size width::640 height::360 env;
+  Draw.fill (Utils.color r::255 g::0 b::0) env;
+  Draw.noStroke env;
+  let lst = Array.init 500 (fun _ => make (Env.width env) ((-500), (-50)) 0);
   {lst, time: 0, running: true}
 };
 
 let draw {lst, running, time} env => {
-  background (color 230 230 250) env;
-  fill (color 255 0 0) env;
-  randomSeed time;
+  Draw.background (Utils.color r::230 g::230 b::250) env;
+  Draw.fill (Utils.color r::255 g::0 b::0) env;
+  Utils.randomSeed time;
   let lst =
-    List.map
+    Array.map
       (
         fun drop =>
           switch (drop.y + drop.yspeed * (time - drop.time)) {
-          | y when y > height env + 500 => make (width env) ((-500), (-50)) time
-          | y when y < (-500) => make (width env) (height env + 50, height env + 500) time
+          | y when y > Env.height env + 500 =>
+            make (Env.width env) ((-500), (-50)) time
+          | y when y < (-500) =>
+            make
+              (Env.width env) (Env.height env + 50, Env.height env + 500) time
           | _ => drop
           }
       )
       lst;
-  List.iter
+  Array.iter
     (
       fun drop => {
-        fill drop.color env;
-        ellipse
-          (drop.x, drop.y + drop.yspeed * (time - drop.time))
-          (remap drop.z 0 20 1 3)
-          drop.yspeed
+        Draw.fill drop.color env;
+        Draw.ellipse
+          center::(drop.x, drop.y + drop.yspeed * (time - drop.time))
+          radx::(Utils.remap value::drop.z low1::0 high1::20 low2::1 high2::3)
+          rady::drop.yspeed
           env
       }
     )
@@ -71,15 +76,15 @@ let draw {lst, running, time} env => {
   {lst, running, time: running ? time + 1 : time}
 };
 
-let mouseDown ({running} as state) env => {...state, running: false};
+let mouseDown state _env => {...state, running: false};
 
-let mouseUp ({running} as state) env => {...state, running: true};
+let mouseUp state _env => {...state, running: true};
 
 let mouseDragged ({time} as state) env => {
-  let (pmouseX, _) = pmouse env;
-  let (mouseX, _) = mouse env;
+  let (pmouseX, _) = Env.pmouse env;
+  let (mouseX, _) = Env.mouse env;
   let newTime = time - (pmouseX - mouseX);
   {...state, time: newTime}
 };
 
-ReProcessor.run ::setup ::draw ::mouseDown ::mouseUp ::mouseDragged ();
+run ::setup ::draw ::mouseDown ::mouseUp ::mouseDragged ();
