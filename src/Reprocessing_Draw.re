@@ -148,10 +148,12 @@ let quadf ::p1 ::p2 ::p3 ::p4 (env: glEnv) => {
   switch env.style.strokeColor {
   | None => () /* don't draw stroke */
   | Some color =>
-    linef ::p1 ::p2 env;
-    linef p1::p2 p2::p3 env;
-    linef p1::p3 p2::p4 env;
-    linef p1::p4 p2::p1 env;
+    let width = float_of_int env.style.strokeWeight;
+    let project = false;
+    Internal.drawLine ::p1 ::p2 ::color ::width ::project env;
+    Internal.drawLine p1::p2 p2::p3 ::color ::width ::project env;
+    Internal.drawLine p1::p3 p2::p4 ::color ::width ::project env;
+    Internal.drawLine ::p1 p2::p4 ::color ::width ::project env;
     let r = float_of_int env.style.strokeWeight /. 2.;
     let m = Matrix.identity;
     Internal.drawEllipse env p1 r r m color;
@@ -230,9 +232,11 @@ let trianglef ::p1 ::p2 ::p3 (env: glEnv) => {
   switch env.style.strokeColor {
   | None => () /* don't draw stroke */
   | Some color =>
-    linef ::p1 ::p2 env;
-    linef p1::p2 p2::p3 env;
-    linef p1::p3 p2::p1 env;
+    let width = float_of_int env.style.strokeWeight;
+    let project = false;
+    Internal.drawLine ::p1 ::p2 ::color ::width ::project env;
+    Internal.drawLine p1::p2 p2::p3 ::color ::width ::project env;
+    Internal.drawLine ::p1 p2::p3 ::color ::width ::project env;
     let r = float_of_int env.style.strokeWeight /. 2.;
     let m = Matrix.identity;
     Internal.drawEllipse env p1 r r m color;
