@@ -44,7 +44,8 @@ let run
     Random.int (Reprocessing_Utils.pow base::2 exp::(30 - 1))
   );
   let env =
-    Reprocessing_Internal.createCanvas (Gl.Window.init argv::Sys.argv) 200 200;
+    Reprocessing_Internal.createCanvas
+      (Reprocessing_ClientWrapper.init argv::Sys.argv) 200 200;
   let userState = ref (setup env);
 
   /** This is a basically a hack to get around the default behavior of drawing something inside setup.
