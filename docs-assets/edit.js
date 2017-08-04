@@ -189,8 +189,8 @@ function readFile(filename, cb) {
 
 var predefinedStuff;
 
-readFile('mainBundle.ml', function(str) {
-  console.log("Loaded mainBundle of length", str.length);
+readFile('Reprocessing_Ext.re', function(str) {
+  console.log("Loaded ext of length", str.length);
   predefinedStuff = str;
 });
 
@@ -202,7 +202,7 @@ function onEditChanges(cm, change) {
   console.error = redirect_err;
   if (predefinedStuff !== null) {
     console.log("Running compilerrrr");
-    var raw = compile_code(predefinedStuff + document.refmt(myCode1Mirror.getValue()).c);
+    var raw = compile_code(document.refmt(predefinedStuff + myCode1Mirror.getValue()).c);
     errorMirror.setValue(get_error_output());
     console.error = original_err;
     // console.log(raw);

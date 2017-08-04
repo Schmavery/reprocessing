@@ -45,14 +45,15 @@ function loadGist (gist) {
             var id =  location.hash.substr(1)
             switchExample(id)
         } else {
+          // TODO: Load and compile the default exapmple
           // If there is no location we load the default example and eval it
-          $.ajax({
-            url: "examples/defaultPacked.js",
-            cache: true
-          })
-          .done(function (response) {
-            evalCode(response);
-          });
+          // $.ajax({
+          //   url: "examples/defaultPacked.js",
+          //   cache: true
+          // })
+          // .done(function (response) {
+          //   evalCode(response);
+          // });
         }
     })
     .fail(function(xhr, textStatus, thrown){
