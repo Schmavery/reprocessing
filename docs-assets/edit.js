@@ -11,7 +11,8 @@ var myCode1Mirror = CodeMirror.fromTextArea(
     styleActiveLine:true,
     theme: "monokai",
     matchBrackets: true,
-    autoCloseBrackets: true
+    autoCloseBrackets: true,
+    tabSize: 2
   } );
 var jsCode1Mirror = CodeMirror.fromTextArea(
   document.getElementById('jscode#1'),
