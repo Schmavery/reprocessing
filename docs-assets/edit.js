@@ -225,6 +225,11 @@ function onEditChanges(cm, change) {
     jsCode1Mirror.setValue(rsp.js_error_msg);
   }
 }
+
+function onRefmtChanges(cm, change) {
+  var refmted = document.refmt(myCode1Mirror.getValue()).c;
+  myCode1Mirror.setValue(refmted);
+}
 // myCode2Mirror.on("changes", onEditChanges);
 
 jsCode1Mirror.setSize(null,codeMirrorDefaultHeight);

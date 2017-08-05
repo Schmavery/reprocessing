@@ -18,7 +18,7 @@
    crossorigin="anonymous"></script>
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.3.2/gl-matrix-min.js"></script>
-   <title>OCaml to Javascript transpiler playground</title>
+   <title>Reprocessing playground</title>
 </head>
 
 <body style="background-color: #272822; font-family: 'Open Sans', sans-serif;">
@@ -26,7 +26,7 @@
 <nav class="navbar navbar-inverse navbar-static-top" style="margin-bottom: 0px">
   <div class="container-fluid">
     <div class="collapse navbar-collapse navbar-header"> <!-- Hides brand on small width -->
-      <div class="navbar-brand" style="color: white"><a href="https://github.com/bloomberg/bucklescript" target="_blank">BuckleScript on GitHub</a></div>
+      <div class="navbar-brand" style="color: white"><a href="https://github.com/schmavery/reprocessing" target="_blank">Reprocessing on GitHub</a></div>
     </div>
 
     <div>
@@ -38,17 +38,10 @@
         </li>
         <li><button class="btn navbar-btn navbar-button" data-loading-text="Getting link..."type="button" id="share">Share</button></li>
         <li><button class="btn navbar-btn navbar-button" onclick="onEditChanges()">Compile</button></li>
+        <!-- <li><button class="btn navbar-btn navbar-button" onclick="onRefmtChanges()">Reformat</button></li> -->
       </ul>
 
       <div class="checkbox navbar-btn navbar-right">
-        <!-- <label class="navbar&#45;link repl&#45;toolbar" > -->
-        <!--   <input type="checkbox" id="option&#45;non&#45;export" checked> -->
-        <!--   Remove unused code -->
-        <!-- </label> -->
-        <!-- <label class="navbar&#45;link repl&#45;toolbar"> -->
-        <!--   <input type="checkbox" id="option&#45;eval" checked> -->
-        <!--   Eval -->
-        <!-- </label> -->
       </div>
 
     </div><!-- /.navbar-collapse -->
@@ -63,6 +56,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">Share</h4>
+        <h4 class="modal-title" onclick="onRefmtChanges()">Reformat</h4>
         <h4 class="modal-title" onclick="onEditChanges()">Compile</h4>
       </div>
       <div class="modal-body">
@@ -148,14 +142,11 @@ Reprocessing.run ::setup ::draw ();
 </textarea>
     </div>
 </div>
-<!--<p> can you  see me</p>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
 <script src="./docs-assets/refmt.js" ></script>
 <script src="./reprocessing.js" ></script>
 <script src="./docs-assets/edit.js" ></script>
-
 <script src="./docs-assets/exports.js">    </script>
 <script src="./docs-assets/pre_load.js"></script>
-<!-- <script src="./require.js"></script> -->
 <script src="./docs-assets/init.js"></script>
 </body>

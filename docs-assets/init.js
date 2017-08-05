@@ -1,3 +1,10 @@
+myCode1Mirror.setOption("extraKeys", {
+  Tab: function(cm) {
+    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+    cm.replaceSelection(spaces);
+  }
+});
+
 function contentFromResponse(gist) {
     $
         .ajax({ url: 'https://api.github.com/gists/' + gist })
