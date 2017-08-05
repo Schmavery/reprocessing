@@ -1,7 +1,7 @@
 'use strict';
 
 
-var codeMirrorDefaultHeight = 10000;
+var codeMirrorDefaultHeight = 800;
 var myCode1Mirror = CodeMirror.fromTextArea(
   document.getElementById('ocamlcode#1'),
   {
@@ -12,8 +12,14 @@ var myCode1Mirror = CodeMirror.fromTextArea(
     theme: "monokai",
     matchBrackets: true,
     autoCloseBrackets: true,
-    tabSize: 2
+    tabSize: 2,
+    keyMap: "sublime",
   } );
+myCode1Mirror.setOption("extraKeys", {
+  "Cmd-S": function() {
+    onEditChanges();
+  }
+});
 var jsCode1Mirror = CodeMirror.fromTextArea(
   document.getElementById('jscode#1'),
   { mode:'javascript',
@@ -185,7 +191,6 @@ function readFile(filename, cb) {
   };
   return rawFile.send(null);
 }
-
 
 function compile(src){
   if(typeof compile_code === 'undefined'){
