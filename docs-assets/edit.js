@@ -220,6 +220,7 @@ readFile('Reprocessing_Ext.re', function(str) {
 function onEditChanges(cm, change) {
   var rsp = compile(myCode1Mirror.getValue());
   if (rsp.js_code !== undefined) {
+    cancelAnimationFrame(document.getElementById("main-canvas").__hiddenrafid);
     evalCode(rsp.js_code)
   } else {
     jsCode1Mirror.setValue(rsp.js_error_msg);
