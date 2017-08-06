@@ -646,7 +646,7 @@ function render(canvas, mouseDown, mouseUp, mouseMove, keyDown, keyUp, windowRes
                     Caml_builtin_exceptions.assert_failure,
                     [
                       "reasongl.re",
-                      150,
+                      152,
                       21
                     ]
                   ];
@@ -680,7 +680,7 @@ function render(canvas, mouseDown, mouseUp, mouseMove, keyDown, keyUp, windowRes
                     Caml_builtin_exceptions.assert_failure,
                     [
                       "reasongl.re",
-                      173,
+                      175,
                       21
                     ]
                   ];
@@ -753,13 +753,13 @@ function render(canvas, mouseDown, mouseUp, mouseMove, keyDown, keyUp, windowRes
   var tick = function (prev, _) {
     var now = Date.now();
     Curry._1(displayFunc, now - prev);
-    window.requestAnimationFrame((function (param) {
+    canvas.__hiddenrafid = window.requestAnimationFrame((function (param) {
             return tick(now, param);
           }));
     return /* () */0;
   };
   var partial_arg = Date.now();
-  window.requestAnimationFrame((function (param) {
+  canvas.__hiddenrafid = window.requestAnimationFrame((function (param) {
           return tick(partial_arg, param);
         }));
   return /* () */0;
@@ -790,7 +790,7 @@ function create(kind, size) {
               Caml_builtin_exceptions.assert_failure,
               [
                 "reasongl.re",
-                352,
+                354,
                 17
               ]
             ];
@@ -821,7 +821,7 @@ function of_array(kind, arr) {
               Caml_builtin_exceptions.assert_failure,
               [
                 "reasongl.re",
-                365,
+                367,
                 17
               ]
             ];
