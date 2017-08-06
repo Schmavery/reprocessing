@@ -1,1 +1,1 @@
-let init = Gl.Window.init;
+let init = Reasongl.Gl.Window.init;
