@@ -8,18 +8,21 @@ mv ./src/Reprocessing_ClientWrapper.re.bak ./src/Reprocessing_ClientWrapper.re
 
 # Copy to js build location
 mkdir -p ./webenv-artifacts/webenv-build
+mkdir -p ./webenv-artifacts/transfer
 cp ./lib/js/src/* ./webenv-artifacts/webenv-build
 cp ./webenv-artifacts/entrypoint.js ./webenv-artifacts/webenv-build
 
 # Build browserified bundle
-./node_modules/.bin/browserify ./webenv-artifacts/webenv-build/entrypoint.js -o ./webenv-artifacts/reprocessing-bundle.js
+./node_modules/.bin/browserify ./webenv-artifacts/webenv-build/entrypoint.js -o ./webenv-artifacts/transfer/reprocessing-bundle.js
+
+cp ./webenv-artifacts/Reprocessing_Ext.re ./webenv-artifacts/transfer
 
 curr_branch=$(git rev-parse --abbrev-ref HEAD)
 git stash
 
 git checkout gh-pages
-cp ./webenv-artifacts/reprocessing-bundle.js reprocessing.js
-cp ./webenv-artifacts/Reprocessing_Ext.re Reprocessing_Ext.re
+cp ./webenv-artifacts/transfer/reprocessing-bundle.js reprocessing.js
+cp ./webenv-artifacts/transfer/Reprocessing_Ext.re Reprocessing_Ext.re
 
 if [ $1 == "--non-interactive" ]
 then
