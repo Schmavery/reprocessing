@@ -16,7 +16,7 @@
   },
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "webpack": "^1.14.0",
+    "browserify": "*",
     "bs-platform": "bsansouci/bsb-native"
   }
 }
