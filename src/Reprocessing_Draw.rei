@@ -96,6 +96,23 @@ let pushStyle: Reprocessing_Types.Types.glEnvT => unit;
 let popStyle: Reprocessing_Types.Types.glEnvT => unit;
 
 
+/** Pushes the current transformation matrix onto the matrix stack. Understanding pushMatrix() and popMatrix()
+  * requires understanding the concept of a matrix stack. The pushMatrix() function saves the current coordinate
+  * system to the stack and popMatrix() restores the prior coordinate system. pushMatrix() and popMatrix() are
+  * used in conjuction with the other transformation methods and may be embedded to control the scope of
+  * the transformations.
+ */
+let pushMatrix: Reprocessing_Types.Types.glEnvT => unit;
+
+
+/** Pops the current transformation matrix off the matrix stack. Understanding pushing and popping requires
+  * understanding the concept of a matrix stack. The pushMatrix() function saves the current coordinate system to
+  * the stack and popMatrix() restores the prior coordinate system. pushMatrix() and popMatrix() are used in
+  * conjuction with the other transformation methods and may be embedded to control the scope of the transformations.
+ */
+let popMatrix: Reprocessing_Types.Types.glEnvT => unit;
+
+
 /** Loads an image and returns a handle to it. This will lazily load and
    * attempting to draw an image that has not finished loading will result
    * in nothing being drawn.
