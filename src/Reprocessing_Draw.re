@@ -38,6 +38,20 @@ let popStyle env =>
     env.styleStack = tl
   };
 
+let pushMatrix env => {
+  let copy = Matrix.createIdentity ();
+  Matrix.copyInto src::env.matrix dst::copy;
+  env.matrixStack = [copy, ...env.matrixStack]
+};
+
+let popMatrix env =>
+  switch env.matrixStack {
+  | [] => failwith "Too many `popMatrix` without enough `pushMatrix`."
+  | [hd, ...tl] =>
+    env.matrix = hd;
+    env.matrixStack = tl
+  };
+
 let loadImage ::filename env => Internal.loadImage env filename;
 
 let subImage
