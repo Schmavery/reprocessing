@@ -13,6 +13,10 @@ let translate ::x ::y env =>
 
 let rotate theta env => Matrix.(matmatmul env.matrix (createRotation theta));
 
+let scale ::x ::y env => Matrix.(matmatmul env.matrix (createScaling x y));
+
+let shear ::x ::y env => Matrix.(matmatmul env.matrix (createShearing x y));
+
 let fill color (env: glEnv) =>
   env.style = {...env.style, fillColor: Some color};
 
