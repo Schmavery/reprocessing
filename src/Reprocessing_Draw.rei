@@ -33,6 +33,20 @@ let translate: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
 let rotate: float => Reprocessing_Types.Types.glEnvT => unit;
 
 
+/** The scale() function increases or decreases the size of a shape by expanding
+ * and contracting vertices.
+ */
+let scale: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
+
+
+/** The shear() function shears the matrix along the axes the amount
+ * specified by the angle parameters. Angles should be specified in radians
+ * (values from 0 to PI*2) or converted to radians with the Utils.radians()
+ * function.
+ */
+let shear: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
+
+
 /** Sets the color used to fill shapes.*/
 let fill:
   Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;

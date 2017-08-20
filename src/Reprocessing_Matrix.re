@@ -16,6 +16,10 @@ let createRotation theta => [|
   1.
 |];
 
+let createScaling sx sy => [|sx, 0., 0., 0., sy, 0., 0., 0., 1.|];
+
+let createShearing sx sy => [|1., sx, 0., sy, 1., 0., 0., 0., 1.|];
+
 let copyInto ::src ::dst => {
   dst.(0) = src.(0);
   dst.(1) = src.(1);
