@@ -48,9 +48,9 @@ var errorMirror = CodeMirror.fromTextArea(
     theme: "monokai"
   }
 );
-var PROMPT = "> " ;
+var PROMPT = "" ;
 var log_output = PROMPT;
-var ERR_OUTPUT = "Warnings: "
+var ERR_OUTPUT = ""
 var err_output = ERR_OUTPUT;
 
 function reset_log_output (){ log_output  = PROMPT;}
@@ -122,11 +122,11 @@ function evalCode(js){
   try {
     window.eval(js + sourceLocation);
     outputMirror.setValue(get_log_output());
-    console.log = original_log;
+    //console.log = original_log;
   }
   catch(e){
     outputMirror.setValue(get_log_output() + "\n" + e);
-    console.log = original_log;
+    //console.log = original_log;
   }
 
 }
@@ -165,7 +165,8 @@ function switchExample(id){
     if (rsp.js_code !== undefined) {
       evalCode(rsp.js_code)
     } else {
-      jsCode1Mirror.setValue(rsp.js_error_msg);
+      // jsCode1Mirror.setValue(rsp.js_error_msg);
+      errorMirror.setValue(rsp.js_error_msg);
     }
   });
 
@@ -192,19 +193,35 @@ function readFile(filename, cb) {
   return rawFile.send(null);
 }
 
+
+console.log = function redirectLog(s){
+  outputMirror.replaceRange(s+"\n", {line: Infinity});
+}
+
 function compile(src){
   if(typeof compile_code === 'undefined'){
-    console.log('init....');
     compile_code = ocaml.compile;
   }
-  console.error = redirect_err;
+  function stripWarnings(s){
+    if (!s.startsWith("Warning: You are passing a OCaml bool type into JS") &&
+        !s.startsWith("File \"\"")){
+      redirect_err(s);
+    }
+  }
+  console.error = stripWarnings;
   if (predefinedStuff !== null) {
-    console.log("Running compilerrrr");
-    var raw = compile_code(document.refmt(predefinedStuff + src).c);
-    errorMirror.setValue(get_error_output());
-    console.error = original_err;
-    var rsp = JSON.parse(raw); // can we save this from parsing?
-    return rsp;
+    var converted = window.refmt(src, 'RE', 'implementation', 'ML');
+    if (converted[0] == "REtoML") {
+      var raw = compile_code(predefinedStuff + "\n#0 \"example.re\"\n" + converted[1]);
+      errorMirror.setValue(get_error_output());
+      outputMirror.setValue("");
+      var rsp = JSON.parse(raw); // can we save this from parsing?
+      console.error = original_err;
+      return rsp;
+    } else if (converted[0] == "REtoUnkown") {
+      console.error = original_err;
+      return {js_error_msg: converted[1]}
+    }
   } else {
     return {js_error_msg: "Reprocessing lib not yet loaded."}
   }
@@ -213,8 +230,8 @@ function compile(src){
 var predefinedStuff;
 
 readFile('Reprocessing_Ext.re', function(str) {
-  console.log("Loaded ext of length", str.length);
-  predefinedStuff = str;
+  var converted = window.refmt(str, 'RE', 'implementation', 'ML')
+  predefinedStuff = converted[1];
 });
 
 function onEditChanges(cm, change) {
@@ -223,17 +240,24 @@ function onEditChanges(cm, change) {
     cancelAnimationFrame(document.getElementById("main-canvas").__hiddenrafid);
     evalCode(rsp.js_code)
   } else {
-    jsCode1Mirror.setValue(rsp.js_error_msg);
+    //jsCode1Mirror.setValue(rsp.js_error_msg);
+    errorMirror.setValue(rsp.js_error_msg);
   }
 }
 
 function onRefmtChanges(cm, change) {
-  var refmted = document.refmt(myCode1Mirror.getValue()).c;
-  myCode1Mirror.setValue(refmted);
+  // var refmted = document.refmt(myCode1Mirror.getValue()).c;
+  console.error("WHAT")
+  var refmted = window.refmt(myCode1Mirror.getValue(), 'RE', 'implementation', 'RE')
+    if (refmted[0] == "REtoRE") {
+      myCode1Mirror.setValue(refmted[1]);
+    } else if (refmted[0] == "REtoUnkown") {
+      errorMirror.setValue(refmted[1]);
+    }
 }
 // myCode2Mirror.on("changes", onEditChanges);
 
-jsCode1Mirror.setSize(null,codeMirrorDefaultHeight);
+//jsCode1Mirror.setSize(null,codeMirrorDefaultHeight);
 
 
 
