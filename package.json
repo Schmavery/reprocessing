@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
+    "build": "bsb -make-world -backend js",
+    "build:bytecode": "bsb -make-world -backend bytecode",
+    "build:native": "bsb -make-world -backend native",
     "buildweb": "bsb -make-world -backend js && webpack -d lib/js/src/index.js lib/js/src/app.js"
   },
   "dependencies": {

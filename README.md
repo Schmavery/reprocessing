@@ -5,6 +5,13 @@ Everything you need should be accessible from the Reprocessing module.
 
 If you have trouble installing or want to give any input for how to make this library better, please open an issue! :smile:
 
+## Demo
+There are a couple demos inside `examples`. Run `npm i` to install all deps and `npm run build` to build to JS (default). Open `index.html` in safari (or use `python -m SimpleHTTPServer 8000` to spawn a static server and go to `localhost:8000` in chrome).
+
+Run `npm run build:bytecode` to build to a bytecode executable and run `./lib/bs/bytecode/index.byte`.
+
+Run `npm run build:native` to build to a native executable and run `./lib/bs/native/index.native`.
+
 ## Install
 ```bash
 npm install Schmavery/reprocessing#bsb-support-new
