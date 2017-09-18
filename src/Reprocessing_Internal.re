@@ -14,7 +14,8 @@ let getProgram
   Gl.compileShader ::context vertexShader;
   let compiledCorrectly =
     Gl.getShaderParameter
-      ::context shader::vertexShader paramName::Gl.Compile_status == 1;
+      ::context shader::vertexShader paramName::Gl.Compile_status
+    == 1;
   if compiledCorrectly {
     let fragmentShader =
       Gl.createShader ::context RGLConstants.fragment_shader;
@@ -23,7 +24,8 @@ let getProgram
     Gl.compileShader ::context fragmentShader;
     let compiledCorrectly =
       Gl.getShaderParameter
-        ::context shader::fragmentShader paramName::Gl.Compile_status == 1;
+        ::context shader::fragmentShader paramName::Gl.Compile_status
+      == 1;
     if compiledCorrectly {
       let program = Gl.createProgram ::context;
       Gl.attachShader ::context ::program shader::vertexShader;
@@ -32,22 +34,26 @@ let getProgram
       Gl.deleteShader ::context fragmentShader;
       Gl.linkProgram ::context program;
       let linkedCorrectly =
-        Gl.getProgramParameter ::context ::program paramName::Gl.Link_status == 1;
+        Gl.getProgramParameter ::context ::program paramName::Gl.Link_status
+        == 1;
       if linkedCorrectly {
         Some program
       } else {
-        print_endline @@
-        "Linking error: " ^ Gl.getProgramInfoLog ::context program;
+        print_endline
+        @@ "Linking error: "
+        ^ Gl.getProgramInfoLog ::context program;
         None
       }
     } else {
-      print_endline @@
-      "Fragment shader error: " ^ Gl.getShaderInfoLog ::context fragmentShader;
+      print_endline
+      @@ "Fragment shader error: "
+      ^ Gl.getShaderInfoLog ::context fragmentShader;
       None
     }
   } else {
-    print_endline @@
-    "Vertex shader error: " ^ Gl.getShaderInfoLog ::context vertexShader;
+    print_endline
+    @@ "Vertex shader error: "
+    ^ Gl.getShaderInfoLog ::context vertexShader;
     None
   }
 };
@@ -169,7 +175,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     keyboard: {keyCode: Reprocessing_Events.Nothing},
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
     style: {
-      fillColor: Some {r: 0, g: 0, b: 0},
+      fillColor: Some {r: 0, g: 0, b: 0, a: 1.},
       strokeWeight: 3,
       strokeCap: Round,
       strokeColor: None
@@ -294,9 +300,16 @@ let flushGlobalBatch env =>
 
 let maybeFlushBatch ::texture ::el ::vert env =>
   if (
-    env.batch.elementPtr + el >= circularBufferSize ||
-    env.batch.vertexPtr + vert >= circularBufferSize ||
-    env.batch.elementPtr > 0 && env.batch.currTex !== texture
+    env.batch.elementPtr
+    + el
+    >= circularBufferSize
+    || env.batch.vertexPtr
+    + vert
+    >= circularBufferSize
+    || env.batch.elementPtr
+    > 0
+    && env.batch.currTex
+    !== texture
   ) {
     flushGlobalBatch env
   };
@@ -332,7 +345,7 @@ let addRectToGlobalBatch
     bottomLeft::(x2, y2)
     topRight::(x3, y3)
     topLeft::(x4, y4)
-    color::{r, g, b} => {
+    color::{r, g, b, a} => {
   maybeFlushBatch texture::None el::6 vert::32 env;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
@@ -343,7 +356,7 @@ let addRectToGlobalBatch
   set vertexArrayToMutate (i + 2) r;
   set vertexArrayToMutate (i + 3) g;
   set vertexArrayToMutate (i + 4) b;
-  set vertexArrayToMutate (i + 5) 1.;
+  set vertexArrayToMutate (i + 5) a;
   set vertexArrayToMutate (i + 6) 0.0;
   set vertexArrayToMutate (i + 7) 0.0;
   set vertexArrayToMutate (i + 8) x2;
@@ -351,7 +364,7 @@ let addRectToGlobalBatch
   set vertexArrayToMutate (i + 10) r;
   set vertexArrayToMutate (i + 11) g;
   set vertexArrayToMutate (i + 12) b;
-  set vertexArrayToMutate (i + 13) 1.;
+  set vertexArrayToMutate (i + 13) a;
   set vertexArrayToMutate (i + 14) 0.0;
   set vertexArrayToMutate (i + 15) 0.0;
   set vertexArrayToMutate (i + 16) x3;
@@ -359,7 +372,7 @@ let addRectToGlobalBatch
   set vertexArrayToMutate (i + 18) r;
   set vertexArrayToMutate (i + 19) g;
   set vertexArrayToMutate (i + 20) b;
-  set vertexArrayToMutate (i + 21) 1.;
+  set vertexArrayToMutate (i + 21) a;
   set vertexArrayToMutate (i + 22) 0.0;
   set vertexArrayToMutate (i + 23) 0.0;
   set vertexArrayToMutate (i + 24) x4;
@@ -367,7 +380,7 @@ let addRectToGlobalBatch
   set vertexArrayToMutate (i + 26) r;
   set vertexArrayToMutate (i + 27) g;
   set vertexArrayToMutate (i + 28) b;
-  set vertexArrayToMutate (i + 29) 1.;
+  set vertexArrayToMutate (i + 29) a;
   set vertexArrayToMutate (i + 30) 0.0;
   set vertexArrayToMutate (i + 31) 0.0;
   let ii = i / vertexSize;
@@ -383,7 +396,7 @@ let addRectToGlobalBatch
   env.batch.elementPtr = j + 6
 };
 
-let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
+let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b, a} => {
   maybeFlushBatch texture::None vert::3 el::24 env;
   let set = Gl.Bigarray.set;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
@@ -394,7 +407,7 @@ let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   set vertexArrayToMutate (i + 2) r;
   set vertexArrayToMutate (i + 3) g;
   set vertexArrayToMutate (i + 4) b;
-  set vertexArrayToMutate (i + 5) 1.;
+  set vertexArrayToMutate (i + 5) a;
   set vertexArrayToMutate (i + 6) 0.0;
   set vertexArrayToMutate (i + 7) 0.0;
   set vertexArrayToMutate (i + 8) x2;
@@ -402,7 +415,7 @@ let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   set vertexArrayToMutate (i + 10) r;
   set vertexArrayToMutate (i + 11) g;
   set vertexArrayToMutate (i + 12) b;
-  set vertexArrayToMutate (i + 13) 1.;
+  set vertexArrayToMutate (i + 13) a;
   set vertexArrayToMutate (i + 14) 0.0;
   set vertexArrayToMutate (i + 15) 0.0;
   set vertexArrayToMutate (i + 16) x3;
@@ -410,7 +423,7 @@ let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b} => {
   set vertexArrayToMutate (i + 18) r;
   set vertexArrayToMutate (i + 19) g;
   set vertexArrayToMutate (i + 20) b;
-  set vertexArrayToMutate (i + 21) 1.;
+  set vertexArrayToMutate (i + 21) a;
   set vertexArrayToMutate (i + 22) 0.0;
   set vertexArrayToMutate (i + 23) 0.0;
   let ii = i / vertexSize;
@@ -430,10 +443,8 @@ let drawLine p1::(xx1, yy1) p2::(xx2, yy2) ::color ::width ::project env => {
   let radius = width /. 2.;
   let xthing = dy /. mag *. radius;
   let ything = -. dx /. mag *. radius;
-  let (projectx, projecty) = switch project {
-  | true => (dx /. mag *. radius, xthing)
-  | false => (0.,0.)
-  };
+  let (projectx, projecty) =
+    project ? (dx /. mag *. radius, xthing) : (0., 0.);
   let x1 = xx2 +. xthing +. projectx;
   let y1 = yy2 +. ything +. projecty;
   let x2 = xx1 +. xthing -. projectx;
@@ -460,7 +471,7 @@ let drawArc
     (stop: float)
     (isPie: bool)
     (matrix: array float)
-    {r, g, b} => {
+    {r, g, b, a} => {
   let transform = Matrix.matptmul matrix;
   let noOfFans = int_of_float (radx +. rady) / 4 + 10;
   maybeFlushBatch texture::None vert::(8 * noOfFans) el::(3 * noOfFans) env;
@@ -476,7 +487,8 @@ let drawArc
   let start_i =
     if isPie {
       /* Start one earlier and force the first point to be the center */
-      int_of_float (start /. anglePerFan) - 2
+      int_of_float (start /. anglePerFan)
+      - 2
     } else {
       int_of_float (start /. anglePerFan) - 1
     };
@@ -504,7 +516,7 @@ let drawArc
     set verticesData (ii + 2) r;
     set verticesData (ii + 3) g;
     set verticesData (ii + 4) b;
-    set verticesData (ii + 5) 1.0;
+    set verticesData (ii + 5) a;
     set verticesData (ii + 6) 0.0;
     set verticesData (ii + 7) 0.0;
     /* For the first three vertices, we don't do any deduping. Then for the subsequent ones, we'll actually
@@ -541,7 +553,7 @@ let drawArcStroke
     (isOpen: bool)
     (isPie: bool)
     (matrix: array float)
-    ({r, g, b} as strokeColor)
+    ({r, g, b, a} as strokeColor)
     strokeWidth => {
   let transform = Matrix.matptmul matrix;
   let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
@@ -578,7 +590,7 @@ let drawArcStroke
     set verticesData (ii + 2) r;
     set verticesData (ii + 3) g;
     set verticesData (ii + 4) b;
-    set verticesData (ii + 5) 1.0;
+    set verticesData (ii + 5) a;
     set verticesData (ii + 6) 0.0;
     set verticesData (ii + 7) 0.0;
     let ii = ii + vertexSize;
@@ -587,7 +599,7 @@ let drawArcStroke
     set verticesData (ii + 2) r;
     set verticesData (ii + 3) g;
     set verticesData (ii + 4) b;
-    set verticesData (ii + 5) 1.0;
+    set verticesData (ii + 5) a;
     set verticesData (ii + 6) 0.0;
     set verticesData (ii + 7) 0.0;
     env.batch.vertexPtr = env.batch.vertexPtr + vertexSize * 2;
@@ -702,7 +714,7 @@ let loadImage (env: glEnv) filename :imageT => {
 };
 
 let drawImage
-    {width:imgw, height:imgh, textureBuffer}
+    {width: imgw, height: imgh, textureBuffer}
     ::x
     ::y
     ::width

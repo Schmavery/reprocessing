@@ -4,7 +4,7 @@ let foi = float_of_int;
 
 let lookup_table: ref (array int) = ref [||];
 
-let color ::r ::g ::b :colorT => {r, g, b};
+let color ::r ::g ::b ::a=1. () :colorT => {r, g, b, a};
 
 /*Calculation Functions*/
 let round i => floor (i +. 0.5);
@@ -17,7 +17,9 @@ let rec pow ::base ::exp =>
   | 1 => base
   | n =>
     let b = pow ::base exp::(n / 2);
-    b * b * (
+    b
+    * b
+    * (
       if (n mod 2 == 0) {
         1
       } else {
@@ -81,7 +83,8 @@ let mag vec => dist p1::(0, 0) p2::vec;
 let lerpColor ::low ::high ::value => {
   r: lerp low::low.r high::high.r ::value,
   g: lerp low::low.g high::high.g ::value,
-  b: lerp low::low.b high::high.b ::value
+  b: lerp low::low.b high::high.b ::value,
+  a: lerpf low::low.a high::high.a ::value
 };
 
 let degrees x => 180.0 /. Reprocessing_Constants.pi *. x;

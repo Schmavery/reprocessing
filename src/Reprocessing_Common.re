@@ -14,7 +14,8 @@ type glCamera = {projectionMatrix: Gl.Mat4.t};
 type colorT = {
   r: int,
   g: int,
-  b: int
+  b: int,
+  a: float
 };
 
 type styleT = {
