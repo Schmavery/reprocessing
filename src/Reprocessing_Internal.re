@@ -788,7 +788,8 @@ let drawImage
 let resetSize env width height => {
   env.size.width = width;
   env.size.height = height;
-  Gl.viewport context::env.gl x::0 y::0 ::width ::height;
+  let (pixelWidth, pixelHeight) = Gl.Window.(getPixelWidth env.window, getPixelHeight env.window);
+  Gl.viewport context::env.gl x::0 y::0 width::pixelWidth height::pixelHeight;
   Gl.clearColor context::env.gl r::0. g::0. b::0. a::1.;
   Gl.Mat4.ortho
     out::env.camera.projectionMatrix
