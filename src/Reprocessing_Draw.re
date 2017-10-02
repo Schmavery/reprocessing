@@ -8,8 +8,7 @@ module Env = Reprocessing_Env;
 
 module Font = Reprocessing_Font.Font;
 
-let translate ::x ::y env =>
-  Matrix.(matmatmul env.matrix (createTranslation x y));
+let translate ::x ::y env => Matrix.(matmatmul env.matrix (createTranslation x y));
 
 let rotate theta env => Matrix.(matmatmul env.matrix (createRotation theta));
 
@@ -17,8 +16,7 @@ let scale ::x ::y env => Matrix.(matmatmul env.matrix (createScaling x y));
 
 let shear ::x ::y env => Matrix.(matmatmul env.matrix (createShearing x y));
 
-let fill color (env: glEnv) =>
-  env.style = {...env.style, fillColor: Some color};
+let fill color (env: glEnv) => env.style = {...env.style, fillColor: Some color};
 
 let noFill (env: glEnv) => env.style = {...env.style, fillColor: None};
 
@@ -26,8 +24,7 @@ let stroke color env => env.style = {...env.style, strokeColor: Some color};
 
 let noStroke env => env.style = {...env.style, strokeColor: None};
 
-let strokeWeight weight env =>
-  env.style = {...env.style, strokeWeight: weight};
+let strokeWeight weight env => env.style = {...env.style, strokeWeight: weight};
 
 let strokeCap cap env => env.style = {...env.style, strokeCap: cap};
 
@@ -69,9 +66,7 @@ let subImage
     env =>
   switch !img {
   | None => print_endline "image not ready yet, just doing nothing :D"
-  | Some i =>
-    Internal.drawImage
-      i ::x ::y ::width ::height ::subx ::suby ::subw ::subh env
+  | Some i => Internal.drawImage i ::x ::y ::width ::height ::subx ::suby ::subw ::subh env
   };
 
 let image img pos::(x, y) ::width=? ::height=? (env: glEnv) =>
@@ -83,17 +78,7 @@ let image img pos::(x, y) ::width=? ::height=? (env: glEnv) =>
     | (None, w, Some h, _)
     | (Some w, _, None, h)
     | (Some w, _, Some h, _) =>
-      Internal.drawImage
-        img
-        ::x
-        ::y
-        width::w
-        height::h
-        subx::0
-        suby::0
-        subw::imgw
-        subh::imgh
-        env
+      Internal.drawImage img ::x ::y width::w height::h subx::0 suby::0 subw::imgw subh::imgh env
     }
   };
 
@@ -105,8 +90,7 @@ let linef ::p1 ::p2 (env: glEnv) =>
     let width = float_of_int env.style.strokeWeight;
     let radius = width /. 2.;
     let project = env.style.strokeCap == Project;
-    Internal.drawLine
-      p1::(transform p1) p2::(transform p2) ::color ::width ::project env;
+    Internal.drawLine p1::(transform p1) p2::(transform p2) ::color ::width ::project env;
     if (env.style.strokeCap == Round) {
       Internal.drawEllipse env p1 radius radius env.matrix color;
       Internal.drawEllipse env p2 radius radius env.matrix color
@@ -114,10 +98,7 @@ let linef ::p1 ::p2 (env: glEnv) =>
   };
 
 let line p1::(x1, y1) p2::(x2, y2) (env: glEnv) =>
-  linef
-    p1::(float_of_int x1, float_of_int y1)
-    p2::(float_of_int x2, float_of_int y2)
-    env;
+  linef p1::(float_of_int x1, float_of_int y1) p2::(float_of_int x2, float_of_int y2) env;
 
 let ellipsef ::center ::radx ::rady (env: glEnv) => {
   switch env.style.fillColor {
@@ -151,12 +132,7 @@ let ellipse center::(cx, cy) ::radx ::rady (env: glEnv) =>
 
 let quadf ::p1 ::p2 ::p3 ::p4 (env: glEnv) => {
   let transform = Matrix.matptmul env.matrix;
-  let (p1, p2, p3, p4) = (
-    transform p1,
-    transform p2,
-    transform p3,
-    transform p4
-  );
+  let (p1, p2, p3, p4) = (transform p1, transform p2, transform p3, transform p4);
   switch env.style.fillColor {
   | None => () /* Don't draw fill */
   | Some fill =>
@@ -190,12 +166,7 @@ let quad p1::(x1, y1) p2::(x2, y2) p3::(x3, y3) p4::(x4, y4) (env: glEnv) =>
     env;
 
 let rectf pos::(x, y) ::width ::height (env: glEnv) =>
-  quadf
-    p1::(x, y)
-    p2::(x +. width, y)
-    p3::(x +. width, y +. height)
-    p4::(x, y +. height)
-    env;
+  quadf p1::(x, y) p2::(x +. width, y) p3::(x +. width, y +. height) p4::(x, y +. height) env;
 
 let rect pos::(x, y) ::width ::height (env: glEnv) =>
   rectf
@@ -204,27 +175,119 @@ let rect pos::(x, y) ::width ::height (env: glEnv) =>
     height::(float_of_int height)
     env;
 
-let bezier
-    p1::(xx1, yy1)
-    p2::(xx2, yy2)
-    p3::(xx3, yy3)
-    p4::(xx4, yy4)
-    (env: glEnv) => {
-  let bezier_point t => (
-    (1. -. t) *\* 3. *. xx1 +. 3. *. (1. -. t) *\* 2. *. t *. xx2 +.
-    3. *. (1. -. t) *. t *\* 2. *. xx3 +.
-    t *\* 3. *. xx4,
-    (1. -. t) *\* 3. *. yy1 +. 3. *. (1. -. t) *\* 2. *. t *. yy2 +.
-    3. *. (1. -. t) *. t *\* 2. *. yy3 +.
-    t *\* 3. *. yy4
-  );
-  for i in 0 to 99 {
-    linef
-      p1::(bezier_point (float_of_int i /. 100.0))
-      p2::(bezier_point (float_of_int (i + 1) /. 100.0))
+let bezierPoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => (
+  (1. -. t) *\* 3. *. xx1 +. 3. *. (1. -. t) *\* 2. *. t *. xx2 +.
+  3. *. (1. -. t) *. t *\* 2. *. xx3 +.
+  t *\* 3. *. xx4,
+  (1. -. t) *\* 3. *. yy1 +. 3. *. (1. -. t) *\* 2. *. t *. yy2 +.
+  3. *. (1. -. t) *. t *\* 2. *. yy3 +.
+  t *\* 3. *. yy4
+);
+
+let bezierTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => (
+  (-3.) *. (1. -. t) *\* 2. *. xx1 +. 3. *. (1. -. t) *\* 2. *. xx2 -. 6. *. t *. (1. -. t) *. xx2 -.
+  3. *. t *\* 2. *. xx3 +.
+  6. *. t *. (1. -. t) *. xx3 +.
+  3. *. t *\* 2. *. xx4,
+  (-3.) *. (1. -. t) *\* 2. *. yy1 +. 3. *. (1. -. t) *\* 2. *. yy2 -. 6. *. t *. (1. -. t) *. yy2 -.
+  3. *. t *\* 2. *. yy3 +.
+  6. *. t *. (1. -. t) *. yy3 +.
+  3. *. t *\* 2. *. yy4
+);
+
+let bezier p1::(xx1, yy1) p2::(xx2, yy2) p3::(xx3, yy3) p4::(xx4, yy4) (env: glEnv) =>
+  /* @speed this thing can reuse points*/
+  for i in 0 to 19 {
+    let (x1, y1) =
+      bezierPoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int i /. 20.0);
+    let (x2, y2) =
+      bezierPoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int (i + 1) /. 20.0);
+    let (tangent_x1, tangent_y1) =
+      bezierTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int i /. 20.0);
+    let (tangent_x2, tangent_y2) =
+      bezierTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int (i + 1) /. 20.0);
+    let a1 = atan2 tangent_y1 tangent_x1 -. Reprocessing_Constants.half_pi;
+    let a2 = atan2 tangent_y2 tangent_x2 -. Reprocessing_Constants.half_pi;
+    quadf
+      (
+        x1 +. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
+        y1 +. sin a1 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      (
+        x1 -. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
+        y1 -. sin a1 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      (
+        x2 -. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
+        y2 -. sin a2 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      (
+        x2 +. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
+        y2 +. sin a2 *. float_of_int env.style.strokeWeight /. 2.
+      )
       env
-  }
+  };
+
+let curvePoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => {
+  let mx0 = (1. -. 0.5) *. (xx3 -. xx1); /* @feature tightness will be defined as the 0 here */
+  let my0 = (1. -. 0.5) *. (yy3 -. yy1);
+  let mx1 = (1. -. 0.5) *. (xx4 -. xx2);
+  let my1 = (1. -. 0.5) *. (yy4 -. yy2);
+  (
+    (2. *. t *\* 3. -. 3. *. t *\* 2. +. 1.) *. xx2 +. (t *\* 3. -. 2. *. t *\* 2. +. t) *. mx0 +.
+    ((-2.) *. t *\* 3. +. 3. *. t *\* 2.) *. xx3 +.
+    (t *\* 3. -. t *\* 2.) *. mx1,
+    (2. *. t *\* 3. -. 3. *. t *\* 2. +. 1.) *. yy2 +. (t *\* 3. -. 2. *. t *\* 2. +. t) *. my0 +.
+    ((-2.) *. t *\* 3. +. 3. *. t *\* 2.) *. yy3 +.
+    (t *\* 3. -. t *\* 2.) *. my1
+  )
 };
+
+let curveTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) t => {
+  let mx0 = (1. -. 0.5) *. (xx3 -. xx1); /* @feature tightness will be defined as the 0 here */
+  let my0 = (1. -. 0.5) *. (yy3 -. yy1);
+  let mx1 = (1. -. 0.5) *. (xx4 -. xx2);
+  let my1 = (1. -. 0.5) *. (yy4 -. yy2);
+  (
+    (6. *. t *\* 2. -. 6. *. t) *. xx2 +. (3. *. t *\* 2. -. 4. *. t +. 1.) *. mx0 +.
+    ((-6.) *. t *\* 2. +. 6. *. t) *. xx3 +.
+    (3. *. t *\* 2. -. 2. *. t) *. mx1,
+    (6. *. t *\* 2. -. 6. *. t) *. yy2 +. (3. *. t *\* 2. -. 4. *. t +. 1.) *. my0 +.
+    ((-6.) *. t *\* 2. +. 6. *. t) *. yy3 +.
+    (3. *. t *\* 2. -. 2. *. t) *. my1
+  )
+};
+
+let curve (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (env: glEnv) =>
+  for i in 0 to 19 {
+    let (x1, y1) = curvePoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int i /. 20.0);
+    let (x2, y2) =
+      curvePoint (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int (i + 1) /. 20.0);
+    let (tangent_x1, tangent_y1) =
+      curveTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int i /. 20.0);
+    let (tangent_x2, tangent_y2) =
+      curveTangent (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (float_of_int (i + 1) /. 20.0);
+    let a1 = atan2 tangent_y1 tangent_x1 -. Reprocessing_Constants.half_pi;
+    let a2 = atan2 tangent_y2 tangent_x2 -. Reprocessing_Constants.half_pi;
+    quadf
+      (
+        x1 +. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
+        y1 +. sin a1 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      (
+        x1 -. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
+        y1 -. sin a1 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      (
+        x2 -. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
+        y2 -. sin a2 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      (
+        x2 +. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
+        y2 +. sin a2 *. float_of_int env.style.strokeWeight /. 2.
+      )
+      env
+  };
 
 let pixelf pos::(x, y) ::color (env: glEnv) => {
   let w = float_of_int env.style.strokeWeight;
@@ -273,36 +336,17 @@ let triangle p1::(x1, y1) p2::(x2, y2) p3::(x3, y3) (env: glEnv) =>
 let arcf ::center ::radx ::rady ::start ::stop ::isOpen ::isPie (env: glEnv) => {
   switch env.style.fillColor {
   | None => () /* don't draw fill */
-  | Some color =>
-    Internal.drawArc env center radx rady start stop isPie env.matrix color
+  | Some color => Internal.drawArc env center radx rady start stop isPie env.matrix color
   };
   switch env.style.strokeColor {
   | None => () /* don't draw stroke */
   | Some stroke =>
     Internal.drawArcStroke
-      env
-      center
-      radx
-      rady
-      start
-      stop
-      isOpen
-      isPie
-      env.matrix
-      stroke
-      env.style.strokeWeight
+      env center radx rady start stop isOpen isPie env.matrix stroke env.style.strokeWeight
   }
 };
 
-let arc
-    center::(cx, cy)
-    ::radx
-    ::rady
-    ::start
-    ::stop
-    ::isOpen
-    ::isPie
-    (env: glEnv) =>
+let arc center::(cx, cy) ::radx ::rady ::start ::stop ::isOpen ::isPie (env: glEnv) =>
   arcf
     center::(float_of_int cx, float_of_int cy)
     radx::(float_of_int radx)
@@ -315,23 +359,16 @@ let arc
 
 let loadFont ::filename (env: glEnv) => Font.parseFontFormat env filename;
 
-let text ::font ::body pos::(x, y) (env: glEnv) =>
-  Font.drawString env font body x y;
+let text ::font ::body pos::(x, y) (env: glEnv) => Font.drawString env font body x y;
 
 let clear env =>
   Reasongl.Gl.clear
-    context::env.gl
-    mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
+    context::env.gl mask::(Constants.color_buffer_bit lor Constants.depth_buffer_bit);
 
 let background color (env: glEnv) => {
   clear env;
   let w = float_of_int (Env.width env);
   let h = float_of_int (Env.height env);
   Internal.addRectToGlobalBatch
-    env
-    bottomRight::(w, h)
-    bottomLeft::(0., h)
-    topRight::(w, 0.)
-    topLeft::(0., 0.)
-    ::color
+    env bottomRight::(w, h) bottomLeft::(0., h) topRight::(w, 0.) topLeft::(0., 0.) ::color
 };
