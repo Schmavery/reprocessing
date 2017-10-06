@@ -13,7 +13,7 @@ let setup env => {
 };
 
 let draw z env => {
-  background (color r::230 g::230 b::250 ()) env;
+  background (color r::230 g::230 b::250 a::255) env;
   let res = 100;
   let w = float_of_int (width env) /. float_of_int res;
   let h = float_of_int (height env) /. float_of_int res;

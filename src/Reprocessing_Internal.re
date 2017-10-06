@@ -175,7 +175,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     keyboard: {keyCode: Reprocessing_Events.Nothing},
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
     style: {
-      fillColor: Some {r: 0, g: 0, b: 0, a: 1.},
+      fillColor: Some {r: 0., g: 0., b: 0., a: 1.},
       strokeWeight: 3,
       strokeCap: Round,
       strokeColor: None
@@ -314,8 +314,6 @@ let maybeFlushBatch ::texture ::el ::vert env =>
     flushGlobalBatch env
   };
 
-let toColorFloat i => float_of_int i /. 255.;
-
 /*
  * This array packs all of the values that the shaders need: vertices, colors and texture coordinates.
  * We put them all in one as an optimization, so there are less back and forths between us and the GPU.
@@ -348,7 +346,6 @@ let addRectToGlobalBatch
     color::{r, g, b, a} => {
   maybeFlushBatch texture::None el::6 vert::32 env;
   let set = Gl.Bigarray.set;
-  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let i = env.batch.vertexPtr;
   let vertexArrayToMutate = env.batch.vertexArray;
   set vertexArrayToMutate (i + 0) x1;
@@ -399,7 +396,6 @@ let addRectToGlobalBatch
 let drawTriangle env (x1, y1) (x2, y2) (x3, y3) color::{r, g, b, a} => {
   maybeFlushBatch texture::None vert::3 el::24 env;
   let set = Gl.Bigarray.set;
-  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let i = env.batch.vertexPtr;
   let vertexArrayToMutate = env.batch.vertexArray;
   set vertexArrayToMutate (i + 0) x1;
@@ -477,7 +473,6 @@ let drawArc
   maybeFlushBatch texture::None vert::(8 * noOfFans) el::(3 * noOfFans) env;
   let pi = 4.0 *. atan 1.0;
   let anglePerFan = 2. *. pi /. float_of_int noOfFans;
-  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let verticesData = env.batch.vertexArray;
   let elementData = env.batch.elementArray;
   let set = Gl.Bigarray.set;
@@ -556,7 +551,6 @@ let drawArcStroke
     ({r, g, b, a} as strokeColor)
     strokeWidth => {
   let transform = Matrix.matptmul matrix;
-  let (r, g, b) = (toColorFloat r, toColorFloat g, toColorFloat b);
   let verticesData = env.batch.vertexArray;
   let elementData = env.batch.elementArray;
   let noOfFans = int_of_float (radx +. rady) / 4 + 10;
@@ -788,7 +782,8 @@ let drawImage
 let resetSize env width height => {
   env.size.width = width;
   env.size.height = height;
-  let (pixelWidth, pixelHeight) = Gl.Window.(getPixelWidth env.window, getPixelHeight env.window);
+  let (pixelWidth, pixelHeight) =
+    Gl.Window.(getPixelWidth env.window, getPixelHeight env.window);
   Gl.viewport context::env.gl x::0 y::0 width::pixelWidth height::pixelHeight;
   Gl.clearColor context::env.gl r::0. g::0. b::0. a::1.;
   Gl.Mat4.ortho

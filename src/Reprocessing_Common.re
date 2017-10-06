@@ -12,9 +12,9 @@ type glState = Gl.Window.t;
 type glCamera = {projectionMatrix: Gl.Mat4.t};
 
 type colorT = {
-  r: int,
-  g: int,
-  b: int,
+  r: float,
+  g: float,
+  b: float,
   a: float
 };
 

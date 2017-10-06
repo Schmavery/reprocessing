@@ -1,10 +1,20 @@
-/** Creates colors for storing in variables of the color datatype. */
+/** Creates colors for storing in variables of the color datatype.
+  *
+  * Components should be in the range 0 to 255 (or 0x00 to 0xFF).
+ */
 let color:
-  r::int =>
-  g::int =>
-  b::int =>
-  a::float? =>
-  unit =>
+  r::int => g::int => b::int => a::int => Reprocessing_Types.Types.colorT;
+
+
+/** Creates colors for storing in variables of the color datatype.
+  *
+  * Components should be in the range 0.0 to 1.0.
+ */
+let colorf:
+  r::float =>
+  g::float =>
+  b::float =>
+  a::float =>
   Reprocessing_Types.Types.colorT;
 
 

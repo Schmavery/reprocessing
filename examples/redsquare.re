@@ -1,5 +1,7 @@
 open Reprocessing.Draw;
+
 open Reprocessing.Env;
+
 open Reprocessing.Utils;
 
 type state = (int, int);
@@ -13,7 +15,7 @@ let setup env => {
 };
 
 let draw squarePos env => {
-  background (color r::150 g::255 b::255 ()) env;
+  background (color r::150 g::255 b::255 a::255) env;
   let (sx, sy) = squarePos;
   let (px, py) = pmouse env;
   let (x, y) as squarePos =

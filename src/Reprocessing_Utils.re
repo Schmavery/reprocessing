@@ -4,8 +4,6 @@ let foi = float_of_int;
 
 let lookup_table: ref (array int) = ref [||];
 
-let color ::r ::g ::b ::a=1. () :colorT => {r, g, b, a};
-
 /*Calculation Functions*/
 let round i => floor (i +. 0.5);
 
@@ -81,9 +79,9 @@ let magf vec => distf p1::(0., 0.) p2::vec;
 let mag vec => dist p1::(0, 0) p2::vec;
 
 let lerpColor ::low ::high ::value => {
-  r: lerp low::low.r high::high.r ::value,
-  g: lerp low::low.g high::high.g ::value,
-  b: lerp low::low.b high::high.b ::value,
+  r: lerpf low::low.r high::high.r ::value,
+  g: lerpf low::low.g high::high.g ::value,
+  b: lerpf low::low.b high::high.b ::value,
   a: lerpf low::low.a high::high.a ::value
 };
 
@@ -177,3 +175,12 @@ let noiseSeed seed => {
 };
 
 let split = Reprocessing_Common.split;
+
+let color ::r ::g ::b ::a :colorT => {
+  r: norm value::(float_of_int r) low::0. high::1.,
+  g: norm value::(float_of_int g) low::0. high::1.,
+  b: norm value::(float_of_int b) low::0. high::1.,
+  a: norm value::(float_of_int a) low::0. high::1.
+};
+
+let colorf ::r ::g ::b ::a :colorT => {r, g, b, a};
