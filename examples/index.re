@@ -23,7 +23,7 @@ let make w (ymin, ymax) time => {
     color:
       Utils.lerpColor
         low::Constants.white
-        high::(Utils.color r::138 g::43 b::226)
+        high::(Utils.color r::138 g::43 b::226 a::255)
         value::(Utils.randomf min::0.3 max::1.),
     time
   }
@@ -37,15 +37,15 @@ type state = {
 
 let setup env => {
   Env.size width::640 height::360 env;
-  Draw.fill (Utils.color r::255 g::0 b::0) env;
+  Draw.fill (Utils.color r::255 g::0 b::0 a::255) env;
   Draw.noStroke env;
   let lst = Array.init 500 (fun _ => make (Env.width env) ((-500), (-50)) 0);
   {lst, time: 0, running: true}
 };
 
 let draw {lst, running, time} env => {
-  Draw.background (Utils.color r::230 g::230 b::250) env;
-  Draw.fill (Utils.color r::255 g::0 b::0) env;
+  Draw.background (Utils.color r::230 g::230 b::250 a::255) env;
+  Draw.fill (Utils.color r::255 g::0 b::0 a::255) env;
   Utils.randomSeed time;
   let lst =
     Array.map

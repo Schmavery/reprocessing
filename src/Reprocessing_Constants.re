@@ -1,14 +1,14 @@
 open Reprocessing_Common;
 
-let white = {r: 255, g: 255, b: 255};
+let white = {r: 1., g: 1., b: 1., a: 1.};
 
-let black = {r: 0, g: 0, b: 0};
+let black = {r: 0., g: 0., b: 0., a: 1.};
 
-let red = {r: 255, g: 0, b: 0};
+let red = {r: 1., g: 0., b: 0., a: 1.};
 
-let green = {r: 0, g: 255, b: 0};
+let green = {r: 0., g: 1., b: 0., a: 1.};
 
-let blue = {r: 0, g: 0, b: 255};
+let blue = {r: 0., g: 0., b: 1., a: 1.};
 
 let pi = 4.0 *. atan 1.0;
 
