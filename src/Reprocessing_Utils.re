@@ -177,10 +177,10 @@ let noiseSeed seed => {
 let split = Reprocessing_Common.split;
 
 let color ::r ::g ::b ::a :colorT => {
-  r: norm value::(float_of_int r) low::0. high::1.,
-  g: norm value::(float_of_int g) low::0. high::1.,
-  b: norm value::(float_of_int b) low::0. high::1.,
-  a: norm value::(float_of_int a) low::0. high::1.
+  r: foi r /. 255.,
+  g: foi g /. 255.,
+  b: foi b /. 255.,
+  a: foi a /. 255.
 };
 
 let colorf ::r ::g ::b ::a :colorT => {r, g, b, a};
