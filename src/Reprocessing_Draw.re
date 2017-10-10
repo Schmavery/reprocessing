@@ -53,7 +53,8 @@ let popMatrix env =>
     env.matrixStack = tl
   };
 
-let loadImage ::filename env => Internal.loadImage env filename;
+let loadImage ::filename ::isPixel=false env =>
+  Internal.loadImage env filename isPixel;
 
 let subImage
     img

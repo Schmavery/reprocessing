@@ -661,7 +661,7 @@ let drawArcStroke
   }
 };
 
-let loadImage (env: glEnv) filename :imageT => {
+let loadImage (env: glEnv) filename isPixel :imageT => {
   let imageRef = ref None;
   Gl.loadImage
     ::filename
@@ -674,6 +674,7 @@ let loadImage (env: glEnv) filename :imageT => {
           let textureBuffer = Gl.createTexture context::env.gl;
           let height = Gl.getImageHeight img;
           let width = Gl.getImageWidth img;
+          let filter = isPixel ? Constants.nearest : Constants.linear;
           imageRef := Some {img, textureBuffer, height, width};
           Gl.bindTexture
             context::env.gl
@@ -685,12 +686,12 @@ let loadImage (env: glEnv) filename :imageT => {
             context::env.gl
             target::Constants.texture_2d
             pname::Constants.texture_mag_filter
-            param::Constants.linear;
+            param::filter;
           Gl.texParameteri
             context::env.gl
             target::Constants.texture_2d
             pname::Constants.texture_min_filter
-            param::Constants.linear;
+            param::filter;
           Gl.texParameteri
             context::env.gl
             target::Constants.texture_2d

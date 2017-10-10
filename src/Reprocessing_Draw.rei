@@ -135,6 +135,7 @@ let popMatrix: Reprocessing_Types.Types.glEnvT => unit;
  */
 let loadImage:
   filename::string =>
+  isPixel::bool? =>
   Reprocessing_Types.Types.glEnvT =>
   Reprocessing_Types.Types.imageT;
 

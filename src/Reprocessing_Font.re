@@ -137,7 +137,7 @@ module Font = {
             Some {
               chars: char_map,
               kerning: kern_map,
-              image: Internal.loadImage env img_filename
+              image: Internal.loadImage env img_filename false
             }
         }
       );
