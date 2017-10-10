@@ -9,9 +9,9 @@
     "buildweb": "bsb -make-world -backend js && webpack -d lib/js/src/index.js lib/js/src/app.js"
   },
   "dependencies": {
-    "ReasonglInterface": "github:bsansouci/reasongl-interface#bsb-support-new",
-    "ReasonglNative": "github:bsansouci/reasongl-native#bsb-support-new",
-    "ReasonglWeb": "github:bsansouci/reasongl-web#bsb-support-new"
+    "ReasonglInterface": "github:bsansouci/reasongl-interface",
+    "ReasonglNative": "github:bsansouci/reasongl-native",
+    "ReasonglWeb": "github:bsansouci/reasongl-web"
   },
   "repository": {
     "type": "git",
