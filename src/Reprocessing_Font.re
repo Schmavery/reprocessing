@@ -164,7 +164,7 @@ module Font = {
       };
     switch image {
     | Some img =>
-      Internal.drawImage
+      Internal.drawImageWithMatrix
         img
         x::(x + c.xoffset + kernAmount)
         y::(y + c.yoffset)

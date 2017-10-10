@@ -67,7 +67,7 @@ let subImage
     env =>
   switch !img {
   | None => print_endline "image not ready yet, just doing nothing :D"
-  | Some i => Internal.drawImage i ::x ::y ::width ::height ::subx ::suby ::subw ::subh env
+  | Some i => Internal.drawImageWithMatrix i ::x ::y ::width ::height ::subx ::suby ::subw ::subh env
   };
 
 let image img pos::(x, y) ::width=? ::height=? (env: glEnv) =>
@@ -79,7 +79,7 @@ let image img pos::(x, y) ::width=? ::height=? (env: glEnv) =>
     | (None, w, Some h, _)
     | (Some w, _, None, h)
     | (Some w, _, Some h, _) =>
-      Internal.drawImage img ::x ::y width::w height::h subx::0 suby::0 subw::imgw subh::imgh env
+      Internal.drawImageWithMatrix img ::x ::y width::w height::h subx::0 suby::0 subw::imgw subh::imgh env
     }
   };
 

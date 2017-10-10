@@ -710,10 +710,10 @@ let loadImage (env: glEnv) filename isPixel :imageT => {
 
 let drawImage
     {width: imgw, height: imgh, textureBuffer}
-    ::x
-    ::y
-    ::width
-    ::height
+    p1::(x1, y1)
+    p2::(x2, y2)
+    p3::(x3, y3)
+    p4::(x4, y4)
     ::subx
     ::suby
     ::subw
@@ -726,10 +726,6 @@ let drawImage
     float_of_int subw /. float_of_int imgw,
     float_of_int subh /. float_of_int imgh
   );
-  let (x1, y1) = (float_of_int @@ x + width, float_of_int @@ y + height);
-  let (x2, y2) = (float_of_int x, float_of_int @@ y + height);
-  let (x3, y3) = (float_of_int @@ x + width, float_of_int y);
-  let (x4, y4) = (float_of_int x, float_of_int y);
   let set = Gl.Bigarray.set;
   let ii = env.batch.vertexPtr;
   let vertexArray = env.batch.vertexArray;
@@ -778,6 +774,24 @@ let drawImage
   env.batch.currTex = Some textureBuffer
 };
 
+let drawImageWithMatrix
+    image
+    ::x
+    ::y
+    ::width
+    ::height
+    ::subx
+    ::suby
+    ::subw
+    ::subh
+    env => {
+      let transform = Matrix.matptmul env.matrix;
+      let p1 = transform (float_of_int @@ x + width, float_of_int @@ y + height);
+      let p2 = transform (float_of_int x, float_of_int @@ y + height);
+      let p3 = transform (float_of_int @@ x + width, float_of_int y);
+      let p4 = transform (float_of_int x, float_of_int y);
+      drawImage image ::p1 ::p2 ::p3 ::p4 ::subx ::suby ::subw ::subh env
+    };
 
 /** Recomputes matrices while resetting size of window */
 let resetSize env width height => {
