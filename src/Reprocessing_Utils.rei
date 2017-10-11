@@ -227,3 +227,31 @@ let noiseSeed: int => unit;
   * that contains each of the pieces.
  */
 let split: string => sep::char => list string;
+
+/** Determines if there is an intersection between a rectangle and a circle.
+  * rectPos refers to the top left of the rect and circlePos to the center of
+  * the circle. rectW and rectH are the width and height of the rectangle and
+  * circleRad is the radius of the circle.
+  * Returns true if the two shapes overlap.
+  */
+let intersectRectCircle:
+  rectPos::(float, float) =>
+  rectW::float =>
+  rectH::float =>
+  circlePos::(float, float) =>
+  circleRad::float =>
+  bool;
+
+/** Determines if there is an intersection between two axis-aligned rectangles.
+  * rect1Pos and rect2Pos refer to the top left of the rectangles.
+  * rectW and rectH are the width and height of the rectangle.
+  * Returns true if the two shapes overlap.
+  */
+let intersectRectRect:
+  rect1Pos::(float, float) =>
+  rect1W::float =>
+  rect1H::float =>
+  rect2Pos::(float, float) =>
+  rect2W::float =>
+  rect2H::float =>
+  bool;

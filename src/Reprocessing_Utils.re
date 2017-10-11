@@ -184,3 +184,37 @@ let color ::r ::g ::b ::a :colorT => {
 };
 
 let colorf ::r ::g ::b ::a :colorT => {r, g, b, a};
+
+let intersectRectCircle
+    rectPos::(rx, ry)
+    ::rectW
+    ::rectH
+    circlePos::(cx, cy)
+    ::circleRad => {
+  let halfW = rectW /. 2.;
+  let halfH = rectH /. 2.;
+  let cdistX = abs_float (cx -. (rx +. halfW));
+  let cdistY = abs_float (cy -. (ry +. halfH));
+  if (cdistX > halfW +. circleRad || cdistY > halfH +. circleRad) {
+    false
+  } else if (
+    cdistX <= halfW || cdistY <= halfH
+  ) {
+    true
+  } else {
+    let cornerDistSq = (cdistX -. halfW) *\* 2. +. (cdistY -. halfH) *\* 2.;
+    cornerDistSq <= circleRad *\* 2.
+  }
+};
+
+let intersectRectRect
+    rect1Pos::(rx1, ry1)
+    ::rect1W
+    ::rect1H
+    rect2Pos::(rx2, ry2)
+    ::rect2W
+    ::rect2H =>
+  not (
+    rx2 > rx1 +. rect1W ||
+    rx2 +. rect2W < rx1 || ry2 > ry1 +. rect1H || ry2 +. rect2H < ry1
+  );
