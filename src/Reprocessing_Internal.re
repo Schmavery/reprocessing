@@ -183,7 +183,7 @@ let createCanvas window (height: int) (width: int) :glEnv => {
     styleStack: [],
     matrix: Matrix.createIdentity (),
     matrixStack: [],
-    frame: {count: 1, rate: 10},
+    frame: {count: 1, rate: 10, deltaTime: 0.001},
     size: {height, width, resizeable: true}
   }
 };

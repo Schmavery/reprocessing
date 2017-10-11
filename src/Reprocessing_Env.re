@@ -22,3 +22,5 @@ let resizeable resizeable (env: glEnv) => env.size.resizeable = resizeable;
 let frameRate (env: glEnv) => env.frame.rate;
 
 let frameCount (env: glEnv) => env.frame.count;
+
+let deltaTime (env: glEnv) => env.frame.deltaTime;

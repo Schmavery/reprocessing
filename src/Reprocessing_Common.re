@@ -35,7 +35,8 @@ type keyboardT = {mutable keyCode: Reprocessing_Events.keycodeT};
 
 type frameT = {
   count: int,
-  rate: int
+  rate: int,
+  deltaTime: float
 };
 
 type sizeT = {

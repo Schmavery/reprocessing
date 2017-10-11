@@ -20,7 +20,7 @@ let afterDraw f (env: Common.glEnv) => {
   open Common;
   let rate = int_of_float (1000. /. f);
   env.mouse.prevPos = env.mouse.pos;
-  env.frame = {count: env.frame.count + 1, rate};
+  env.frame = {count: env.frame.count + 1, rate, deltaTime: f /. 1000.};
   Matrix.copyInto src::Matrix.identity dst::env.matrix;
   /* Flush the batching buffer at the end of every frame. */
   if (env.batch.elementPtr > 0) {
