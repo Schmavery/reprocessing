@@ -132,6 +132,9 @@ let popMatrix: Reprocessing_Types.Types.glEnvT => unit;
    * in nothing being drawn.
    * In general, all images should be loaded in `setup` to preload them at
    * the start of the program.
+   * If isPixel is set to true, then when scaling the image, it will use
+   * GL_NEAREST (you want this setting if your image is meant to look
+   * pixelated)
  */
 let loadImage:
   filename::string =>
@@ -388,9 +391,13 @@ let arc:
    * in nothing being drawn.
    * In general, all fonts should be loaded in `setup` to preload them at
    * the start of the program.
+   * If isPixel is set to true, then when scaling the font, it will use
+   * GL_NEAREST (you want this setting if your font is meant to look
+   * pixelated)
  */
 let loadFont:
   filename::string =>
+  isPixel::bool? =>
   Reprocessing_Types.Types.glEnvT =>
   Reprocessing_Font.fontT;
 

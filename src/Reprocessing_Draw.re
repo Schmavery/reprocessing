@@ -358,7 +358,7 @@ let arc center::(cx, cy) ::radx ::rady ::start ::stop ::isOpen ::isPie (env: glE
     ::isPie
     env;
 
-let loadFont ::filename (env: glEnv) => Font.parseFontFormat env filename;
+let loadFont ::filename ::isPixel=false (env: glEnv) => Font.parseFontFormat env filename isPixel;
 
 let text ::font ::body pos::(x, y) (env: glEnv) => Font.drawString env font body x y;
 

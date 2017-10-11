@@ -112,7 +112,7 @@ module Font = {
     let newLst = List.rev newRevLst;
     String.concat "/" newLst
   };
-  let parseFontFormat env path => {
+  let parseFontFormat env path isPixel => {
     let ret = ref None;
     Gl.File.readFile
       filename::path
@@ -137,7 +137,7 @@ module Font = {
             Some {
               chars: char_map,
               kerning: kern_map,
-              image: Internal.loadImage env img_filename false
+              image: Internal.loadImage env img_filename isPixel
             }
         }
       );
