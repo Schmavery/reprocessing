@@ -17,6 +17,8 @@ module Constants = Reprocessing_Constants;
 
 include Reprocessing_Types.TypesT;
 
+let hotreload: string => unit;
+
 /** Entrypoint to the graphics library. The system
   * is designed for you to return a self-defined 'state'
   * object from setup, which will then be passed to every
