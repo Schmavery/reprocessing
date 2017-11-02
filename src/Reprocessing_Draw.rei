@@ -1,4 +1,4 @@
-/** Specifies an amount to displace objects within the display window.
+/*** Specifies an amount to displace objects within the display window.
    * The dx parameter specifies left/right translation, the dy parameter
    * specifies up/down translation.
    *
@@ -10,10 +10,10 @@
    * when the loop begins again. This function can be further controlled
    * by using `pushMatrix` and `popMatrix`.
  */
-let translate: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
+let translate: (~x: float, ~y: float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Rotates the amount specified by the angle parameter. Angles must be
+/*** Rotates the amount specified by the angle parameter. Angles must be
  * specified in radians (values from 0 to two_pi), or they can be converted
  * from degrees to radians with the `radians` function.
 
@@ -30,61 +30,56 @@ let translate: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
  * rotation matrix. This function can be further controlled by `pushMatrix`
  * and `popMatrix`.
  */
-let rotate: float => Reprocessing_Types.Types.glEnvT => unit;
+let rotate: (float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** The scale() function increases or decreases the size of a shape by expanding
+/*** The scale() function increases or decreases the size of a shape by expanding
  * and contracting vertices.
  */
-let scale: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
+let scale: (~x: float, ~y: float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** The shear() function shears the matrix along the axes the amount
+/*** The shear() function shears the matrix along the axes the amount
  * specified by the angle parameters. Angles should be specified in radians
  * (values from 0 to PI*2) or converted to radians with the Utils.radians()
  * function.
  */
-let shear: x::float => y::float => Reprocessing_Types.Types.glEnvT => unit;
+let shear: (~x: float, ~y: float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Sets the color used to fill shapes.*/
-let fill:
-  Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
+/*** Sets the color used to fill shapes.*/
+let fill: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Disables filling geometry. If both `noStroke` and `noFill` are called,
+/*** Disables filling geometry. If both `noStroke` and `noFill` are called,
    * nothing will be drawn to the screen.
  */
 let noFill: Reprocessing_Types.Types.glEnvT => unit;
 
 
-/** Sets the color used to draw lines and borders around shapes. */
-let stroke:
-  Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
+/*** Sets the color used to draw lines and borders around shapes. */
+let stroke: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Disables drawing the stroke (outline). If both noStroke() and noFill()
+/*** Disables drawing the stroke (outline). If both noStroke() and noFill()
    * are called, nothing will be drawn to the screen.
  */
 let noStroke: Reprocessing_Types.Types.glEnvT => unit;
 
 
-/** Sets the width of the stroke used for lines, points, and the border around
+/*** Sets the width of the stroke used for lines, points, and the border around
    * shapes. All widths are set in units of pixels.
  */
-let strokeWeight: int => Reprocessing_Types.Types.glEnvT => unit;
+let strokeWeight: (int, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Sets the style for rendering line endings. These ends are either squared,
+/*** Sets the style for rendering line endings. These ends are either squared,
   * extended, or rounded.
  */
-let strokeCap:
-  Reprocessing_Types.Types.strokeCapT =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+let strokeCap: (Reprocessing_Types.Types.strokeCapT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** The `pushStyle` function saves the current style settings and `popStyle`
+/*** The `pushStyle` function saves the current style settings and `popStyle`
    * restores the prior settings. Note that these functions are always used
    * together. They allow you to change the style settings and later return to
    * what you had. When a new style is started with `pushStyle`, it builds on the
@@ -97,7 +92,7 @@ let strokeCap:
 let pushStyle: Reprocessing_Types.Types.glEnvT => unit;
 
 
-/** The `pushStyle` function saves the current style settings and
+/*** The `pushStyle` function saves the current style settings and
    * `popStyle` restores the prior settings; these functions are always used
    * together. They allow you to change the style settings and later return to
    * what you had. When a new style is started with `pushStyle`, it builds on the
@@ -110,7 +105,7 @@ let pushStyle: Reprocessing_Types.Types.glEnvT => unit;
 let popStyle: Reprocessing_Types.Types.glEnvT => unit;
 
 
-/** Pushes the current transformation matrix onto the matrix stack. Understanding pushMatrix() and popMatrix()
+/*** Pushes the current transformation matrix onto the matrix stack. Understanding pushMatrix() and popMatrix()
   * requires understanding the concept of a matrix stack. The pushMatrix() function saves the current coordinate
   * system to the stack and popMatrix() restores the prior coordinate system. pushMatrix() and popMatrix() are
   * used in conjuction with the other transformation methods and may be embedded to control the scope of
@@ -119,7 +114,7 @@ let popStyle: Reprocessing_Types.Types.glEnvT => unit;
 let pushMatrix: Reprocessing_Types.Types.glEnvT => unit;
 
 
-/** Pops the current transformation matrix off the matrix stack. Understanding pushing and popping requires
+/*** Pops the current transformation matrix off the matrix stack. Understanding pushing and popping requires
   * understanding the concept of a matrix stack. The pushMatrix() function saves the current coordinate system to
   * the stack and popMatrix() restores the prior coordinate system. pushMatrix() and popMatrix() are used in
   * conjuction with the other transformation methods and may be embedded to control the scope of the transformations.
@@ -127,7 +122,7 @@ let pushMatrix: Reprocessing_Types.Types.glEnvT => unit;
 let popMatrix: Reprocessing_Types.Types.glEnvT => unit;
 
 
-/** Loads an image and returns a handle to it. This will lazily load and
+/*** Loads an image and returns a handle to it. This will lazily load and
    * attempting to draw an image that has not finished loading will result
    * in nothing being drawn.
    * In general, all images should be loaded in `setup` to preload them at
@@ -137,26 +132,27 @@ let popMatrix: Reprocessing_Types.Types.glEnvT => unit;
    * pixelated)
  */
 let loadImage:
-  filename::string =>
-  isPixel::bool? =>
-  Reprocessing_Types.Types.glEnvT =>
+  (~filename: string, ~isPixel: bool=?, Reprocessing_Types.Types.glEnvT) =>
   Reprocessing_Types.Types.imageT;
 
 
-/** The `image` function draws an image to the display window.
+/*** The `image` function draws an image to the display window.
    * The image should be loaded using the `loadImage` function.
    * The image is displayed at its original size unless width and
    * height are optionally specified.
  */
 let image:
-  Reprocessing_Types.Types.imageT =>
-  pos::(int, int) =>
-  width::int? =>
-  height::int? =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    Reprocessing_Types.Types.imageT,
+    ~pos: (int, int),
+    ~width: int=?,
+    ~height: int=?,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
-/** The `subImage` function draws a section of an image to the
+
+/*** The `subImage` function draws a section of an image to the
    * display window. The image should be loaded using the
    * `loadImage` function. The image is displayed at the size
    * specified by width and height.  texPos, texWidth, and
@@ -167,56 +163,45 @@ let image:
    * drawing strategy.
  */
 let subImage:
-  Reprocessing_Types.Types.imageT =>
-  pos::(int, int) =>
-  width::int =>
-  height::int =>
-  texPos::(int, int) =>
-  texWidth::int =>
-  texHeight::int =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    Reprocessing_Types.Types.imageT,
+    ~pos: (int, int),
+    ~width: int,
+    ~height: int,
+    ~texPos: (int, int),
+    ~texWidth: int,
+    ~texHeight: int,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** Draws a rectangle to the screen. A rectangle is a four-sided shape with
+/*** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.
  */
 let rectf:
-  pos::(float, float) =>
-  width::float =>
-  height::float =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+  (~pos: (float, float), ~width: float, ~height: float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Draws a rectangle to the screen. A rectangle is a four-sided shape with
+/*** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.
    *
    * This is the same as `rectf`, but converts all its integer arguments to floats
    * as a convenience.
  */
-let rect:
-  pos::(int, int) =>
-  width::int =>
-  height::int =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+let rect: (~pos: (int, int), ~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Draws a line (a direct path between two points) to the screen.
+/*** Draws a line (a direct path between two points) to the screen.
    * To color a line, use the `stroke` function. A line cannot be filled,
    * therefore the `fill` function will not affect the color of a line. Lines are
    * drawn with a width of one pixel by default, but this can be changed with
    * the `strokeWeight` function.
  */
-let linef:
-  p1::(float, float) =>
-  p2::(float, float) =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+let linef: (~p1: (float, float), ~p2: (float, float), Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Draws a line (a direct path between two points) to the screen.
+/*** Draws a line (a direct path between two points) to the screen.
    * To color a line, use the `stroke` function. A line cannot be filled,
    * therefore the `fill` function will not affect the color of a line. Lines are
    * drawn with a width of one pixel by default, but this can be changed with
@@ -225,50 +210,43 @@ let linef:
    * This is the same as `linef`, but converts all its integer arguments to floats
    * as a convenience.
  */
-let line:
-  p1::(int, int) => p2::(int, int) => Reprocessing_Types.Types.glEnvT => unit;
+let line: (~p1: (int, int), ~p2: (int, int), Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Draws an ellipse (oval) to the screen. An ellipse with equal width and
+/*** Draws an ellipse (oval) to the screen. An ellipse with equal width and
    * height is a circle.
  */
 let ellipsef:
-  center::(float, float) =>
-  radx::float =>
-  rady::float =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+  (~center: (float, float), ~radx: float, ~rady: float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Draws an ellipse (oval) to the screen. An ellipse with equal width and
+/*** Draws an ellipse (oval) to the screen. An ellipse with equal width and
    * height is a circle.
    *
    * This is the same as `ellipsef`, but converts all its integer arguments to
    * floats as a convenience.
  */
 let ellipse:
-  center::(int, int) =>
-  radx::int =>
-  rady::int =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+  (~center: (int, int), ~radx: int, ~rady: int, Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/**  A quad is a quadrilateral, a four sided polygon. It is similar to a
+/***  A quad is a quadrilateral, a four sided polygon. It is similar to a
    * rectangle, but the angles between its edges are not constrained to ninety
    * degrees. The parameter p1 sets the first vertex and the subsequest points
    * should proceed clockwise or counter-clockwise around the defined shape.
  */
 let quadf:
-  p1::(float, float) =>
-  p2::(float, float) =>
-  p3::(float, float) =>
-  p4::(float, float) =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~p1: (float, float),
+    ~p2: (float, float),
+    ~p3: (float, float),
+    ~p4: (float, float),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/**  A quad is a quadrilateral, a four sided polygon. It is similar to a
+/***  A quad is a quadrilateral, a four sided polygon. It is similar to a
    * rectangle, but the angles between its edges are not constrained to ninety
    * degrees. The parameter p1 sets the first vertex and the subsequest points
    * should proceed clockwise or counter-clockwise around the defined shape.
@@ -277,57 +255,57 @@ let quadf:
    * floats as a convenience.
  */
 let quad:
-  p1::(int, int) =>
-  p2::(int, int) =>
-  p3::(int, int) =>
-  p4::(int, int) =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~p1: (int, int),
+    ~p2: (int, int),
+    ~p3: (int, int),
+    ~p4: (int, int),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** Adds a single point with a radius defined by strokeWeight */
+/*** Adds a single point with a radius defined by strokeWeight */
 let pixelf:
-  pos::(float, float) =>
-  color::Reprocessing_Types.Types.colorT =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~pos: (float, float),
+    ~color: Reprocessing_Types.Types.colorT,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** Adds a single point with a radius defined by strokeWeight
+/*** Adds a single point with a radius defined by strokeWeight
    *
    * This is the same as `pixelf`, but converts all its integer arguments to
    * floats as a convenience.
  */
 let pixel:
-  pos::(int, int) =>
-  color::Reprocessing_Types.Types.colorT =>
-  Reprocessing_Types.Types.glEnvT =>
+  (~pos: (int, int), ~color: Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) =>
   unit;
 
 
-/** A triangle is a plane created by connecting three points. */
+/*** A triangle is a plane created by connecting three points. */
 let trianglef:
-  p1::(float, float) =>
-  p2::(float, float) =>
-  p3::(float, float) =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~p1: (float, float),
+    ~p2: (float, float),
+    ~p3: (float, float),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** A triangle is a plane created by connecting three points.
+/*** A triangle is a plane created by connecting three points.
    *
    * This is the same as `trianglef`, but converts all its integer arguments to
    * floats as a convenience.
  */
 let triangle:
-  p1::(int, int) =>
-  p2::(int, int) =>
-  p3::(int, int) =>
-  Reprocessing_Types.Types.glEnvT =>
-  unit;
+  (~p1: (int, int), ~p2: (int, int), ~p3: (int, int), Reprocessing_Types.Types.glEnvT) => unit;
 
 
-/** Draws a Bezier curve on the screen. These curves are defined by a
+/*** Draws a Bezier curve on the screen. These curves are defined by a
    * series of anchor and control points. The parameter p1 specifies the
    * first anchor point and the last parameter specifies the other anchor
    * point. The middle parameters p2 and p3 specify the control points
@@ -335,15 +313,17 @@ let triangle:
    * by French engineer Pierre Bezier.
  */
 let bezier:
-  p1::(float, float) =>
-  p2::(float, float) =>
-  p3::(float, float) =>
-  p4::(float, float) =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~p1: (float, float),
+    ~p2: (float, float),
+    ~p3: (float, float),
+    ~p4: (float, float),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** Draws an arc to the screen. Arcs are drawn along the outer edge of an
+/*** Draws an arc to the screen. Arcs are drawn along the outer edge of an
    * ellipse defined by the center, radx, and rady parameters. Use the
    * start and stop parameters to specify the angles (in radians) at which
    * to draw the arc. isPie defines whether or not lines should be drawn to
@@ -352,18 +332,20 @@ let bezier:
    * than the arc between start and stop.
  */
 let arcf:
-  center::(float, float) =>
-  radx::float =>
-  rady::float =>
-  start::float =>
-  stop::float =>
-  isOpen::bool =>
-  isPie::bool =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~center: (float, float),
+    ~radx: float,
+    ~rady: float,
+    ~start: float,
+    ~stop: float,
+    ~isOpen: bool,
+    ~isPie: bool,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** Draws an arc to the screen. Arcs are drawn along the outer edge of an
+/*** Draws an arc to the screen. Arcs are drawn along the outer edge of an
    * ellipse defined by the center, radx, and rady parameters. Use the
    * start and stop parameters to specify the angles (in radians) at which
    * to draw the arc. isPie defines whether or not lines should be drawn to
@@ -375,18 +357,20 @@ let arcf:
    * floats as a convenience.
  */
 let arc:
-  center::(int, int) =>
-  radx::int =>
-  rady::int =>
-  start::float =>
-  stop::float =>
-  isOpen::bool =>
-  isPie::bool =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~center: (int, int),
+    ~radx: int,
+    ~rady: int,
+    ~start: float,
+    ~stop: float,
+    ~isOpen: bool,
+    ~isPie: bool,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
-/** Loads a font and returns a handle to it. This will lazily load and
+/*** Loads a font and returns a handle to it. This will lazily load and
    * attempting to draw an font that has not finished loading will result
    * in nothing being drawn.
    * In general, all fonts should be loaded in `setup` to preload them at
@@ -396,31 +380,31 @@ let arc:
    * pixelated)
  */
 let loadFont:
-  filename::string =>
-  isPixel::bool? =>
-  Reprocessing_Types.Types.glEnvT =>
-  Reprocessing_Font.fontT;
+  (~filename: string, ~isPixel: bool=?, Reprocessing_Types.Types.glEnvT) => Reprocessing_Font.fontT;
 
 
-/** Draws text to the screen.
+/*** Draws text to the screen.
    * The font should be loaded using the `loadFont` function.
  */
 let text:
-  font::Reprocessing_Font.fontT =>
-  body::string =>
-  pos::(int, int) =>
-  Reprocessing_Types.Types.glEnvT =>
+  (
+    ~font: Reprocessing_Font.fontT,
+    ~body: string,
+    ~pos: (int, int),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
-/** Clears the entire screen. Normally, background is used for this purpose,
-  * clear will have different results in web and native. */
+
+/*** Clears the entire screen. Normally, background is used for this purpose,
+ * clear will have different results in web and native. */
 let clear: Reprocessing_Types.Types.glEnvT => unit;
 
-/** The `background` function sets the color used for the background of the
+
+/*** The `background` function sets the color used for the background of the
    * Processing window. The default background is black. This function is
    * typically used within `draw` to clear the display window at the beginning of
    * each frame, but it can be used inside `setup` to set the background on the
    * first frame of animation or if the backgound need only be set once.
  */
-let background:
-  Reprocessing_Types.Types.colorT => Reprocessing_Types.Types.glEnvT => unit;
+let background: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;

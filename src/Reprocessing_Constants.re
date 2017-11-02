@@ -10,7 +10,7 @@ let green = {r: 0., g: 1., b: 0., a: 1.};
 
 let blue = {r: 0., g: 0., b: 1., a: 1.};
 
-let pi = 4.0 *. atan 1.0;
+let pi = 4.0 *. atan(1.0);
 
 let two_pi = 2.0 *. pi;
 
