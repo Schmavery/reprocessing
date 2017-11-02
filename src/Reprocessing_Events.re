@@ -1,5 +1,4 @@
-type buttonStateT =
-  Reasongl.Gl.Events.buttonStateT = | LeftButton | MiddleButton | RightButton;
+type buttonStateT = Reasongl.Gl.Events.buttonStateT = | LeftButton | MiddleButton | RightButton;
 
 type stateT = Reasongl.Gl.Events.stateT = | MouseDown | MouseUp;
 
