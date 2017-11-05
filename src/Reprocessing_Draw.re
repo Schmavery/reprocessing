@@ -210,19 +210,19 @@ let bezier p1::(xx1, yy1) p2::(xx2, yy2) p3::(xx3, yy3) p4::(xx4, yy4) (env: glE
     let a1 = atan2 tangent_y1 tangent_x1 -. Reprocessing_Constants.half_pi;
     let a2 = atan2 tangent_y2 tangent_x2 -. Reprocessing_Constants.half_pi;
     quadf
-      (
+      p1::(
         x1 +. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
         y1 +. sin a1 *. float_of_int env.style.strokeWeight /. 2.
       )
-      (
+      p2::(
         x1 -. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
         y1 -. sin a1 *. float_of_int env.style.strokeWeight /. 2.
       )
-      (
+      p3::(
         x2 -. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
         y2 -. sin a2 *. float_of_int env.style.strokeWeight /. 2.
       )
-      (
+      p4::(
         x2 +. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
         y2 +. sin a2 *. float_of_int env.style.strokeWeight /. 2.
       )
@@ -271,19 +271,19 @@ let curve (xx1, yy1) (xx2, yy2) (xx3, yy3) (xx4, yy4) (env: glEnv) =>
     let a1 = atan2 tangent_y1 tangent_x1 -. Reprocessing_Constants.half_pi;
     let a2 = atan2 tangent_y2 tangent_x2 -. Reprocessing_Constants.half_pi;
     quadf
-      (
+      p1::(
         x1 +. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
         y1 +. sin a1 *. float_of_int env.style.strokeWeight /. 2.
       )
-      (
+      p2::(
         x1 -. cos a1 *. float_of_int env.style.strokeWeight /. 2.,
         y1 -. sin a1 *. float_of_int env.style.strokeWeight /. 2.
       )
-      (
+      p3::(
         x2 -. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
         y2 -. sin a2 *. float_of_int env.style.strokeWeight /. 2.
       )
-      (
+      p4::(
         x2 +. cos a2 *. float_of_int env.style.strokeWeight /. 2.,
         y2 +. sin a2 *. float_of_int env.style.strokeWeight /. 2.
       )

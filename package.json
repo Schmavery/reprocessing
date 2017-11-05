@@ -21,6 +21,6 @@
   "author": "bsansouci & schmavery",
   "devDependencies": {
     "browserify": "*",
-    "bs-platform": "bsansouci/bsb-native#teset"
+    "bs-platform": "bsansouci/bsb-native"
   }
 }
