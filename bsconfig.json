@@ -1,18 +1,29 @@
 {
-  "name" : "Reprocessing",
+  "name": "Reprocessing",
   "ppx-flags": ["matchenv/matchenv"],
-  "sources" :[
-    { "dir": "src", "subdirs": [
-      {"dir":"native", "kind":["bytecode"] },
-      {"dir":"web", "kind":["native", "js"] }
-    ]},
-    { "dir": "examples", "type": "dev"}
-  ],
+  "sources": [{
+    "dir": "src",
+    "subdirs": [{
+      "dir": "native",
+      "backend": ["bytecode"]
+    }, {
+      "dir": "web",
+      "backend": ["native", "js"]
+    }]
+  }, {
+    "dir": "examples",
+    "type": "dev"
+  }],
   "bs-dependencies": ["ReasonglInterface", "ReasonglWeb", "ReasonglNative"],
-  "entries": [
-    {"kind": "native", "main": "Index"},
-    {"kind": "bytecode", "main": "Index"},
-    {"kind": "js", "main": "Index"}
-  ],
+  "entries": [{
+    "backend": "native",
+    "main-module": "Index"
+  }, {
+    "backend": "bytecode",
+    "main-module": "Index"
+  }, {
+    "backend": "js",
+    "main-module": "Index"
+  }],
+  "refmt": 2
 }
-
