@@ -241,7 +241,7 @@ let drawGeometry
 
   /** Tell OpenGL about what the uniform called `uSampler` is pointing at, here it's given 0 which is what
       texture0 represent.  **/
-  Gl.uniform1i context::env.gl location::env.uSampler val::0;
+  Gl.uniform1i context::env.gl location::env.uSampler value::0;
 
   /** Bind `elementBuffer`, a pointer to GPU memory to `element_array_buffer`. That "register" is used for
       the data representing the indices of the vertex. **/
