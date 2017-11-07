@@ -5,8 +5,7 @@
   "scripts": {
     "build": "bsb -make-world -backend js",
     "build:bytecode": "bsb -make-world -backend bytecode",
-    "build:native": "bsb -make-world -backend native",
-    "buildweb": "bsb -make-world -backend js && webpack -d lib/js/src/index.js lib/js/src/app.js"
+    "build:native": "bsb -make-world -backend native"
   },
   "dependencies": {
     "ReasonglInterface": "github:bsansouci/reasongl-interface",
@@ -16,11 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bsansouci/reprocessing.git"
+    "url": "git+https://github.com/schmavery/reprocessing.git"
   },
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "browserify": "*",
     "bs-platform": "bsansouci/bsb-native"
   }
 }

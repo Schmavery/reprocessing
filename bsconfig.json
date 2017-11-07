@@ -24,6 +24,15 @@
   }, {
     "backend": "js",
     "main-module": "Index"
+  }, {
+    "backend": "native",
+    "main-module": "Noise"
+  }, {
+    "backend": "bytecode",
+    "main-module": "Noise"
+  }, {
+    "backend": "js",
+    "main-module": "Noise"
   }],
-  "refmt": 2
+  "refmt": 3
 }
