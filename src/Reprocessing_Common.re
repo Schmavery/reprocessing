@@ -7,6 +7,11 @@ type strokeCapT =
   | Square
   | Project;
 
+type rectModeT =
+  | Corner
+  | Center
+  | Radius;
+
 type glState = Gl.Window.t;
 
 type glCamera = {projectionMatrix: Gl.Mat4.t};
@@ -22,7 +27,8 @@ type styleT = {
   strokeColor: option(colorT),
   strokeWeight: int,
   strokeCap: strokeCapT,
-  fillColor: option(colorT)
+  fillColor: option(colorT),
+  rectMode: rectModeT
 };
 
 type mouseT = {

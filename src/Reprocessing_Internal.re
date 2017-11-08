@@ -161,7 +161,8 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
       fillColor: Some({r: 0., g: 0., b: 0., a: 1.}),
       strokeWeight: 3,
       strokeCap: Round,
-      strokeColor: None
+      strokeColor: None,
+      rectMode: Corner
     },
     styleStack: [],
     matrix: Matrix.createIdentity(),

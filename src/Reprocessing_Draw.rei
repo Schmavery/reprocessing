@@ -79,6 +79,23 @@ let strokeWeight: (int, Reprocessing_Types.Types.glEnvT) => unit;
 let strokeCap: (Reprocessing_Types.Types.strokeCapT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
+/*** Sets the style to modify the location from which rectangles are drawn by
+  * changing the way in which parameters given to rect() and rectf() are intepreted.
+  *
+  * The default mode is rectMode(Corner), which interprets the position of rect()
+  * as the upper-left corner of the shape, while the third and fourth parameters
+  * are its width and height.
+  *
+  * rectMode(Center) interprets the position of rect() as the shape's center point,
+  * while the third and fourth parameters are its width and height.
+  *
+  * rectMode(Radius) also uses the position of rect() as the shape's center point,
+  * but uses the third and fourth parameters to specify half of the shapes's width
+  * and height.
+ */
+let rectMode: (Reprocessing_Types.Types.rectModeT, Reprocessing_Types.Types.glEnvT) => unit;
+
+
 /*** The `pushStyle` function saves the current style settings and `popStyle`
    * restores the prior settings. Note that these functions are always used
    * together. They allow you to change the style settings and later return to

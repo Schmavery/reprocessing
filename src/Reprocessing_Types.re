@@ -4,6 +4,7 @@ module type TypesT = {
   type imageT = Reprocessing_Common.imageT;
   type fontT = Reprocessing_Font.fontT;
   type strokeCapT = Reprocessing_Common.strokeCapT;
+  type rectModeT = Reprocessing_Common.rectModeT;
 };
 
 module Types: TypesT = {
@@ -12,4 +13,5 @@ module Types: TypesT = {
   type imageT = Reprocessing_Common.imageT;
   type fontT = Reprocessing_Font.fontT;
   type strokeCapT = Reprocessing_Common.strokeCapT;
+  type rectModeT = Reprocessing_Common.rectModeT;
 };

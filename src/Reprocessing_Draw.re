@@ -28,6 +28,8 @@ let strokeWeight = (weight, env) => env.style = {...env.style, strokeWeight: wei
 
 let strokeCap = (cap, env) => env.style = {...env.style, strokeCap: cap};
 
+let rectMode = (rm, env) => env.style = {...env.style, rectMode: rm};
+
 let pushStyle = (env) => env.styleStack = [env.style, ...env.styleStack];
 
 let popStyle = (env) =>
@@ -189,7 +191,38 @@ let quad = (~p1 as (x1, y1), ~p2 as (x2, y2), ~p3 as (x3, y3), ~p4 as (x4, y4), 
   );
 
 let rectf = (~pos as (x, y), ~width, ~height, env: glEnv) =>
-  quadf(~p1=(x, y), ~p2=(x +. width, y), ~p3=(x +. width, y +. height), ~p4=(x, y +. height), env);
+  switch env.style.rectMode {
+  | Corner =>
+    quadf(
+      ~p1=(x, y),
+      ~p2=(x +. width, y),
+      ~p3=(x +. width, y +. height),
+      ~p4=(x, y +. height),
+      env
+    )
+  | Center =>
+    let x = x -. width /. 2.;
+    let y = y -. height /. 2.;
+    quadf(
+      ~p1=(x, y),
+      ~p2=(x +. width, y),
+      ~p3=(x +. width, y +. height),
+      ~p4=(x, y +. height),
+      env
+    )
+  | Radius =>
+    let x = x -. width;
+    let y = y -. height;
+    let width = width *. 2.;
+    let height = height *. 2.;
+    quadf(
+      ~p1=(x, y),
+      ~p2=(x +. width, y),
+      ~p3=(x +. width, y +. height),
+      ~p4=(x, y +. height),
+      env
+    )
+  };
 
 let rect = (~pos as (x, y), ~width, ~height, env: glEnv) =>
   rectf(
