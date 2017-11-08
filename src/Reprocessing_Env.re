@@ -12,6 +12,12 @@ let mousePressed = (env) => env.mouse.pressed;
 
 let keyCode = (env) => env.keyboard.keyCode;
 
+let key = (key, env) => Reprocessing_Common.KeySet.mem(key, env.keyboard.down);
+
+let keyPressed = (key, env) => Reprocessing_Common.KeySet.mem(key, env.keyboard.pressed);
+
+let keyReleased = (key, env) => Reprocessing_Common.KeySet.mem(key, env.keyboard.released);
+
 let size = (~width, ~height, env: glEnv) => {
   Reasongl.Gl.Window.setWindowSize(~window=env.window, ~width, ~height);
   Reprocessing_Internal.resetSize(env, width, height)

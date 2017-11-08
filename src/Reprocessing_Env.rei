@@ -10,6 +10,12 @@ let mousePressed: Reprocessing_Types.Types.glEnvT => bool;
 
 let keyCode: Reprocessing_Types.Types.glEnvT => Reprocessing_Events.keycodeT;
 
+let key: (Reprocessing_Common.KeySet.elt, Reprocessing_Common.glEnv) => bool;
+
+let keyPressed: (Reprocessing_Common.KeySet.elt, Reprocessing_Common.glEnv) => bool;
+
+let keyReleased: (Reprocessing_Common.KeySet.elt, Reprocessing_Common.glEnv) => bool;
+
 let size: (~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) => unit;
 
 let resizeable: (bool, Reprocessing_Types.Types.glEnvT) => unit;

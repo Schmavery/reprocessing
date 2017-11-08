@@ -37,7 +37,20 @@ type mouseT = {
   mutable pressed: bool
 };
 
-type keyboardT = {mutable keyCode: Reprocessing_Events.keycodeT};
+module KeySet =
+  Set.Make(
+    {
+      type t = Reprocessing_Events.keycodeT;
+      let compare = compare;
+    }
+  );
+
+type keyboardT = {
+  mutable keyCode: Reprocessing_Events.keycodeT,
+  mutable pressed: KeySet.t,
+  mutable released: KeySet.t,
+  mutable down: KeySet.t
+};
 
 type frameT = {
   count: int,

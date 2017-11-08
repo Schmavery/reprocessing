@@ -36,6 +36,8 @@ let afterDraw = (f, env: Common.glEnv) => {
   let rate = int_of_float(1000. /. f);
   env.mouse.prevPos = env.mouse.pos;
   env.frame = {count: env.frame.count + 1, rate, deltaTime: f /. 1000.};
+  env.keyboard.released = Common.KeySet.empty;
+  env.keyboard.pressed = Common.KeySet.empty;
   Matrix.copyInto(~src=Matrix.identity, ~dst=env.matrix);
   /* Flush the batching buffer at the end of every frame. */
   if (env.batch.elementPtr > 0) {
@@ -275,13 +277,17 @@ let run =
         (~keycode, ~repeat) => {
           env.keyboard.keyCode = keycode;
           if (! repeat) {
-            userState := fns.keyPressed(userState^, env)
+            userState := fns.keyPressed(userState^, env);
+            env.keyboard.pressed = Common.KeySet.add(keycode, env.keyboard.pressed);
+            env.keyboard.down = Common.KeySet.add(keycode, env.keyboard.down)
           };
           userState := fns.keyTyped(userState^, env)
         },
       ~keyUp=
         (~keycode) => {
           env.keyboard.keyCode = keycode;
+          env.keyboard.released = Common.KeySet.add(keycode, env.keyboard.released);
+          env.keyboard.down = Common.KeySet.remove(keycode, env.keyboard.down);
           userState := fns.keyReleased(userState^, env)
         },
       ()
