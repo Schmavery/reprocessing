@@ -170,7 +170,7 @@ let quadf = (~p1, ~p2, ~p3, ~p4, env: glEnv) => {
     Internal.drawLine(~p1=p2, ~p2=p3, ~color, ~width, ~project, env);
     Internal.drawLine(~p1=p3, ~p2=p4, ~color, ~width, ~project, env);
     Internal.drawLine(~p1, ~p2=p4, ~color, ~width, ~project, env);
-    let r = float_of_int(env.style.strokeWeight) /. 2.;
+    let r = width /. 2.;
     let m = Matrix.identity;
     Internal.drawEllipse(env, p1, r, r, m, color);
     Internal.drawEllipse(env, p2, r, r, m, color);
@@ -287,23 +287,12 @@ let bezier =
       bezierTangent((xx1, yy1), (xx2, yy2), (xx3, yy3), (xx4, yy4), float_of_int(i + 1) /. 20.0);
     let a1 = atan2(tangent_y1, tangent_x1) -. Reprocessing_Constants.half_pi;
     let a2 = atan2(tangent_y2, tangent_x2) -. Reprocessing_Constants.half_pi;
+    let strokeWeightf = float_of_int(env.style.strokeWeight);
     quadf(
-      ~p1=(
-        x1 +. cos(a1) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y1 +. sin(a1) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
-      ~p2=(
-        x1 -. cos(a1) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y1 -. sin(a1) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
-      ~p3=(
-        x2 -. cos(a2) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y2 -. sin(a2) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
-      ~p4=(
-        x2 +. cos(a2) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y2 +. sin(a2) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
+      ~p1=(x1 +. cos(a1) *. strokeWeightf /. 2., y1 +. sin(a1) *. strokeWeightf /. 2.),
+      ~p2=(x1 -. cos(a1) *. strokeWeightf /. 2., y1 -. sin(a1) *. strokeWeightf /. 2.),
+      ~p3=(x2 -. cos(a2) *. strokeWeightf /. 2., y2 -. sin(a2) *. strokeWeightf /. 2.),
+      ~p4=(x2 +. cos(a2) *. strokeWeightf /. 2., y2 +. sin(a2) *. strokeWeightf /. 2.),
       env
     )
   };
@@ -370,23 +359,12 @@ let curve = ((xx1, yy1), (xx2, yy2), (xx3, yy3), (xx4, yy4), env: glEnv) =>
       curveTangent((xx1, yy1), (xx2, yy2), (xx3, yy3), (xx4, yy4), float_of_int(i + 1) /. 20.0);
     let a1 = atan2(tangent_y1, tangent_x1) -. Reprocessing_Constants.half_pi;
     let a2 = atan2(tangent_y2, tangent_x2) -. Reprocessing_Constants.half_pi;
+    let strokeWeightf = float_of_int(env.style.strokeWeight);
     quadf(
-      ~p1=(
-        x1 +. cos(a1) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y1 +. sin(a1) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
-      ~p2=(
-        x1 -. cos(a1) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y1 -. sin(a1) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
-      ~p3=(
-        x2 -. cos(a2) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y2 -. sin(a2) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
-      ~p4=(
-        x2 +. cos(a2) *. float_of_int(env.style.strokeWeight) /. 2.,
-        y2 +. sin(a2) *. float_of_int(env.style.strokeWeight) /. 2.
-      ),
+      ~p1=(x1 +. cos(a1) *. strokeWeightf /. 2., y1 +. sin(a1) *. strokeWeightf /. 2.),
+      ~p2=(x1 -. cos(a1) *. strokeWeightf /. 2., y1 -. sin(a1) *. strokeWeightf /. 2.),
+      ~p3=(x2 -. cos(a2) *. strokeWeightf /. 2., y2 -. sin(a2) *. strokeWeightf /. 2.),
+      ~p4=(x2 +. cos(a2) *. strokeWeightf /. 2., y2 +. sin(a2) *. strokeWeightf /. 2.),
       env
     )
   };
@@ -421,7 +399,7 @@ let trianglef = (~p1, ~p2, ~p3, env: glEnv) => {
     Internal.drawLine(~p1, ~p2, ~color, ~width, ~project, env);
     Internal.drawLine(~p1=p2, ~p2=p3, ~color, ~width, ~project, env);
     Internal.drawLine(~p1, ~p2=p3, ~color, ~width, ~project, env);
-    let r = float_of_int(env.style.strokeWeight) /. 2.;
+    let r = width /. 2.;
     let m = Matrix.identity;
     Internal.drawEllipse(env, p1, r, r, m, color);
     Internal.drawEllipse(env, p2, r, r, m, color);

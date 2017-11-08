@@ -192,6 +192,15 @@ let rectf:
 let rect: (~pos: (int, int), ~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) => unit;
 
 
+/*** Draws a curved line on the screen. The first parameter specifies
+   * the beginning control point and the last parameter specifies the ending
+   * control point. The middle parameters specify the start and stop of the curve.
+ */
+let curve:
+  ((float, float), (float, float), (float, float), (float, float), Reprocessing_Common.glEnv) =>
+  unit;
+
+
 /*** Draws a line (a direct path between two points) to the screen.
    * To color a line, use the `stroke` function. A line cannot be filled,
    * therefore the `fill` function will not affect the color of a line. Lines are
