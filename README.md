@@ -1,9 +1,42 @@
 # Reprocessing
 
-This is a high-level drawing library, inspired by [Processing](https://processing.org) and built on top of [bsansouci/reasongl](https://github.com/bsansouci/reasongl).  This means you can write graphics code once, and have the (exact) same code compile to run on web (webgl) and native (opengl).
-Everything you need should be accessible from the Reprocessing module.
+This is a high-level drawing library, inspired by [Processing](https://processing.org), allowing you to write code that'll run on the web (using WebGL) and natively (using OpenGL).
 
-If you have trouble installing or want to give any input for how to make this library better, please open an issue! :smile:
+
+## Example
+The [web environment](https://schmavery.github.io/reprocessing/) is the simplest way to try reprocessing. (It uses an older verison of the Reason syntax though, we're working on fixing that).
+
+The 2nd simplest way to try is to build [reprocessing-example](https://github.com/bsansouci/reprocessing-example).
+
+
+## Getting Started
+```bash
+npm install schmavery/reprocessing
+```
+
+### Example
+```reason
+open Reprocessing;
+
+let setup = (env) => {
+  Env.size(~width=600, ~height=600, env);
+};
+
+let draw = (_state, env) => {
+  Draw.background(Constants.black, env);
+  Draw.fill(Constants.red, env);
+  Draw.rect(~pos=(150, 150), ~width=300, ~height=300, env)
+};
+
+run(~setup, ~draw, ());
+```
+
+### Build
+```
+npm run build:web
+```
+
+This will draw a simple red square on a black background.  Compare this to [reglexampleproject](https://github.com/bsansouci/reasonglexampleproject/blob/simple/src/index.re), which takes 200+ lines to do the exact same thing.  This difference is even more notable on bigger projects.  Check out the code for a [draggable red square](https://github.com/Schmavery/reprocessing/blob/master/examples/redsquare.re).
 
 ## Demo
 There are a couple demos inside `examples`. Run `npm i` to install all deps and `npm run build` to build to JS (default). Open `index.html` in safari (or use `python -m SimpleHTTPServer 8000` to spawn a static server and go to `localhost:8000` in chrome).
@@ -14,30 +47,6 @@ Run `npm run build:native` to build to a native executable and run `./lib/bs/nat
 
 See also https://github.com/Schmavery/FlappyBird for a slightly bigger example.
 
-## Install
-```bash
-npm install Schmavery/reprocessing
-```
-
-This is a library, meant to be installed as a dependency (though you can also clone and play in the `examples` directory).  It builds using [bsb-native](https://github.com/bsansouci/bsb-native), and you will need to install this as a devDependency of your project if you want to try out the native version.
-
-## Example:
-```reason
-open Reprocessing;
-
-let setup = (env) => {
-  Env.size(~width=600, ~height=600, env);
-  Draw.fill(Constants.red, env)
-};
-
-let draw = (state, env) => {
-  Draw.background(Constants.black, env);
-  Draw.rect(~pos=(150, 150), ~width=300, ~height=300, env)
-};
-
-run(~setup, ~draw, ());
-```
-This will draw a simple red square on a black background.  Compare this to [reglexampleproject](https://github.com/bsansouci/reasonglexampleproject/blob/simple/src/index.re), which takes 200+ lines to do the exact same thing.  This difference is even more notable on bigger projects.  Check out the code for a [draggable red square](https://github.com/Schmavery/reprocessing/blob/master/examples/redsquare.re).
 
 # Some Differences from Processing
 - There is no magic - everything is proper Reason code.  This means that you have to call `Reprocessing.run` with the functions that you want to use.  You also have a couple of options about which utility modules to open.  See the `examples` directory for some different ways to do this.  It is recommended to `open Reprocessing` at the top, and then you can optionally open `Draw`, `Env` and `Utils` to make it look more like Processing code. Alternatively, they can be used directly, as can be seen above.
