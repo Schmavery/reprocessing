@@ -40,7 +40,10 @@ let copyInto = (~src, ~dst) => {
  */
 let matmatmul = (mat1: array(float), mat2: array(float)) =>
   switch (mat1, mat2) {
-  | ([|m0, m1, m2, m3, m4, m5, m6, m7, m8|], [|ma, mb, mc, md, me, mf, mg, mh, mi|]) =>
+  | (
+      [|m0, m1, m2, m3, m4, m5, m6, m7, m8|],
+      [|ma, mb, mc, md, me, mf, mg, mh, mi|]
+    ) =>
     mat1[0] = ma *. m0 +. md *. m1 +. mg *. m2;
     mat1[1] = mb *. m0 +. me *. m1 +. mh *. m2;
     mat1[2] = mc *. m0 +. mf *. m1 +. mi *. m2;
@@ -74,4 +77,61 @@ let matvecmul = (m, v) => {
  [3 4 5] * [y] = [x3 + y4 + 5]
  [6 7 8]   [1]   [ who cares ]
  */
-let matptmul = (m, (x, y)) => (x *. m[0] +. y *. m[1] +. m[2], x *. m[3] +. y *. m[4] +. m[5]);
+let matptmul = (m, (x, y)) => (
+  x *. m[0] +. y *. m[1] +. m[2],
+  x *. m[3] +. y *. m[4] +. m[5]
+);
+
+
+/***
+ Invert a matrix
+ https://www.geometrictools.com/Documentation/LaplaceExpansionTheorem.pdf
+ */
+let matinv = (mat) =>
+  switch mat {
+  | [|m00, m01, m02, m10, m11, m12, m20, m21, m22|] =>
+    let det =
+      m00
+      *. m11
+      *. m22
+      +. m01
+      *. m12
+      *. m20
+      +. m02
+      *. m10
+      *. m21
+      -. m00
+      *. m12
+      *. m21
+      -. m01
+      *. m10
+      *. m22
+      -. m02
+      *. m11
+      *. m20;
+    if (det == 0.) {
+      invalid_arg("The current transform matrix cannot be inverted")
+    };
+    let invdet = 1. /. det;
+    let adj00 = m11 *. m22 -. m12 *. m21;
+    let adj01 = -. (m01 *. m22 -. m02 *. m21);
+    let adj02 = m01 *. m12 -. m02 *. m11;
+    let adj10 = -. (m10 *. m22 -. m12 *. m20);
+    let adj11 = m00 *. m22 -. m02 *. m20;
+    let adj12 = -. (m00 *. m12 -. m02 *. m10);
+    let adj20 = m10 *. m21 -. m11 *. m20;
+    let adj21 = -. (m00 *. m21 -. m01 *. m20);
+    let adj22 = m00 *. m11 -. m01 *. m10;
+    [|
+      invdet *. adj00,
+      invdet *. adj01,
+      invdet *. adj02,
+      invdet *. adj10,
+      invdet *. adj11,
+      invdet *. adj12,
+      invdet *. adj20,
+      invdet *. adj21,
+      invdet *. adj22
+    |]
+  | _ => assert false
+  };
