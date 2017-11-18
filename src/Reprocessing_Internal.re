@@ -47,8 +47,8 @@ let getProgram =
   }
 };
 
-let createCanvas = (window, height: int, width: int) : glEnv => {
-  Gl.Window.setWindowSize(~window, ~width, ~height);
+let createCanvas = (window) : glEnv => {
+  let (width, height) = (Gl.Window.getWidth(window), Gl.Window.getHeight(window));
   let context = Gl.Window.getContext(window);
   Gl.viewport(~context, ~x=(-1), ~y=(-1), ~width, ~height);
   Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=1.);
@@ -96,14 +96,14 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
   let uSampler = Gl.getUniformLocation(~context, ~program, ~name="uSampler");
 
   /*** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
-  Gl.texImage2D_RGBA(
+  Gl.fillTextureWithColor(
     ~context,
     ~target=RGLConstants.texture_2d,
     ~level=0,
-    ~width=1,
-    ~height=1,
-    ~border=0,
-    ~data=Gl.Bigarray.of_array(Gl.Bigarray.Uint8, [|255, 255, 255, 255|])
+    ~red=255,
+    ~green=255,
+    ~blue=255,
+    ~alpha=255
   );
   Gl.texParameteri(
     ~context,
@@ -136,6 +136,12 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
     ~near=0.,
     ~far=1.
   );
+
+  Gl.uniformMatrix4fv(
+        ~context=context,
+        ~location=pMatrixUniform,
+        ~value=camera.projectionMatrix
+      );
   {
     camera,
     window,
@@ -647,6 +653,7 @@ let drawArcStroke =
 let loadImage = (env: glEnv, filename, isPixel) : imageT => {
   let imageRef = ref(None);
   Gl.loadImage(
+    ~context=env.gl,
     ~filename,
     ~callback=
       (imageData) =>
