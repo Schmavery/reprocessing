@@ -1,4 +1,5 @@
 let vertexShaderSource = {|
+  precision highp float;
   attribute vec2 aVertexPosition;
   attribute vec4 aVertexColor;
   attribute vec2 aTextureCoord;
@@ -16,6 +17,7 @@ let vertexShaderSource = {|
 |};
 
 let fragmentShaderSource = {|
+  precision highp float;
   varying vec4 vColor;
   varying vec2 vTextureCoord;
 
