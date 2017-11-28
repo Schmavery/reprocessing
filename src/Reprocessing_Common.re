@@ -142,6 +142,19 @@ module Stream = {
     } else {
       None
     };
+  let skipWhite = ((str, i): t): t => {
+    let len = String.length(str);
+    let rec loop = n => {
+      if (i + n >= len) {
+        (str, i + n)
+      } else if (str.[i + n] === ' ') {
+        loop(n + 1)
+      } else {
+        (str, i + n)
+      }
+    };
+    loop(0);
+  };
   let popn = ((str, i), len) => (str, i + len);
   let switch_ = (stream, matchstr) => {
     let len = String.length(matchstr);

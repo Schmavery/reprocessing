@@ -65,24 +65,24 @@ module Font = {
     | None => failwith("could not pop line")
     };
   let rec parse_char_fmt = (stream, num, map) =>
-    if (num < 0) {
+    if (num <= 0) {
       (stream, map)
     } else {
       let stream = Stream.switch_(stream, "char id=");
       let (stream, char_id) = parse_num(stream);
-      let stream = Stream.switch_(stream, " x=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "x=");
       let (stream, x) = parse_num(stream);
-      let stream = Stream.switch_(stream, " y=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "y=");
       let (stream, y) = parse_num(stream);
-      let stream = Stream.switch_(stream, " width=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "width=");
       let (stream, width) = parse_num(stream);
-      let stream = Stream.switch_(stream, " height=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "height=");
       let (stream, height) = parse_num(stream);
-      let stream = Stream.switch_(stream, " xoffset=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "xoffset=");
       let (stream, xoffset) = parse_num(stream);
-      let stream = Stream.switch_(stream, " yoffset=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "yoffset=");
       let (stream, yoffset) = parse_num(stream);
-      let stream = Stream.switch_(stream, " xadvance=");
+      let stream = Stream.switch_(Stream.skipWhite(stream), "xadvance=");
       let (stream, xadvance) = parse_num(stream);
       let stream = pop_line(stream);
       let new_map = IntMap.add(char_id, {x, y, width, height, xoffset, yoffset, xadvance}, map);
