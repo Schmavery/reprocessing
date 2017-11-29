@@ -68,21 +68,21 @@ module Font = {
     if (num <= 0) {
       (stream, map)
     } else {
-      let stream = Stream.switch_(stream, "char id=");
+      let stream = Stream.match(stream, "char id=");
       let (stream, char_id) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "x=");
+      let stream = Stream.match(Stream.skipWhite(stream), "x=");
       let (stream, x) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "y=");
+      let stream = Stream.match(Stream.skipWhite(stream), "y=");
       let (stream, y) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "width=");
+      let stream = Stream.match(Stream.skipWhite(stream), "width=");
       let (stream, width) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "height=");
+      let stream = Stream.match(Stream.skipWhite(stream), "height=");
       let (stream, height) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "xoffset=");
+      let stream = Stream.match(Stream.skipWhite(stream), "xoffset=");
       let (stream, xoffset) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "yoffset=");
+      let stream = Stream.match(Stream.skipWhite(stream), "yoffset=");
       let (stream, yoffset) = parse_num(stream);
-      let stream = Stream.switch_(Stream.skipWhite(stream), "xadvance=");
+      let stream = Stream.match(Stream.skipWhite(stream), "xadvance=");
       let (stream, xadvance) = parse_num(stream);
       let stream = pop_line(stream);
       let new_map = IntMap.add(char_id, {x, y, width, height, xoffset, yoffset, xadvance}, map);
@@ -92,11 +92,11 @@ module Font = {
     if (num == 0) {
       (stream, map)
     } else {
-      let stream = Stream.switch_(stream, "kerning first=");
+      let stream = Stream.match(stream, "kerning first=");
       let (stream, first) = parse_num(stream);
-      let stream = Stream.switch_(stream, " second=");
+      let stream = Stream.match(stream, " second=");
       let (stream, second) = parse_num(stream);
-      let stream = Stream.switch_(stream, " amount=");
+      let stream = Stream.match(stream, " amount=");
       let (stream, amount) = parse_num(stream);
       let stream = pop_line(stream);
       let new_map = IntPairMap.add((first, second), amount, map);
@@ -121,14 +121,14 @@ module Font = {
         (str) => {
           let stream = Stream.create(str ++ "\n");
           let stream = stream |> pop_line |> pop_line;
-          let stream = Stream.switch_(stream, "page id=0 file=\"");
+          let stream = Stream.match(stream, "page id=0 file=\"");
           let (stream, filename) = parse_string(stream);
           let stream = pop_line(stream);
-          let stream = Stream.switch_(stream, "chars count=");
+          let stream = Stream.match(stream, "chars count=");
           let (stream, num_chars) = parse_num(stream);
           let stream = pop_line(stream);
           let (stream, char_map) = parse_char_fmt(stream, num_chars, IntMap.empty);
-          let stream = Stream.switch_(stream, "kernings count=");
+          let stream = Stream.match(stream, "kernings count=");
           let (stream, num_kerns) = parse_num(stream);
           let stream = pop_line(stream);
           let (_, kern_map) = parse_kern_fmt(stream, num_kerns, IntPairMap.empty);
