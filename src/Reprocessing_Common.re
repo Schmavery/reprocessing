@@ -142,8 +142,21 @@ module Stream = {
     } else {
       None
     };
+  let skipWhite = ((str, i): t): t => {
+    let len = String.length(str);
+    let rec loop = n => {
+      if (n >= len) {
+        (str, n)
+      } else if (str.[n] === ' ') {
+        loop(n + 1)
+      } else {
+        (str, n)
+      }
+    };
+    loop(i);
+  };
   let popn = ((str, i), len) => (str, i + len);
-  let switch_ = (stream, matchstr) => {
+  let match = (stream, matchstr) => {
     let len = String.length(matchstr);
     switch (peekn(stream, len)) {
     | Some(peek) when peek == matchstr => popn(stream, len)
