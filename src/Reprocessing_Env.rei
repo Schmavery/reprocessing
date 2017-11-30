@@ -43,3 +43,6 @@ let localizePoint: ((int, int), Reprocessing_Types.Types.glEnvT) => (int, int);
 
 let localizePointf:
   ((float, float), Reprocessing_Types.Types.glEnvT) => (float, float);
+
+let loadUserData: (~key: string, Reprocessing_Types.Types.glEnvT) => option('a);
+let saveUserData: (~key: string, ~value: 'a, Reprocessing_Types.Types.glEnvT) => bool;
