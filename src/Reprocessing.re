@@ -253,8 +253,8 @@ let run =
               | None => ()
               | Some(font) =>
                 let body = Printf.sprintf("%-0.2fms", 1000. *. (afterDrawTime -. beforeDrawTime));
-                let w = Env.width(env);
-                Draw.text(~font, ~body, ~pos=(w - 30, 0), env)
+                let h = Env.width(env);
+                Draw.text(~font, ~body, ~pos=(5, h - 20), env)
               };
               afterDraw(f, env)
             },
