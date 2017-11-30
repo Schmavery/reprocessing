@@ -6,6 +6,10 @@ let width = (env) => env.size.width;
 
 let height = (env) => env.size.height;
 
+let windowWidth = (env) => Reasongl.Gl.Window.getWidth(env.window);
+
+let windowHeight = (env) => Reasongl.Gl.Window.getHeight(env.window);
+
 let mouse = (env) => env.mouse.pos;
 
 let pmouse = (env) => env.mouse.prevPos;
