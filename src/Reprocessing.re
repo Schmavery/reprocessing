@@ -288,24 +288,6 @@ let run =
               } else {
                 Env.size(~width=Env.width(env), ~height=Env.height(env), env)
               },
-          ~mouseMove=
-            (~x, ~y) => {
-              env.mouse.pos = (x, y);
-              if (env.mouse.pressed) {
-                userState := fns.mouseDragged(userState^, env)
-              } else {
-                userState := fns.mouseMove(userState^, env)
-              }
-            },
-          ~windowResize=
-            () =>
-              if (env.size.resizeable) {
-                let height = Gl.Window.getHeight(env.window);
-                let width = Gl.Window.getWidth(env.window);
-                resetSize(env, width, height)
-              } else {
-                Env.size(~width=Env.width(env), ~height=Env.height(env), env)
-              },
           ~keyDown=
             (~keycode, ~repeat) => {
               env.keyboard.keyCode = keycode;
