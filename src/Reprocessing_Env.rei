@@ -2,10 +2,6 @@ let width: Reprocessing_Types.Types.glEnvT => int;
 
 let height: Reprocessing_Types.Types.glEnvT => int;
 
-let windowWidth: Reprocessing_Types.Types.glEnvT => int;
-
-let windowHeight: Reprocessing_Types.Types.glEnvT => int;
-
 let mouse: Reprocessing_Types.Types.glEnvT => (int, int);
 
 let pmouse: Reprocessing_Types.Types.glEnvT => (int, int);

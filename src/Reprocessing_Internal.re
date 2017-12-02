@@ -47,7 +47,8 @@ let getProgram =
   }
 };
 
-let createCanvas = (window, height: int, width: int) : glEnv => {
+let createCanvas = (window) : glEnv => {
+  let (width, height) = (Gl.Window.getWidth(window), Gl.Window.getHeight(window));
   Gl.Window.setWindowSize(~window, ~width, ~height);
   let context = Gl.Window.getContext(window);
   Gl.viewport(~context, ~x=(-1), ~y=(-1), ~width, ~height);

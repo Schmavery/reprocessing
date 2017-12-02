@@ -128,7 +128,7 @@ let run =
       ~title=?title,
       ~argv=Sys.argv,
       (window) => {
-        let env = Reprocessing_Internal.createCanvas(window, 200, 200);
+        let env = Reprocessing_Internal.createCanvas(window);
         let userState = ref(setup(env));
         let monitorFont =
           switch perfMonitorFont {
