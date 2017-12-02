@@ -246,17 +246,18 @@ let run =
               | Some(_) => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
               | None => ()
               };
-              let beforeDrawTime = Unix.gettimeofday();
+              let beforeDrawTime = Gl.getTimeMs();
               userState := fns.draw(userState^, env);
-              let afterDrawTime = Unix.gettimeofday();
+              let afterDrawTime = Gl.getTimeMs();
+              let fr = Env.frameRate(env);
               switch monitorFont {
               | None => ()
               | Some(font) =>
-                let body = Printf.sprintf("%-0.2fms", 1000. *. (afterDrawTime -. beforeDrawTime));
+                let body = Printf.sprintf("%d fps : %-0.2fms", fr, afterDrawTime -. beforeDrawTime);
                 let h = Env.width(env);
                 Draw.text(~font, ~body, ~pos=(5, h - 20), env)
               };
-              afterDraw(f, env)
+              afterDraw(f, env);
             },
           ~mouseDown=
             (~button as _, ~state as _, ~x, ~y) => {
