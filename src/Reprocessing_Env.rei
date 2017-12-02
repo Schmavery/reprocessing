@@ -26,6 +26,17 @@ let frameRate: Reprocessing_Types.Types.glEnvT => int;
 
 let frameCount: Reprocessing_Types.Types.glEnvT => int;
 
+let loadSound: (string, Reprocessing_Types.Types.glEnvT) => Reprocessing_Types.Types.soundT;
+
+let playSound:
+  (
+    Reprocessing_Types.Types.soundT,
+    ~volume: float=?,
+    ~loop: bool=?,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
+
 
 /*** Time in seconds since the last frame */
 let deltaTime: Reprocessing_Types.Types.glEnvT => float;

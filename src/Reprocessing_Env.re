@@ -43,3 +43,26 @@ let localizePoint = ((x, y): (int, int), env: glEnv) => {
     Matrix.(matptmul(matinv(env.matrix), (float_of_int(x), float_of_int(y))));
   (int_of_float(lx), int_of_float(ly))
 };
+
+let loadSound = (path, env) => {
+  let sound = ref(Loading);
+  Reasongl.Gl.Audio.loadSound(
+    env.window,
+    path,
+    (v) => {
+      switch sound^ {
+      | ShouldPlay(volume, loop) => Reasongl.Gl.Audio.playSound(env.window, v, ~volume, ~loop)
+      | _ => ()
+      };
+      sound := Loaded(v)
+    }
+  );
+  sound
+};
+
+let playSound = (sound, ~volume=1.0, ~loop=false, env) =>
+  switch sound^ {
+  | Loading
+  | ShouldPlay(_, _) => sound := ShouldPlay(volume, loop)
+  | Loaded(sound) => Reasongl.Gl.Audio.playSound(env.window, sound, ~volume, ~loop)
+  };
