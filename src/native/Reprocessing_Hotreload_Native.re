@@ -2,6 +2,8 @@ let load_plug = (fname) => {
   let fname = Dynlink.adapt_filename(fname);
   if (Sys.file_exists(fname)) {
     try (Dynlink.loadfile(fname)) {
+    | Dynlink.Error(Dynlink.Inconsistent_import(name)) =>
+      print_endline("Inconsistent import " ++ name ++ ". You probably have an error.")
     | Dynlink.Error(err) as e =>
       print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err));
       raise(e)

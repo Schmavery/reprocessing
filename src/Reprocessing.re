@@ -90,6 +90,7 @@ let run =
       ~keyReleased=?,
       ~keyTyped=?,
       ~perfMonitorFont=?,
+      ~title=?,
       ()
     ) => {
   let unwrap = unwrapOrDefault(identity);
@@ -124,6 +125,7 @@ let run =
     Random.self_init();
     Reprocessing_Utils.noiseSeed(Random.int(Reprocessing_Utils.pow(~base=2, ~exp=30 - 1)));
     Reprocessing_ClientWrapper.init(
+      ~title=?title,
       ~argv=Sys.argv,
       (window) => {
         let env = Reprocessing_Internal.createCanvas(window, 200, 200);
