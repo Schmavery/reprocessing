@@ -49,7 +49,6 @@ let getProgram =
 
 let createCanvas = (window) : glEnv => {
   let (width, height) = (Gl.Window.getWidth(window), Gl.Window.getHeight(window));
-  Gl.Window.setWindowSize(~window, ~width, ~height);
   let context = Gl.Window.getContext(window);
   Gl.viewport(~context, ~x=(-1), ~y=(-1), ~width, ~height);
   Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=1.);

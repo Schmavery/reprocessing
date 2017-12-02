@@ -5,6 +5,3 @@ include [%matchenv
   | "js" => Reprocessing_Hotreload_Web
   }
 ];
-
-/* let checkRebuild = (filePath) =>
-  failwith("Hotreload not supported for ios yet."); */
