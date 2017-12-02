@@ -43,3 +43,6 @@ let localizePoint = ((x, y): (int, int), env: glEnv) => {
     Matrix.(matptmul(matinv(env.matrix), (float_of_int(x), float_of_int(y))));
   (int_of_float(lx), int_of_float(ly))
 };
+
+let loadUserData = (~key: string, _env: glEnv) => Reasongl.Gl.File.loadUserData(~key);
+let saveUserData = (~key: string, ~value: 'a, _env: glEnv) => Reasongl.Gl.File.saveUserData(~key, ~value);

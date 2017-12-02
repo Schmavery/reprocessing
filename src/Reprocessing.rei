@@ -23,6 +23,7 @@ include Reprocessing_Types.TypesT;
 
 let hotreload: string => bool;
 
+let target: string;
 
 /*** Entrypoint to the graphics library. The system
    * is designed for you to return a self-defined 'state'
@@ -41,6 +42,8 @@ let run:
     ~keyPressed: ('a, glEnvT) => 'a=?,
     ~keyReleased: ('a, glEnvT) => 'a=?,
     ~keyTyped: ('a, glEnvT) => 'a=?,
+    ~perfMonitorFont: string=?,
+    ~title: string=?,
     unit
   ) =>
   unit;
