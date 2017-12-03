@@ -33,6 +33,15 @@
   }, {
     "backend": "js",
     "main-module": "Noise"
+  }, {
+    "backend": "native",
+    "main-module": "Redsquare"
+  }, {
+    "backend": "bytecode",
+    "main-module": "Redsquare"
+  }, {
+    "backend": "js",
+    "main-module": "Redsquare"
   }],
   "refmt": 3
 }
