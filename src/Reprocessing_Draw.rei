@@ -56,6 +56,16 @@ let fill: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => 
  */
 let noFill: Reprocessing_Types.Types.glEnvT => unit;
 
+/*** Sets the fill value for displaying images. Images can be tinted to specified colors
+   * or made transparent by including an alpha value.
+ */
+let tint: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
+
+
+/*** Removes the current fill value for displaying images and reverts to displaying
+   * images with their original hues.
+ */
+let noTint: Reprocessing_Types.Types.glEnvT => unit;
 
 /*** Sets the color used to draw lines and borders around shapes. */
 let stroke: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;

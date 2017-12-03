@@ -20,6 +20,10 @@ let fill = (color, env: glEnv) => env.style = {...env.style, fillColor: Some(col
 
 let noFill = (env: glEnv) => env.style = {...env.style, fillColor: None};
 
+let tint = (color, env: glEnv) => env.style = {...env.style, tintColor: Some(color)};
+
+let noTint = (env: glEnv) => env.style = {...env.style, tintColor: None};
+
 let stroke = (color, env) => env.style = {...env.style, strokeColor: Some(color)};
 
 let noStroke = (env) => env.style = {...env.style, strokeColor: None};

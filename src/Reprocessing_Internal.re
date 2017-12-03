@@ -103,7 +103,7 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
     ~width=1,
     ~height=1,
     ~border=0,
-    ~data=Gl.Bigarray.of_array(Gl.Bigarray.Uint8, [|0, 0, 0, 0|])
+    ~data=Gl.Bigarray.of_array(Gl.Bigarray.Uint8, [|255, 255, 255, 255|])
   );
   Gl.texParameteri(
     ~context,
@@ -167,6 +167,7 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
       strokeWeight: 3,
       strokeCap: Round,
       strokeColor: None,
+      tintColor: None,
       rectMode: Corner
     },
     styleStack: [],
@@ -708,6 +709,10 @@ let drawImage =
       ~subh,
       env
     ) => {
+  let {r, g, b, a} = switch env.style.tintColor {
+    | Some(c) => c
+    | None => {r:1., g:1., b:1., a:1.}
+  };
   maybeFlushBatch(~texture=Some(textureBuffer), ~vert=32, ~el=6, env);
   let (fsubx, fsuby, fsubw, fsubh) = (
     float_of_int(subx) /. float_of_int(imgw),
@@ -720,34 +725,34 @@ let drawImage =
   let vertexArray = env.batch.vertexArray;
   set(vertexArray, ii + 0, x1);
   set(vertexArray, ii + 1, y1);
-  set(vertexArray, ii + 2, 0.0);
-  set(vertexArray, ii + 3, 0.0);
-  set(vertexArray, ii + 4, 0.0);
-  set(vertexArray, ii + 5, 0.0);
+  set(vertexArray, ii + 2, r);
+  set(vertexArray, ii + 3, g);
+  set(vertexArray, ii + 4, b);
+  set(vertexArray, ii + 5, a);
   set(vertexArray, ii + 6, fsubx +. fsubw);
   set(vertexArray, ii + 7, fsuby +. fsubh);
   set(vertexArray, ii + 8, x2);
   set(vertexArray, ii + 9, y2);
-  set(vertexArray, ii + 10, 0.0);
-  set(vertexArray, ii + 11, 0.0);
-  set(vertexArray, ii + 12, 0.0);
-  set(vertexArray, ii + 13, 0.0);
+  set(vertexArray, ii + 10, r);
+  set(vertexArray, ii + 11, g);
+  set(vertexArray, ii + 12, b);
+  set(vertexArray, ii + 13, a);
   set(vertexArray, ii + 14, fsubx);
   set(vertexArray, ii + 15, fsuby +. fsubh);
   set(vertexArray, ii + 16, x3);
   set(vertexArray, ii + 17, y3);
-  set(vertexArray, ii + 18, 0.0);
-  set(vertexArray, ii + 19, 0.0);
-  set(vertexArray, ii + 20, 0.0);
-  set(vertexArray, ii + 21, 0.0);
+  set(vertexArray, ii + 18, r);
+  set(vertexArray, ii + 19, g);
+  set(vertexArray, ii + 20, b);
+  set(vertexArray, ii + 21, a);
   set(vertexArray, ii + 22, fsubx +. fsubw);
   set(vertexArray, ii + 23, fsuby);
   set(vertexArray, ii + 24, x4);
   set(vertexArray, ii + 25, y4);
-  set(vertexArray, ii + 26, 0.0);
-  set(vertexArray, ii + 27, 0.0);
-  set(vertexArray, ii + 28, 0.0);
-  set(vertexArray, ii + 29, 0.0);
+  set(vertexArray, ii + 26, r);
+  set(vertexArray, ii + 27, g);
+  set(vertexArray, ii + 28, b);
+  set(vertexArray, ii + 29, a);
   set(vertexArray, ii + 30, fsubx);
   set(vertexArray, ii + 31, fsuby);
   let jj = env.batch.elementPtr;

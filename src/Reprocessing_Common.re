@@ -28,6 +28,7 @@ type styleT = {
   strokeWeight: int,
   strokeCap: strokeCapT,
   fillColor: option(colorT),
+  tintColor: option(colorT),
   rectMode: rectModeT
 };
 
