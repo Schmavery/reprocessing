@@ -159,7 +159,7 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
       keyCode: Reprocessing_Events.Nothing,
       pressed: Reprocessing_Common.KeySet.empty,
       released: Reprocessing_Common.KeySet.empty,
-      down: Reprocessing_Common.KeySet.empty,
+      down: Reprocessing_Common.KeySet.empty
     },
     mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
     style: {
@@ -769,6 +769,15 @@ let drawImageWithMatrix = (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, 
   let p2 = transform((float_of_int(x), float_of_int @@ y + height));
   let p3 = transform((float_of_int @@ x + width, float_of_int(y)));
   let p4 = transform((float_of_int(x), float_of_int(y)));
+  drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env)
+};
+
+let drawImageWithMatrixf = (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
+  let transform = Matrix.matptmul(env.matrix);
+  let p1 = transform((x +. width, y +. height));
+  let p2 = transform((x, y +. height));
+  let p3 = transform((x +. width, y));
+  let p4 = transform((x, y));
   drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env)
 };
 

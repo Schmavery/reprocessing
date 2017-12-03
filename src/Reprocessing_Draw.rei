@@ -192,6 +192,29 @@ let subImage:
   ) =>
   unit;
 
+/*** The `subImagef` function draws a section of an image to the
+   * display window. The image should be loaded using the
+   * `loadImage` function. The image is displayed at the size
+   * specified by width and height.  texPos, texWidth, and
+   * texHeight describe the section of the full image that
+   * should be drawn.
+   *
+   * This function is useful for a spritesheet-style of
+   * drawing strategy.
+ */
+let subImagef:
+  (
+    Reprocessing_Types.Types.imageT,
+    ~pos: (float, float),
+    ~width: float,
+    ~height: float,
+    ~texPos: (int, int),
+    ~texWidth: int,
+    ~texHeight: int,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
+
 
 /*** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.

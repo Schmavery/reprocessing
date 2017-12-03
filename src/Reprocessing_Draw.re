@@ -74,6 +74,23 @@ let subImage =
     Internal.drawImageWithMatrix(i, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env)
   };
 
+let subImagef =
+    (
+      img,
+      ~pos as (x, y),
+      ~width,
+      ~height,
+      ~texPos as (subx, suby),
+      ~texWidth as subw,
+      ~texHeight as subh,
+      env
+    ) =>
+  switch img^ {
+  | None => print_endline("image not ready yet, just doing nothing :D")
+  | Some(i) =>
+    Internal.drawImageWithMatrixf(i, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env)
+  };
+
 let image = (img, ~pos as (x, y), ~width=?, ~height=?, env: glEnv) =>
   switch img^ {
   | None => print_endline("image not ready yet, just doing nothing :D")
