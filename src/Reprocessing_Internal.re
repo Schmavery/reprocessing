@@ -457,8 +457,9 @@ let drawArc =
       {r, g, b, a}
     ) => {
   let transform = Matrix.matptmul(matrix);
-  let noOfFans = int_of_float(radx +. rady) / 4 + 10;
-  maybeFlushBatch(~texture=None, ~vert=8 * noOfFans, ~el=3 * noOfFans, env);
+  let noOfFans = int_of_float(radx +. rady) / 2 + 10;
+  maybeFlushBatch(~texture=None, ~vert=vertexSize * (noOfFans + 3), ~el=3 * noOfFans, env);
+  let (start, stop) = stop < start ? (stop, start) : (start, stop);
   let pi = 4.0 *. atan(1.0);
   let anglePerFan = 2. *. pi /. float_of_int(noOfFans);
   let verticesData = env.batch.vertexArray;
@@ -471,11 +472,11 @@ let drawArc =
     if (isPie) {
       /* Start one earlier and force the first point to be the center */
       int_of_float(start /. anglePerFan)
-      - 2
+      - 3
     } else {
-      int_of_float(start /. anglePerFan) - 1
+      int_of_float(start /. anglePerFan) - 2
     };
-  let stop_i = int_of_float(stop /. anglePerFan) - 1;
+  let stop_i = int_of_float(stop /. anglePerFan) + 1;
   for (i in start_i to stop_i) {
     let (xCoordinate, yCoordinate) =
       transform(
@@ -486,7 +487,7 @@ let drawArc =
             yCenterOfCircle
           )
         } else {
-          let angle = anglePerFan *. float_of_int(i + 1);
+          let angle = max(min(anglePerFan *. float_of_int(i + 1), stop), start);
           (xCenterOfCircle +. cos(angle) *. radx, yCenterOfCircle +. sin(angle) *. rady)
         }
       );
@@ -516,7 +517,7 @@ let drawArc =
       set(elementData, jj + 2, ii / vertexSize)
     }
   };
-  env.batch.vertexPtr = env.batch.vertexPtr + noOfFans * vertexSize;
+  env.batch.vertexPtr = env.batch.vertexPtr + (noOfFans + 3) * vertexSize;
   env.batch.elementPtr = env.batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
 };
 
@@ -540,22 +541,23 @@ let drawArcStroke =
   let transform = Matrix.matptmul(matrix);
   let verticesData = env.batch.vertexArray;
   let elementData = env.batch.elementArray;
-  let noOfFans = int_of_float(radx +. rady) / 4 + 10;
+  let noOfFans = int_of_float(radx +. rady) / 2 + 10;
   let set = Gl.Bigarray.set;
-  maybeFlushBatch(~texture=None, ~vert=16, ~el=6, env);
+  maybeFlushBatch(~texture=None, ~vert=noOfFans * 2 * vertexSize, ~el=noOfFans * 6, env);
+  let (start, stop) = stop < start ? (stop, start) : (start, stop);
   let pi = 4.0 *. atan(1.0);
   let anglePerFan = 2. *. pi /. float_of_int(noOfFans);
   /* I calculated this roughly by doing:
      anglePerFan *. float_of_int (i + 1) == start
      i+1 == start /. anglePerFan
      */
-  let start_i = int_of_float(start /. anglePerFan) - 1;
-  let stop_i = int_of_float(stop /. anglePerFan) - 1;
+  let start_i = int_of_float(start /. anglePerFan) - 2;
+  let stop_i = int_of_float(stop /. anglePerFan);
   let prevEl: ref(option((int, int))) = ref(None);
   let strokeWidth = float_of_int(strokeWidth);
   let halfStrokeWidth = strokeWidth /. 2.;
   for (i in start_i to stop_i) {
-    let angle = anglePerFan *. float_of_int(i + 1);
+    let angle = max(start, min(anglePerFan *. float_of_int(i + 1), stop));
     let (xCoordinateInner, yCoordinateInner) =
       transform((
         xCenterOfCircle +. cos(angle) *. (radx -. halfStrokeWidth),
@@ -603,12 +605,12 @@ let drawArcStroke =
     }
   };
   if (! isOpen) {
-    let start = (xCenterOfCircle +. cos(start) *. radx, yCenterOfCircle +. sin(start) *. rady);
-    let stop = (xCenterOfCircle +. cos(stop) *. radx, yCenterOfCircle +. sin(stop) *. rady);
+    let startPt = (xCenterOfCircle +. cos(start) *. radx, yCenterOfCircle +. sin(start) *. rady);
+    let stopPt = (xCenterOfCircle +. cos(stop) *. radx, yCenterOfCircle +. sin(stop) *. rady);
     let centerOfCircle = (xCenterOfCircle, yCenterOfCircle);
     if (isPie) {
       drawLineWithMatrix(
-        ~p1=start,
+        ~p1=startPt,
         ~p2=centerOfCircle,
         ~matrix,
         ~color=strokeColor,
@@ -617,7 +619,7 @@ let drawArcStroke =
         env
       );
       drawLineWithMatrix(
-        ~p1=stop,
+        ~p1=stopPt,
         ~p2=centerOfCircle,
         ~matrix,
         ~color=strokeColor,
@@ -628,17 +630,17 @@ let drawArcStroke =
       drawEllipse(env, centerOfCircle, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
     } else {
       drawLineWithMatrix(
-        ~p1=start,
-        ~p2=stop,
+        ~p1=startPt,
+        ~p2=stopPt,
         ~matrix,
         ~color=strokeColor,
-        ~width=halfStrokeWidth,
+        ~width=strokeWidth,
         ~project=false,
         env
       )
     };
-    drawEllipse(env, start, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
-    drawEllipse(env, stop, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
+    drawEllipse(env, startPt, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
+    drawEllipse(env, stopPt, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
   }
 };
 
