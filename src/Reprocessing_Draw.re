@@ -123,11 +123,10 @@ let linef = (~p1, ~p2, env: glEnv) =>
   switch env.style.strokeColor {
   | None => () /* don't draw stroke */
   | Some(color) =>
-    let transform = Matrix.matptmul(env.matrix);
     let width = float_of_int(env.style.strokeWeight);
     let radius = width /. 2.;
     let project = env.style.strokeCap == Project;
-    Internal.drawLine(~p1=transform(p1), ~p2=transform(p2), ~color, ~width, ~project, env);
+    Internal.drawLineWithMatrix(~p1, ~p2, ~matrix=env.matrix, ~color, ~width, ~project, env);
     if (env.style.strokeCap == Round) {
       Internal.drawEllipse(env, p1, radius, radius, env.matrix, color);
       Internal.drawEllipse(env, p2, radius, radius, env.matrix, color)
@@ -189,10 +188,11 @@ let quadf = (~p1, ~p2, ~p3, ~p4, env: glEnv) => {
   | Some(color) =>
     let width = float_of_int(env.style.strokeWeight);
     let project = false;
-    Internal.drawLine(~p1, ~p2, ~color, ~width, ~project, env);
-    Internal.drawLine(~p1=p2, ~p2=p3, ~color, ~width, ~project, env);
-    Internal.drawLine(~p1=p3, ~p2=p4, ~color, ~width, ~project, env);
-    Internal.drawLine(~p1, ~p2=p4, ~color, ~width, ~project, env);
+    let matrix = env.matrix;
+    Internal.drawLineWithMatrix(~p1, ~p2, ~matrix, ~color, ~width, ~project, env);
+    Internal.drawLineWithMatrix(~p1=p2, ~p2=p3, ~matrix, ~color, ~width, ~project, env);
+    Internal.drawLineWithMatrix(~p1=p3, ~p2=p4, ~matrix, ~color, ~width, ~project, env);
+    Internal.drawLineWithMatrix(~p1, ~p2=p4, ~matrix, ~color, ~width, ~project, env);
     let r = width /. 2.;
     let m = Matrix.identity;
     Internal.drawEllipse(env, p1, r, r, m, color);
@@ -450,9 +450,10 @@ let trianglef = (~p1, ~p2, ~p3, env: glEnv) => {
   | Some(color) =>
     let width = float_of_int(env.style.strokeWeight);
     let project = false;
-    Internal.drawLine(~p1, ~p2, ~color, ~width, ~project, env);
-    Internal.drawLine(~p1=p2, ~p2=p3, ~color, ~width, ~project, env);
-    Internal.drawLine(~p1, ~p2=p3, ~color, ~width, ~project, env);
+    let matrix = env.matrix;
+    Internal.drawLineWithMatrix(~p1, ~p2, ~matrix, ~color, ~width, ~project, env);
+    Internal.drawLineWithMatrix(~p1=p2, ~p2=p3, ~matrix, ~color, ~width, ~project, env);
+    Internal.drawLineWithMatrix(~p1, ~p2=p3, ~matrix, ~color, ~width, ~project, env);
     let r = width /. 2.;
     let m = Matrix.identity;
     Internal.drawEllipse(env, p1, r, r, m, color);

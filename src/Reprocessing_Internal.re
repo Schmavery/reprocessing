@@ -416,7 +416,9 @@ let drawTriangle = (env, (x1, y1), (x2, y2), (x3, y3), ~color as {r, g, b, a}) =
   env.batch.elementPtr = j + 3
 };
 
-let drawLine = (~p1 as (xx1, yy1), ~p2 as (xx2, yy2), ~color, ~width, ~project, env) => {
+let drawLineWithMatrix =
+    (~p1 as (xx1, yy1), ~p2 as (xx2, yy2), ~matrix, ~color, ~width, ~project, env) => {
+  let transform = Matrix.matptmul(matrix);
   let dx = xx2 -. xx1;
   let dy = yy2 -. yy1;
   let mag = sqrt(dx *. dx +. dy *. dy);
@@ -434,10 +436,10 @@ let drawLine = (~p1 as (xx1, yy1), ~p2 as (xx2, yy2), ~color, ~width, ~project, 
   let y4 = yy1 -. ything -. projecty;
   addRectToGlobalBatch(
     env,
-    ~bottomRight=(x1, y1),
-    ~bottomLeft=(x2, y2),
-    ~topRight=(x3, y3),
-    ~topLeft=(x4, y4),
+    ~bottomRight=transform((x1, y1)),
+    ~bottomLeft=transform((x2, y2)),
+    ~topRight=transform((x3, y3)),
+    ~topLeft=transform((x4, y4)),
     ~color
   )
 };
@@ -550,18 +552,19 @@ let drawArcStroke =
   let start_i = int_of_float(start /. anglePerFan) - 1;
   let stop_i = int_of_float(stop /. anglePerFan) - 1;
   let prevEl: ref(option((int, int))) = ref(None);
-  let halfwidth = float_of_int(strokeWidth) /. 2.;
+  let strokeWidth = float_of_int(strokeWidth);
+  let halfStrokeWidth = strokeWidth /. 2.;
   for (i in start_i to stop_i) {
     let angle = anglePerFan *. float_of_int(i + 1);
     let (xCoordinateInner, yCoordinateInner) =
       transform((
-        xCenterOfCircle +. cos(angle) *. (radx -. halfwidth),
-        yCenterOfCircle +. sin(angle) *. (rady -. halfwidth)
+        xCenterOfCircle +. cos(angle) *. (radx -. halfStrokeWidth),
+        yCenterOfCircle +. sin(angle) *. (rady -. halfStrokeWidth)
       ));
     let (xCoordinateOuter, yCoordinateOuter) =
       transform((
-        xCenterOfCircle +. cos(angle) *. (radx +. halfwidth),
-        yCenterOfCircle +. sin(angle) *. (rady +. halfwidth)
+        xCenterOfCircle +. cos(angle) *. (radx +. halfStrokeWidth),
+        yCenterOfCircle +. sin(angle) *. (rady +. halfStrokeWidth)
       ));
     let ii = env.batch.vertexPtr;
     set(verticesData, ii + 0, xCoordinateInner);
@@ -600,47 +603,42 @@ let drawArcStroke =
     }
   };
   if (! isOpen) {
-    let (startX, startY) =
-      transform((xCenterOfCircle +. cos(start) *. radx, yCenterOfCircle +. sin(start) *. rady));
-    let (stopX, stopY) =
-      transform((xCenterOfCircle +. cos(stop) *. radx, yCenterOfCircle +. sin(stop) *. rady));
+    let start = (xCenterOfCircle +. cos(start) *. radx, yCenterOfCircle +. sin(start) *. rady);
+    let stop = (xCenterOfCircle +. cos(stop) *. radx, yCenterOfCircle +. sin(stop) *. rady);
+    let centerOfCircle = (xCenterOfCircle, yCenterOfCircle);
     if (isPie) {
-      drawLine(
-        ~p1=(startX, startY),
-        ~p2=(xCenterOfCircle, yCenterOfCircle),
+      drawLineWithMatrix(
+        ~p1=start,
+        ~p2=centerOfCircle,
+        ~matrix,
         ~color=strokeColor,
-        ~width=halfwidth,
+        ~width=strokeWidth,
         ~project=false,
         env
       );
-      drawLine(
-        ~p1=(stopX, stopY),
-        ~p2=(xCenterOfCircle, yCenterOfCircle),
+      drawLineWithMatrix(
+        ~p1=stop,
+        ~p2=centerOfCircle,
+        ~matrix,
         ~color=strokeColor,
-        ~width=halfwidth,
+        ~width=strokeWidth,
         ~project=false,
         env
       );
-      drawEllipse(
-        env,
-        transform((xCenterOfCircle, yCenterOfCircle)),
-        halfwidth,
-        halfwidth,
-        matrix,
-        strokeColor
-      )
+      drawEllipse(env, centerOfCircle, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
     } else {
-      drawLine(
-        ~p1=(startX, startY),
-        ~p2=(stopX, stopY),
+      drawLineWithMatrix(
+        ~p1=start,
+        ~p2=stop,
+        ~matrix,
         ~color=strokeColor,
-        ~width=halfwidth,
+        ~width=halfStrokeWidth,
         ~project=false,
         env
       )
     };
-    drawEllipse(env, (startX, startY), halfwidth, halfwidth, matrix, strokeColor);
-    drawEllipse(env, (stopX, stopY), halfwidth, halfwidth, matrix, strokeColor)
+    drawEllipse(env, start, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
+    drawEllipse(env, stop, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
   }
 };
 
@@ -709,10 +707,11 @@ let drawImage =
       ~subh,
       env
     ) => {
-  let {r, g, b, a} = switch env.style.tintColor {
+  let {r, g, b, a} =
+    switch env.style.tintColor {
     | Some(c) => c
-    | None => {r:1., g:1., b:1., a:1.}
-  };
+    | None => {r: 1., g: 1., b: 1., a: 1.}
+    };
   maybeFlushBatch(~texture=Some(textureBuffer), ~vert=32, ~el=6, env);
   let (fsubx, fsuby, fsubw, fsubh) = (
     float_of_int(subx) /. float_of_int(imgw),
