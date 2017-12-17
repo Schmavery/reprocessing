@@ -6,8 +6,9 @@ This is a high-level drawing library, inspired by [Processing](https://processin
 ## Example
 The [web environment](https://schmavery.github.io/reprocessing/) is the simplest way to try reprocessing. (It uses an older verison of the Reason syntax though, we're working on fixing that).
 
-The 2nd simplest way to try is to build [reprocessing-example](https://github.com/bsansouci/reprocessing-example).
+The 2nd simplest way to try is to clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example).
 
+See [below](#projects-using-reprocessing) for projects using Reprocessing!
 
 ## Getting Started
 ```bash
@@ -73,8 +74,6 @@ let draw = (state, env) => {
 };
 ```
 
-- This is 100% a work in progress.  Only a small subset of Processing's functionality has been replicated.  Please feel free to contribute as my knowledge of OpenGl is limited at best :)
-
 
 # Using Fonts
 The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it. The above link gives a few different tools that can be used to generate these files.  The assets folder of this repo also has an [example](https://github.com/Schmavery/reprocessing/tree/bsb-support-new/assets/font) of a font that can be copied to your project and used.  In order to use a font once you have the files:
@@ -82,3 +81,11 @@ The story for using fonts in your Reprocessing app is still under some developme
 let font = Draw.loadFont(~filename, env);
 Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
 ```
+
+## Projects using Reprocessing
+
+- [Gravitron](https://github.com/jaredly/gravitron)
+- [Oh No! Zombies!](https://github.com/bsansouci/ludum-dare-40)
+- [2048](https://github.com/bsansouci/reprocessing-example/tree/2048)
+- [FlappyBird](https://github.com/bsansouci/reprocessing-example/tree/livestream-flappybird)
+- [Pong](https://github.com/illbexyz/repong)
