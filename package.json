@@ -17,6 +17,16 @@
     "type": "git",
     "url": "git+https://github.com/schmavery/reprocessing.git"
   },
+  "homepage": "https://github.com/Schmavery/reprocessing#readme",
+  "bugs": "https://github.com/Schmavery/reprocessing/issues",
+  "keywords": [
+    "reason",
+    "processing",
+    "graphics",
+    "opengl",
+    "webgl"
+  ],
+  "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
     "bs-platform": "bsansouci/bsb-native"
