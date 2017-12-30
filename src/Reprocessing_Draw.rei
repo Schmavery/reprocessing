@@ -56,6 +56,7 @@ let fill: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => 
  */
 let noFill: Reprocessing_Types.Types.glEnvT => unit;
 
+
 /*** Sets the fill value for displaying images. Images can be tinted to specified colors
    * or made transparent by including an alpha value.
  */
@@ -66,6 +67,7 @@ let tint: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => 
    * images with their original hues.
  */
 let noTint: Reprocessing_Types.Types.glEnvT => unit;
+
 
 /*** Sets the color used to draw lines and borders around shapes. */
 let stroke: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
@@ -201,6 +203,7 @@ let subImage:
     Reprocessing_Types.Types.glEnvT
   ) =>
   unit;
+
 
 /*** The `subImagef` function draws a section of an image to the
    * display window. The image should be loaded using the
@@ -453,6 +456,17 @@ let text:
     Reprocessing_Types.Types.glEnvT
   ) =>
   unit;
+
+/** Calculates width of text using a specific font.
+  * The font should be loaded using the `loadFont` function.
+  */
+let textWidth:
+  (
+    ~font: Reprocessing_Font.fontT,
+    ~body: string,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  int;
 
 
 /*** Clears the entire screen. Normally, background is used for this purpose,

@@ -198,18 +198,21 @@ module Font = {
       | None => print_endline("loading font.")
       }
     };
-  let calcStringWidth = (env, fnt, str: string) => {
-    let offset = ref(0);
-    let lastChar = ref(None);
-    String.iter(
-      (c) => {
-        offset := offset^ + drawChar(env, fnt, None, c, lastChar^, offset^, 0);
-        lastChar := Some(c)
-      },
-      str
-    );
-    offset^
-  };
+  let calcStringWidth = (env, fnt, str: string) =>
+    switch fnt^ {
+    | None => 0
+    | Some(fnt) =>
+      let offset = ref(0);
+      let lastChar = ref(None);
+      String.iter(
+        (c) => {
+          offset := offset^ + drawChar(env, fnt, None, c, lastChar^, offset^, 0);
+          lastChar := Some(c)
+        },
+        str
+      );
+      offset^
+    };
 };
 
 type fontT = ref(option(Font.internalType));

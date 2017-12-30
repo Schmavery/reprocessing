@@ -511,6 +511,8 @@ let loadFont = (~filename, ~isPixel=false, env: glEnv) =>
 
 let text = (~font, ~body, ~pos as (x, y), env: glEnv) => Font.drawString(env, font, body, x, y);
 
+let textWidth = (~font, ~body, env) => Font.calcStringWidth(env, font, body);
+
 let clear = (env) =>
   Reasongl.Gl.clear(
     ~context=env.gl,
