@@ -31,7 +31,7 @@ let checkRebuild = (filePath) => {
     /* @Incomplete Check the error code sent back. Also don't do this, use stdout/stderr. */
     let cmd =
       Printf.sprintf(
-        "%s %s -w -40 -I lib/bs/%s/src -I node_modules/ReasonglInterface/lib/bs/%s/src -I node_modules/Reprocessing/lib/bs/%s/src -pp './node_modules/bs-platform/lib/refmt3.exe --print binary' -o lib/bs/%s/%s.%s -impl %s 2>&1",
+        "%s %s -w -40 -I lib/bs/%s/src -I node_modules/bs-platform/vendor/ocaml/lib/ocaml -I node_modules/ReasonglInterface/lib/bs/%s/src -I node_modules/Reprocessing/lib/bs/%s/src -pp './node_modules/bs-platform/lib/refmt3.exe --print binary' -o lib/bs/%s/%s.%s -impl %s 2>&1",
         ocamlPath,
         shared,
         /* folder */
