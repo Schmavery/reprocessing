@@ -2,6 +2,10 @@ let width: Reprocessing_Types.Types.glEnvT => int;
 
 let height: Reprocessing_Types.Types.glEnvT => int;
 
+let maxWidth: Reprocessing_Types.Types.glEnvT => int;
+
+let maxHeight: Reprocessing_Types.Types.glEnvT => int;
+
 let mouse: Reprocessing_Types.Types.glEnvT => (int, int);
 
 let pmouse: Reprocessing_Types.Types.glEnvT => (int, int);
@@ -37,6 +41,7 @@ let playSound:
   ) =>
   unit;
 
+let getTimeMs: Reprocessing_Types.Types.glEnvT => float;
 
 /*** Time in seconds since the last frame */
 let deltaTime: Reprocessing_Types.Types.glEnvT => float;
@@ -50,3 +55,6 @@ let localizePoint: ((int, int), Reprocessing_Types.Types.glEnvT) => (int, int);
 
 let localizePointf:
   ((float, float), Reprocessing_Types.Types.glEnvT) => (float, float);
+
+let loadUserData: (~key: string, Reprocessing_Types.Types.glEnvT) => option('a);
+let saveUserData: (~key: string, ~value: 'a, Reprocessing_Types.Types.glEnvT) => bool;

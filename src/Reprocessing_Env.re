@@ -6,6 +6,10 @@ let width = (env) => env.size.width;
 
 let height = (env) => env.size.height;
 
+let maxWidth = (env) => Reasongl.Gl.Window.getMaxWidth(env.window);
+
+let maxHeight = (env) => Reasongl.Gl.Window.getMaxHeight(env.window);
+
 let mouse = (env) => env.mouse.pos;
 
 let pmouse = (env) => env.mouse.prevPos;
@@ -32,6 +36,8 @@ let resizeable = (resizeable, env: glEnv) => env.size.resizeable = resizeable;
 let frameRate = (env: glEnv) => env.frame.rate;
 
 let frameCount = (env: glEnv) => env.frame.count;
+
+let getTimeMs = (env: glEnv) => Reasongl.Gl.getTimeMs();
 
 let deltaTime = (env: glEnv) => env.frame.deltaTime;
 
@@ -66,3 +72,6 @@ let playSound = (sound, ~volume=1.0, ~loop=false, env) =>
   | ShouldPlay(_, _) => sound := ShouldPlay(volume, loop)
   | Loaded(sound) => Reasongl.Gl.Audio.playSound(env.window, sound, ~volume, ~loop)
   };
+
+let loadUserData = (~key: string, env: glEnv) => Reasongl.Gl.File.loadUserData(~context=env.gl, ~key);
+let saveUserData = (~key: string, ~value: 'a, env: glEnv) => Reasongl.Gl.File.saveUserData(~context=env.gl, ~key, ~value);

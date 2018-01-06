@@ -65,7 +65,7 @@ module Font = {
     | None => failwith("could not pop line")
     };
   let rec parse_char_fmt = (stream, num, map) =>
-    if (num < 0) {
+    if (num <= 0) {
       (stream, map)
     } else {
       let stream = Stream.match(stream, "char id=");
@@ -116,6 +116,7 @@ module Font = {
   let parseFontFormat = (env, path, isPixel) => {
     let ret = ref(None);
     Gl.File.readFile(
+      ~context=env.gl,
       ~filename=path,
       ~cb=
         (str) => {
