@@ -4,12 +4,15 @@ module Internal = Reprocessing_Internal;
 
 open Reprocessing_Common;
 
+/* Mostly to suppress the bsc warning */
+let intCompare = (i: int, j: int) => i == j ? 0 : i < j ? (-1) : 1;
+
 module Font = {
   module IntMap =
     Map.Make(
       {
         type t = int;
-        let compare = compare;
+        let compare = intCompare;
       }
     );
   module IntPairMap =
@@ -17,11 +20,11 @@ module Font = {
       {
         type t = (int, int);
         let compare = ((a1, a2), (b1, b2)) => {
-          let first = compare(a1, b1);
+          let first = intCompare(a1, b1);
           if (first != 0) {
             first
           } else {
-            compare(a2, b2)
+            intCompare(a2, b2)
           }
         };
       }

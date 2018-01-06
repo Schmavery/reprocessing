@@ -1,21 +1,21 @@
 {
   "name": "Reprocessing",
-  "ppx-flags": ["matchenv/matchenv"],
   "sources": [{
     "dir": "src",
     "subdirs": [{
-      "dir": "native",
+      "dir": "bytecode",
       "backend": ["bytecode"]
-    }, {
-      "dir": "web",
-      "backend": ["native", "js"]
     }]
   }, {
     "dir": "examples",
     "type": "dev"
   }],
-  "bs-dependencies": ["ReasonglInterface", "ReasonglWeb", "ReasonglNative"],
-  "entries": [{
+  "bs-dependencies": ["Reasongl"],
+  "entries": [
+    {
+    "backend": "bytecode",
+    "main-module": "IndexHot"
+  }, {
     "backend": "native",
     "main-module": "Index"
   }, {

@@ -8,10 +8,7 @@
     "build:native": "bsb -make-world -backend native"
   },
   "dependencies": {
-    "ReasonglInterface": "github:bsansouci/reasongl-interface",
-    "ReasonglNative": "github:bsansouci/reasongl-native",
-    "ReasonglWeb": "github:bsansouci/reasongl-web",
-    "matchenv": "bsansouci/matchenv"
+    "Reasongl": "github:bsansouci/reasongl"
   },
   "repository": {
     "type": "git",
@@ -29,6 +26,6 @@
   "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "bs-platform": "bsansouci/bsb-native"
+    "bs-platform": "bsansouci/bsb-native#2.1.1"
   }
 }
