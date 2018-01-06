@@ -8,7 +8,7 @@
     "build:native": "bsb -make-world -backend native"
   },
   "dependencies": {
-    "ReasonglInterface": "github:bsansouci/reasongl"
+    "Reasongl": "github:bsansouci/reasongl"
   },
   "repository": {
     "type": "git",
