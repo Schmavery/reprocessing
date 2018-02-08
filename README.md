@@ -34,7 +34,7 @@ run(~setup, ~draw, ());
 
 ### Build
 ```
-npm run build:web
+npm run build
 ```
 
 This will draw a simple red square on a black background.  Compare this to [reglexampleproject](https://github.com/bsansouci/reasonglexampleproject/blob/simple/src/index.re), which takes 200+ lines to do the exact same thing.  This difference is even more notable on bigger projects.  Check out the code for a [draggable red square](https://github.com/Schmavery/reprocessing/blob/master/examples/redsquare.re).
