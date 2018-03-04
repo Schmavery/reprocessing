@@ -450,7 +450,7 @@ let loadFont:
  */
 let text:
   (
-    ~font: Reprocessing_Font.fontT,
+    ~font: Reprocessing_Font.fontT=?,
     ~body: string,
     ~pos: (int, int),
     Reprocessing_Types.Types.glEnvT
@@ -462,7 +462,7 @@ let text:
   */
 let textWidth:
   (
-    ~font: Reprocessing_Font.fontT,
+    ~font: Reprocessing_Font.fontT=?,
     ~body: string,
     Reprocessing_Types.Types.glEnvT
   ) =>

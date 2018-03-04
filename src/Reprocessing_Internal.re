@@ -695,6 +695,57 @@ let loadImage = (env: glEnv, filename, isPixel) : imageT => {
   );
   imageRef
 };
+let loadImageFromMemory = (env: glEnv, data, isPixel) : imageT => {
+  let imageRef = ref(None);
+  Gl.loadImageFromMemory(
+    ~data,
+    ~callback=
+      (imageData) =>
+        switch imageData {
+        | None => failwith("Could not load image") /* TODO: handle this better? */
+        | Some(img) =>
+          let env = env;
+          let textureBuffer = Gl.createTexture(~context=env.gl);
+          let height = Gl.getImageHeight(img);
+          let width = Gl.getImageWidth(img);
+          let filter = isPixel ? Constants.nearest : Constants.linear;
+          imageRef := Some({img, textureBuffer, height, width});
+          Gl.bindTexture(~context=env.gl, ~target=Constants.texture_2d, ~texture=textureBuffer);
+          Gl.texImage2DWithImage(
+            ~context=env.gl,
+            ~target=Constants.texture_2d,
+            ~level=0,
+            ~image=img
+          );
+          Gl.texParameteri(
+            ~context=env.gl,
+            ~target=Constants.texture_2d,
+            ~pname=Constants.texture_mag_filter,
+            ~param=filter
+          );
+          Gl.texParameteri(
+            ~context=env.gl,
+            ~target=Constants.texture_2d,
+            ~pname=Constants.texture_min_filter,
+            ~param=filter
+          );
+          Gl.texParameteri(
+            ~context=env.gl,
+            ~target=Constants.texture_2d,
+            ~pname=Constants.texture_wrap_s,
+            ~param=Constants.clamp_to_edge
+          );
+          Gl.texParameteri(
+            ~context=env.gl,
+            ~target=Constants.texture_2d,
+            ~pname=Constants.texture_wrap_t,
+            ~param=Constants.clamp_to_edge
+          )
+        },
+    ()
+  );
+  imageRef
+};
 
 let drawImage =
     (
