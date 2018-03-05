@@ -46,7 +46,7 @@ Run `npm run build:bytecode` to build to a bytecode executable and run `./lib/bs
 
 Run `npm run build:native` to build to a native executable and run `./lib/bs/native/index.native`.
 
-See also https://github.com/Schmavery/FlappyBird for a slightly bigger example.
+See also [FlappyBird](https://github.com/Schmavery/FlappyBird) or [2048](https://github.com/bsansouci/reprocessing-example/tree/2048) for slightly bigger examples.
 
 
 # Some Differences from Processing
@@ -76,7 +76,11 @@ let draw = (state, env) => {
 
 
 # Using Fonts
-The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it. The above link gives a few different tools that can be used to generate these files.  The assets folder of this repo also has an [example](https://github.com/Schmavery/reprocessing/tree/bsb-support-new/assets/font) of a font that can be copied to your project and used.  In order to use a font once you have the files:
+The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it. 
+
+Check out [font-generator](https://github.com/bsansouci/font-generator) for a tool that can take any truetype or opentype font and output font files that Reprocessing can use.
+
+The assets folder of this repo also has an [example](https://github.com/Schmavery/reprocessing/tree/master/assets/font) of a font that can be copied to your project and used.  In order to use a font once you have the files:
 ```
 let font = Draw.loadFont(~filename, env);
 Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
