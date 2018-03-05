@@ -42,6 +42,7 @@ module Font = {
     chars: IntMap.t(charT),
     kerning: IntPairMap.t(float),
     res: float,
+    lineHeight: float,
     image: imageT
   };
   type t = ref(option(internalType));
@@ -49,6 +50,7 @@ module Font = {
   let rec parse_num = (stream: Stream.t, acc) : (Stream.t, float) =>
     switch (Stream.peekch(stream)) {
     | Some('-' as c)
+    | Some('.' as c)
     | Some('0'..'9' as c) =>
       parse_num(Stream.popch(stream), append_char(acc, c))
     | _ =>
@@ -110,9 +112,9 @@ module Font = {
     } else {
       let stream = Stream.match(stream, "kerning first=");
       let (stream, first) = parse_num(stream);
-      let stream = Stream.match(stream, " second=");
+      let stream = Stream.match(Stream.skipWhite(stream), "second=");
       let (stream, second) = parse_num(stream);
-      let stream = Stream.match(stream, " amount=");
+      let stream = Stream.match(Stream.skipWhite(stream), "amount=");
       let (stream, amount) = parse_num(stream);
       let stream = pop_line(stream);
       let new_map =
@@ -144,6 +146,8 @@ module Font = {
       | Some(_)
       | None => (stream, 1.)
       };
+    let stream = Stream.match(stream, "common lineHeight=");
+    let (stream, lineHeight) = parse_num(stream);
     let stream = stream |> pop_line |> pop_line;
     let stream = Stream.match(stream, "page id=0 file=\"");
     let (stream, filename) = parse_string(stream);
@@ -158,20 +162,21 @@ module Font = {
     let stream = pop_line(stream);
     let (_, kern_map) =
       parse_kern_fmt(stream, int_of_float(num_kerns), IntPairMap.empty);
-    (char_map, kern_map, filename, res);
+    (char_map, kern_map, filename, res, lineHeight);
   };
   let parseFontFormat = (env, path, isPixel) => {
     let ret = ref(None);
     Gl.File.readFile(
       ~filename=path,
       ~cb=str => {
-        let (char_map, kern_map, filename, res) = getCharMapAndKernMap(str);
+        let (char_map, kern_map, filename, res, lineHeight) = getCharMapAndKernMap(str);
         let img_filename = replaceFilename(path, filename);
         ret :=
           Some({
             chars: char_map,
             kerning: kern_map,
             res,
+            lineHeight,
             image: Internal.loadImage(env, img_filename, isPixel)
           });
       }
@@ -277,12 +282,13 @@ module Font = {
         failwith("Failed to load default font image. This shouldn't happen")
       | Some(data) => data
       };
-    let (char_map, kern_map, _, res) = getCharMapAndKernMap(data);
+    let (char_map, kern_map, _, res, lineHeight) = getCharMapAndKernMap(data);
     defaultFont :=
       Some({
         chars: char_map,
         kerning: kern_map,
         res,
+        lineHeight,
         image: Internal.loadImageFromMemory(env, imageData, false)
       });
   };
