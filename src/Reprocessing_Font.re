@@ -146,9 +146,10 @@ module Font = {
       | Some(_)
       | None => (stream, 1.)
       };
+    let stream = pop_line(stream);
     let stream = Stream.match(stream, "common lineHeight=");
     let (stream, lineHeight) = parse_num(stream);
-    let stream = stream |> pop_line |> pop_line;
+    let stream = pop_line(stream);
     let stream = Stream.match(stream, "page id=0 file=\"");
     let (stream, filename) = parse_string(stream);
     let stream = pop_line(stream);
@@ -169,7 +170,8 @@ module Font = {
     Gl.File.readFile(
       ~filename=path,
       ~cb=str => {
-        let (char_map, kern_map, filename, res, lineHeight) = getCharMapAndKernMap(str);
+        let (char_map, kern_map, filename, res, lineHeight) =
+          getCharMapAndKernMap(str);
         let img_filename = replaceFilename(path, filename);
         ret :=
           Some({
