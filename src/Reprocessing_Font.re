@@ -30,28 +30,29 @@ module Font = {
       }
     );
   type charT = {
-    x: int,
-    y: int,
-    width: int,
-    height: int,
-    xoffset: int,
-    yoffset: int,
-    xadvance: int
+    x: float,
+    y: float,
+    width: float,
+    height: float,
+    xoffset: float,
+    yoffset: float,
+    xadvance: float
   };
   type internalType = {
     chars: IntMap.t(charT),
-    kerning: IntPairMap.t(int),
+    kerning: IntPairMap.t(float),
+    res: float,
     image: imageT
   };
   type t = ref(option(internalType));
   let defaultFont = ref(None);
-  let rec parse_num = (stream: Stream.t, acc) : (Stream.t, int) =>
+  let rec parse_num = (stream: Stream.t, acc) : (Stream.t, float) =>
     switch (Stream.peekch(stream)) {
     | Some('-' as c)
     | Some('0'..'9' as c) =>
       parse_num(Stream.popch(stream), append_char(acc, c))
     | _ =>
-      try (stream, int_of_string(acc)) {
+      try (stream, float_of_string(acc)) {
       | _ => failwith("Could not parse number [" ++ acc ++ "].")
       }
     };
@@ -71,6 +72,11 @@ module Font = {
     };
   let rec parse_char_fmt = (stream, num, map) =>
     if (num < 0) {
+      (stream, map);
+    } else if (Stream.peekn(stream, 4) != Some("char")) {
+      prerr_string(
+        "Warning: encountered end of char sequence early when loading font.\n"
+      );
       (stream, map);
     } else {
       let stream = Stream.match(stream, "char id=");
@@ -92,7 +98,7 @@ module Font = {
       let stream = pop_line(stream);
       let new_map =
         IntMap.add(
-          char_id,
+          int_of_float(char_id),
           {x, y, width, height, xoffset, yoffset, xadvance},
           map
         );
@@ -109,7 +115,12 @@ module Font = {
       let stream = Stream.match(stream, " amount=");
       let (stream, amount) = parse_num(stream);
       let stream = pop_line(stream);
-      let new_map = IntPairMap.add((first, second), amount, map);
+      let new_map =
+        IntPairMap.add(
+          (int_of_float(first), int_of_float(second)),
+          amount,
+          map
+        );
       parse_kern_fmt(stream, num - 1, new_map);
     };
   let replaceFilename = (path, filename) => {
@@ -125,6 +136,14 @@ module Font = {
   };
   let getCharMapAndKernMap = str => {
     let stream = Stream.create(str ++ "\n");
+    let (stream, res) =
+      switch (Stream.peekn(stream, 9)) {
+      | Some("info res=") =>
+        let stream = Stream.match(stream, "info res=");
+        parse_num(stream);
+      | Some(_)
+      | None => (stream, 1.)
+      };
     let stream = stream |> pop_line |> pop_line;
     let stream = Stream.match(stream, "page id=0 file=\"");
     let (stream, filename) = parse_string(stream);
@@ -132,24 +151,27 @@ module Font = {
     let stream = Stream.match(stream, "chars count=");
     let (stream, num_chars) = parse_num(stream);
     let stream = pop_line(stream);
-    let (stream, char_map) = parse_char_fmt(stream, num_chars, IntMap.empty);
+    let (stream, char_map) =
+      parse_char_fmt(stream, int_of_float(num_chars), IntMap.empty);
     let stream = Stream.match(stream, "kernings count=");
     let (stream, num_kerns) = parse_num(stream);
     let stream = pop_line(stream);
-    let (_, kern_map) = parse_kern_fmt(stream, num_kerns, IntPairMap.empty);
-    (char_map, kern_map, filename);
+    let (_, kern_map) =
+      parse_kern_fmt(stream, int_of_float(num_kerns), IntPairMap.empty);
+    (char_map, kern_map, filename, res);
   };
   let parseFontFormat = (env, path, isPixel) => {
     let ret = ref(None);
     Gl.File.readFile(
       ~filename=path,
       ~cb=str => {
-        let (char_map, kern_map, filename) = getCharMapAndKernMap(str);
+        let (char_map, kern_map, filename, res) = getCharMapAndKernMap(str);
         let img_filename = replaceFilename(path, filename);
         ret :=
           Some({
             chars: char_map,
             kerning: kern_map,
+            res,
             image: Internal.loadImage(env, img_filename, isPixel)
           });
       }
@@ -173,26 +195,26 @@ module Font = {
         let first = Char.code(lastCh);
         let second = Char.code(ch);
         try (IntPairMap.find((first, second), fnt.kerning)) {
-        | _ => 0
+        | _ => 0.
         };
-      | None => 0
+      | None => 0.
       };
     switch image {
     | Some(img) =>
-      Internal.drawImageWithMatrix(
+      Internal.drawImageWithMatrixf(
         img,
-        ~x=x + c.xoffset + kernAmount,
-        ~y=y + c.yoffset,
-        ~width=c.width,
-        ~height=c.height,
-        ~subx=c.x,
-        ~suby=c.y,
-        ~subw=c.width,
-        ~subh=c.height,
+        ~x=x +. (c.xoffset +. kernAmount) /. fnt.res,
+        ~y=y +. c.yoffset /. fnt.res,
+        ~width=c.width /. fnt.res,
+        ~height=c.height /. fnt.res,
+        ~subx=int_of_float(c.x),
+        ~suby=int_of_float(c.y),
+        ~subw=int_of_float(c.width),
+        ~subh=int_of_float(c.height),
         env
       );
-      c.xadvance + kernAmount;
-    | None => c.xadvance + kernAmount
+      (c.xadvance +. kernAmount) /. fnt.res;
+    | None => (c.xadvance +. kernAmount) /. fnt.res
     };
   };
   let drawString = (env: glEnv, fnt, str: string, x, y) => {
@@ -212,7 +234,7 @@ module Font = {
           c => {
             let advance =
               drawChar(env, fnt, Some(img), c, lastChar^, offset^, y);
-            offset := offset^ + advance;
+            offset := offset^ +. advance;
             lastChar := Some(c);
           },
           str
@@ -228,14 +250,14 @@ module Font = {
       | Some(fnt) => fnt
       };
     switch fnt^ {
-    | None => 0
+    | None => 0.
     | Some(fnt) =>
-      let offset = ref(0);
+      let offset = ref(0.);
       let lastChar = ref(None);
       String.iter(
         c => {
           offset :=
-            offset^ + drawChar(env, fnt, None, c, lastChar^, offset^, 0);
+            offset^ +. drawChar(env, fnt, None, c, lastChar^, offset^, 0.);
           lastChar := Some(c);
         },
         str
@@ -255,11 +277,12 @@ module Font = {
         failwith("Failed to load default font image. This shouldn't happen")
       | Some(data) => data
       };
-    let (char_map, kern_map, _) = getCharMapAndKernMap(data);
+    let (char_map, kern_map, _, res) = getCharMapAndKernMap(data);
     defaultFont :=
       Some({
         chars: char_map,
         kerning: kern_map,
+        res,
         image: Internal.loadImageFromMemory(env, imageData, false)
       });
   };

@@ -509,9 +509,9 @@ let arc = (~center as (cx, cy), ~radx, ~rady, ~start, ~stop, ~isOpen, ~isPie, en
 let loadFont = (~filename, ~isPixel=false, env: glEnv) =>
   Font.parseFontFormat(env, filename, isPixel);
 
-let text = (~font=?, ~body, ~pos as (x, y), env: glEnv) => Font.drawString(env, font, body, x, y);
+let text = (~font=?, ~body, ~pos as (x, y), env: glEnv) => Font.drawString(env, font, body, float_of_int(x), float_of_int(y));
 
-let textWidth = (~font=?, ~body, env) => Font.calcStringWidth(env, font, body);
+let textWidth = (~font=?, ~body, env) => int_of_float(Font.calcStringWidth(env, font, body));
 
 let clear = (env) =>
   Reasongl.Gl.clear(
