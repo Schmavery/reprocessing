@@ -1,5 +1,5 @@
 {
-  "name": "Reprocessing",
+  "name": "reprocessing",
   "sources": [{
     "dir": "src",
     "subdirs": [{
