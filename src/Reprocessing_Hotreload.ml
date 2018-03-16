@@ -1,4 +1,5 @@
 module NoHotreloading = struct
+  let unlockMutex () = ()
   let checkRebuild _ =
     failwith "Hotreload only supported when compiling to bytecode."
 end
