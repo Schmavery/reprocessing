@@ -140,6 +140,9 @@ let run =
       hr
     };
   if (! fns.started) {
+    /* This is super hack. We unlock the mutex here because we wanted to make sure the user code
+       loaded before we started the thread that'll compile in a loop. */
+    Reprocessing_Hotreload.unlockMutex();
     fns.started = true;
     Random.self_init();
     Reprocessing_Utils.noiseSeed(Random.int(Reprocessing_Utils.pow(~base=2, ~exp=30 - 1)));

@@ -2,8 +2,9 @@ let load_plug = fname => {
   let fname = Dynlink.adapt_filename(fname);
   if (Sys.file_exists(fname)) {
     try (Dynlink.loadfile(fname)) {
-    | Dynlink.Error(err) =>
-      print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err))
+    | Dynlink.Error(err) as e =>
+      print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err));
+      raise(e);
     | _ => failwith("Unknown error while loading plugin")
     };
   } else {
@@ -40,8 +41,8 @@ let checkRebuild = (firstTime, filePath) => {
         bsb
         ++ " -build-library "
         ++ String.capitalize(
-             Filename.chop_extension(Filename.basename(filePath))
-           )
+             Filename.chop_extension(Filename.basename(filePath)),
+           ),
       )
     ) {
     | WEXITED(0) => ()
@@ -57,12 +58,12 @@ let checkRebuild = (firstTime, filePath) => {
           "-w",
           "-build-library",
           String.capitalize(
-            Filename.chop_extension(Filename.basename(filePath))
-          )
+            Filename.chop_extension(Filename.basename(filePath)),
+          ),
         |],
         Unix.stdin,
         Unix.stdout,
-        Unix.stderr
+        Unix.stderr,
       );
     print_endline("bsb running with pid: " ++ string_of_int(pid));
     /* 9 is SIGKILL */

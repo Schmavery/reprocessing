@@ -1,5 +1,4 @@
 module NoHotreloading = struct
-  let unlockMutex () = ()
   let checkRebuild _ _ =
     false
 end
