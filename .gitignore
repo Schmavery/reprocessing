@@ -1,5 +1,5 @@
-_build
 node_modules
-.jenga
 .merlin
 npm-debug.log
+website/node_modules
+website/yarn.lock

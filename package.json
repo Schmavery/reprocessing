@@ -1,58 +1,10 @@
 {
-  "name": "ReProcessing",
+  "name": "Reprocessing",
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
-    "postinstall": "eval $(dependencyEnv) && nopam && rebel -verbose && echo \"FLG -ppx $(pwd)/node_modules/matchenv/ppx_matchenv.exe\" >> .merlin",
-    "start": "_build/native/src/app.native",
-    "build": "eval $(dependencyEnv) && nopam && rebel && webpack -d _build/web/src/index.js _build/web/src/app.js",
-    "run": "eval $(dependencyEnv) && nopam && rebel && _build/native/src/app.native",
-    "top": "eval $(dependencyEnv) && rtop",
-    "env": "eval $(dependencyEnv) && env",
-    "ocamldep": "eval $(dependencyEnv) && ocamldep",
-    "editor": "eval $(dependencyEnv) && GL_BACKEND=native atom .",
-    "whereisocamlmerlin": "eval $(dependencyEnv) && which ocamlmerlin-reason",
-    "whereisrebel": "eval $(dependencyEnv) && which rebel",
-    "mlre": "pbpaste | ./node_modules/reason/refmt_impl.native -parse ml -print re -use-stdin true -is-interface-pp false",
-    "reml": "pbpaste | ./node_modules/reason/refmt_impl.native -parse re -print ml -use-stdin true -is-interface-pp false",
-    "compileExamples": "./eject.sh && ./compileAllExamples.sh"
   },
   "dependencies": {
-    "@opam-alpha/merlin": "^ 2.5.0",
-    "dependency-env": "https://github.com/npm-ml/dependency-env.git",
-    "nopam": "https://github.com/yunxing/nopam.git",
-    "reason": "https://github.com/facebook/reason.git",
-    "rebel": "https://github.com/bsansouci/jengaboot.git#add-env-vars",
-    "reglinterface": "*",
-    "reglnative": "*",
-    "reglweb": "*",
-    "matchenv": "https://github.com/bsansouci/matchenv.git"
-  },
-  "rebel": {
-    "targets": [
-      {
-        "target": "web",
-        "engine": "bucklescript",
-        "entry": "src/index.re",
-        "unstable_flags": {
-          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -I _build/web/reglweb -I _build/web/reglinterface",
-          "link": "-I _build/web/reglweb",
-          "envvars": "GL_BACKEND=web",
-          "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
-        }
-      },
-      {
-        "target": "native",
-        "engine": "native",
-        "entry": "src/index.re",
-        "unstable_flags": {
-          "compile": "-ppx node_modules/matchenv/ppx_matchenv.exe -package tgls.tgl3,tsdl -I _build/web/reglinterface -I _build/native/reglnative",
-          "link": "-linkpkg -package tgls.tgl3,tsdl -cclib \"$(pkg-config --libs reglnative)\"",
-          "envvars": "GL_BACKEND=native",
-          "dep": "-ppx node_modules/matchenv/ppx_matchenv.exe"
-        }
-      }
-    ]
   },
   "repository": {
     "type": "git",
