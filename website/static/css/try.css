@@ -1,0 +1,204 @@
+/* try playground style */
+.try-inner {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  padding-top: 50px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+/* small screens size. The nav bar becomes two lines */
+@media (max-width: 735px) {
+  .try-inner {
+    padding-top: 100px;
+  }
+}
+.try-buttons {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  background: white;
+  text-align: center;
+  align-items: center;
+}
+.try-button {
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  padding: 1em 2em;
+}
+.try-button:hover {
+  color: $primaryColor;
+  cursor: pointer;
+}
+.try-button-right-border {
+  border-right: 1px solid #d6d4d4;
+}
+
+.arrow {
+  position: absolute;
+  content: '';
+  bottom: 100%;
+  height: 0;
+  width: 0;
+  border: .5em solid transparent;
+  pointer-events: none;
+  border-bottom-color: rgba(0, 0, 0, .6);
+  margin-left: .5em;
+}
+.try-tooltip {
+  position: absolute;
+  z-index: 100;
+  top: 100%;
+  background: rgba(0, 0, 0, .6);
+  color: white;
+  padding: .15em .8em;
+  border-radius: .25em;
+  font-size: .8rem;
+}
+
+.try-button-share {
+  position: relative;
+}
+.try-button-share input {
+  background: #f6f4f4;
+  transition: all 250ms;
+  width: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+}
+.try-button-share:hover input {
+  width: 25vw;
+  margin-right: 1em;
+}
+.try-button-share:hover .try-tooltip {
+  display: block;
+}
+.try-button-share .try-tooltip {
+  display: none;
+  right: 1em;
+  white-space: nowrap;
+}
+.try-button-share .try-tooltip .arrow {
+  right: 2.5em;
+}
+
+.try-button-note:hover .try-tooltip {
+  display: block;
+  width: 50%;
+  text-align: left;
+}
+.try-button-note .try-tooltip {
+  display: none;
+}
+
+.try-button-examples:hover .try-button-examples-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.try-button-examples-list {
+  position: absolute;
+  color: #555;
+  z-index: 100;
+  background: white;
+  display: none;
+  top: 100%;
+  left: 0;
+  min-width: 50vw;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+  border-top: 1px solid #d6d4d4;
+  padding-top: 1em;
+  padding-bottom: 1em;
+}
+.try-button-examples-list li {
+  margin: 0;
+  padding: .5em 2em;
+}
+.try-button-examples-list li:hover {
+  color: $primaryColor;
+}
+
+.try-button-evaluate-checkbox {
+  display: flex;
+  margin-left: 1em;
+  align-self: center;
+  justify-self: center;
+}
+
+.try-grid {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* needed so that firefox height works: https://github.com/reasonml/reasonml.github.io/issues/299 */
+  min-height: 0;
+}
+/* small screens size. The nav bar becomes two lines */
+@media (max-width: 735px) {
+  .try-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.try-grid-editor {
+  background: #f6f4f4;
+  border: 1px solid #d6d4d4;
+  border-bottom: none;
+  border-right: none;
+  position: relative;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.try-label {
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(246, 244, 244, 0.8);
+  padding: 1em;
+  text-transform: uppercase;
+  color: #988;
+  font-size: 12;
+  line-height: 12px;
+  flex-direction: row;
+  align-items: center;
+  z-index: 20;
+  border-radius: 0 0 0 5px;
+  transition: opacity 0.25s;
+}
+.try-grid-editor:hover .try-label {
+  opacity: 0;
+}
+.try-output {
+  /* TODO */
+  /*grid-column: 3/5;*/
+}
+.try-grid .CodeMirror {
+  flex: 1;
+}
+.try-codemirror-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.try-error {
+  font-family: monospace;
+  font-size: 12;
+  padding: 10px 20px;
+  background-color: #faa;
+}
+.try-warning {
+  font-family: monospace;
+  font-size: 12;
+  padding: 10px 20px;
+  background-color: #fff8dc;
+}
+
+.try-output-line {
+  font-family: monospace;
+  white-space: pre;
+}

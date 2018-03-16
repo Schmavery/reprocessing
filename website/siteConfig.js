@@ -9,13 +9,13 @@
 const users = [
   {
     caption: 'Gravitron',
-    image: '/test-site/img/gravitron.png',
+    image: '/reprocessing/img/gravitron.png',
     infoLink: 'https://github.com/jaredly/gravitron',
     pinned: true,
   },
   {
     caption: 'Oh No, Zombies!',
-    image: '/test-site/img/ohnozombies.png',
+    image: '/reprocessing/img/ohnozombies.png',
     infoLink: 'https://github.com/bsansouci/ludum-dare-40/',
     pinned: true,
   },
@@ -25,12 +25,13 @@ const siteConfig = {
   title: 'Reprocessing' /* title for your website */,
   tagline: 'Easy 2D cross-platform drawing',
   url: 'https://github.com/Schmavery/reprocessing' /* your website url */,
-  baseUrl: '/test-site/' /* base url for your project */,
+  baseUrl: '/reprocessing/' /* base url for your project */,
   projectName: 'reprocessing',
   headerLinks: [
     {doc: 'doc1', label: 'Docs'},
     {doc: 'doc4', label: 'API'},
     {page: 'help', label: 'Help'},
+    {page: 'try', label: 'Try'},
     {blog: true, label: 'Blog'},
   ],
   users,

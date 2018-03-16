@@ -6,9 +6,18 @@
     "publish-gh-pages": "docusaurus-publish",
     "write-translations": "docusaurus-write-translations",
     "version": "docusaurus-version",
-    "rename-version": "docusaurus-rename-version"
+    "rename-version": "docusaurus-rename-version",
+    "bundle": "rollup -c"
   },
   "devDependencies": {
-    "docusaurus": "^1.0.9"
+    "docusaurus": "^1.0.9",
+    "rollup": "^0.52.0",
+    "lz-string": "^1.4.4",
+    "codemirror": "^5.32.0",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-jsx": "^1.0.3",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^3.0.0"
   }
 }
