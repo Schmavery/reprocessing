@@ -87,7 +87,7 @@ let hotreload = (~screen=defaultScreen, filename) => {
     mouseDown: identity,
     mouseUp: identity
   });
-  Reprocessing_Hotreload.checkRebuild(filename)
+  Reprocessing_Hotreload.checkRebuild(true, filename)
 };
 
 let run =
@@ -140,6 +140,9 @@ let run =
       hr
     };
   if (! fns.started) {
+    /* This is super hack. We unlock the mutex here because we wanted to make sure the user code  
+       loaded before we started the thread that'll compile in a loop. */
+    Reprocessing_Hotreload.unlockMutex();
     fns.started = true;
     Random.self_init();
     Reprocessing_Utils.noiseSeed(Random.int(Reprocessing_Utils.pow(~base=2, ~exp=30 - 1)));
@@ -262,7 +265,7 @@ let run =
           };
           switch (Hashtbl.find(hotreloadData, screen)) {
           | exception Not_found => ()
-          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
+          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(false, fns.filename)
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
