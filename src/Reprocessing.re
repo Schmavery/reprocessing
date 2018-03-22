@@ -87,7 +87,7 @@ let hotreload = (~screen=defaultScreen, filename) => {
     mouseDown: identity,
     mouseUp: identity
   });
-  Reprocessing_Hotreload.checkRebuild(filename)
+  Reprocessing_Hotreload.checkRebuild(true, filename)
 };
 
 let run =
@@ -262,7 +262,7 @@ let run =
           };
           switch (Hashtbl.find(hotreloadData, screen)) {
           | exception Not_found => ()
-          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
+          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(false, fns.filename)
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
