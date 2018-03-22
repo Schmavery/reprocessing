@@ -4,7 +4,7 @@ let load_plug = fname => {
     try (Dynlink.loadfile(fname)) {
     | Dynlink.Error(err) as e =>
       print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err));
-      raise(e);
+      /*raise(e);*/
     | _ => failwith("Unknown error while loading plugin")
     };
   } else {
@@ -31,48 +31,42 @@ let ocamlPath =
 
 let refmtexe = "node_modules" +/ "bs-platform" +/ "lib" +/ "refmt3.exe";
 
-let compile = m =>
-  while (true) {
-    Mutex.lock(m);
-    switch (Unix.system("~/Desktop/bucklescript/lib/bsb -build-library Index")) {
-    | WEXITED(0) => ()
-    | WEXITED(_)
-    | WSIGNALED(_)
-    | WSTOPPED(_) => print_endline("Hotreload failed")
-    };
-    Mutex.unlock(m);
-  };
+let bsb = "node_modules" +/ ".bin" +/ "bsb";
 
-let m = Mutex.create();
-let unlockMutex = () => Mutex.unlock(m);
 let checkRebuild = (firstTime, filePath) => {
   if (firstTime) {
-    switch (Unix.system("~/Desktop/bucklescript/lib/bsb -build-library Index")) {
+    /* Compile once synchronously because we're going to load it immediately after this. */
+    switch (Unix.system(bsb ++ " -build-library Index")) {
     | WEXITED(0) => ()
     | WEXITED(_)
     | WSIGNALED(_)
     | WSTOPPED(_) => print_endline("Hotreload failed")
     };
-    Mutex.lock(m);
-    ignore @@ Thread.create(compile, m);
-    load_plug("./lib/bs/bytecode/lib.cma");
-    true;
-  } else {
-    let filePath = "./lib/bs/bytecode/lib.cma";
-    if (Sys.file_exists(filePath)) {
-      let {Unix.st_mtime} = Unix.stat(filePath);
-      if (st_mtime > last_st_mtime^) {
-        print_endline("Rebuilding hotloaded module");
-        Mutex.lock(m);
-        load_plug(filePath);
-        Mutex.unlock(m);
-        last_st_mtime := st_mtime;
-        true;
-      } else {
-        false;
-      };
+    let pid =
+      Unix.create_process(
+        bsb,
+        [|bsb, "-w", "-build-library", "Index"|],
+        Unix.stdin,
+        Unix.stdout,
+        Unix.stderr
+      );
+    print_endline("bsb running with pid: " ++ string_of_int(pid));
+    /* 9 is SIGKILL */
+    at_exit(() => Unix.kill(pid, 9));
+    ();
+  };
+  let filePath = "./lib/bs/bytecode/lib.cma";
+  if (Sys.file_exists(filePath)) {
+    let {Unix.st_mtime} = Unix.stat(filePath);
+    if (st_mtime > last_st_mtime^) {
+      print_endline("Reloading hotloaded module");
+      load_plug(filePath);
+      last_st_mtime := st_mtime;
+      true;
     } else {
       false;
     };
+  } else {
+    false;
   };
 };
