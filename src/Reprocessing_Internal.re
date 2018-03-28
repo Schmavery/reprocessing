@@ -154,7 +154,6 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
 
   /*** Enable blend and tell OpenGL how to blend. */
   Gl.enable(~context, RGLConstants.blend);
-
   Gl.blendFunc(
     ~context,
     RGLConstants.src_alpha,
@@ -808,11 +807,7 @@ let loadImage = (env: glEnv, filename, isPixel) : imageT => {
           let width = Gl.getImageWidth(img);
           let filter = isPixel ? Constants.nearest : Constants.linear;
           imageRef.glData = Some({texture, height, width, framebuffer: None});
-          Gl.bindTexture(
-            ~context,
-            ~target=Constants.texture_2d,
-            ~texture
-          );
+          Gl.bindTexture(~context, ~target=Constants.texture_2d, ~texture);
           Gl.texImage2DWithImage(
             ~context,
             ~target=Constants.texture_2d,
@@ -1068,9 +1063,9 @@ let createImage = (width, height, env) => {
     ~pname=Constants.texture_wrap_t,
     ~param=Constants.clamp_to_edge
   );
-
   let framebuffer = Gl.createFramebuffer(~context);
   Gl.bindFramebuffer(~context, ~target=Constants.framebuffer, ~framebuffer);
+
   /*** Enable blend and tell OpenGL how to blend. */
   /*Gl.enable(~context, Constants.blend);*/
   /*Gl.blendFunc(~context, Constants.src_alpha, Constants.one_minus_src_alpha);*/
@@ -1133,14 +1128,17 @@ let drawOnImage = (image, env, cb) =>
         strokeWeight: env.style.strokeWeight /* we need this because ocaml doesn't support record spread without any value added */
       },
       matrix: Matrix.createIdentity(),
-      matrixStack: List.map(m => {
-        let mm = Matrix.createIdentity();
-        Matrix.copyInto(~src=m, ~dst=mm);
-        mm
-      }, env.matrixStack),
-      styleStack: List.map(s => {
-        {...s, strokeWeight: s.strokeWeight}
-      }, env.styleStack),
+      matrixStack:
+        List.map(
+          m => {
+            let mm = Matrix.createIdentity();
+            Matrix.copyInto(~src=m, ~dst=mm);
+            mm;
+          },
+          env.matrixStack
+        ),
+      styleStack:
+        List.map(s => {...s, strokeWeight: s.strokeWeight}, env.styleStack),
       size: {
         ...env.size,
         width: glData.width,
@@ -1194,3 +1192,28 @@ let drawOnImage = (image, env, cb) =>
       ~value=env.camera.projectionMatrix
     );
   };
+
+let clearImage = (image, env) => {
+  image.drawnTo = false;
+  switch image.glData {
+  | None => ()
+  | Some(glData) =>
+    switch glData.framebuffer {
+    | None => ()
+    | Some(framebuffer) =>
+      Gl.bindFramebuffer(
+        ~context=env.gl,
+        ~target=Constants.framebuffer,
+        ~framebuffer
+      );
+      Reasongl.Gl.clear(
+        ~context=env.gl,
+        ~mask=Constants.color_buffer_bit lor Constants.depth_buffer_bit
+      );
+      Gl.bindDefaultFramebuffer(
+        ~context=env.gl,
+        ~target=Constants.framebuffer
+      );
+    }
+  };
+};

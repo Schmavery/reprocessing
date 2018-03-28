@@ -501,7 +501,7 @@ let loadFont:
 
 
 /*** Draws text to the screen.
-   * The font should be loaded using the `loadFont` function.
+  * The font should be loaded using the `loadFont` function.
  */
 let text:
   (
@@ -512,9 +512,10 @@ let text:
   ) =>
   unit;
 
-/** Calculates width of text using a specific font.
+
+/*** Calculates width of text using a specific font.
   * The font should be loaded using the `loadFont` function.
-  */
+ */
 let textWidth:
   (
     ~font: Reprocessing_Font.fontT=?,
@@ -525,7 +526,8 @@ let textWidth:
 
 
 /*** Clears the entire screen. Normally, background is used for this purpose,
- * clear will have different results in web and native. */
+  * clear will have different results in web and native.
+ */
 let clear: Reprocessing_Types.Types.glEnvT => unit;
 
 
@@ -538,6 +540,13 @@ let clear: Reprocessing_Types.Types.glEnvT => unit;
 let background:
   (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
 
+
+/*** Makes draw calls inside the callback draw to the given image instead of to the screen.
+  * The callback is called with a new env which will make all draw calls done inside the callback
+  * draw on the image instead of the main canvas.
+  * This is useful to basically cache draw calls onto an image which can then be drawn to the
+  * screen very cheaply at any point after.
+ */
 let withImage:
   (
     Reprocessing_Types.Types.imageT,
@@ -546,10 +555,22 @@ let withImage:
   ) =>
   unit;
 
+
+/*** Returns a new image which can be drawn to.
+ */
 let createImage:
   (~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) =>
   Reprocessing_Types.Types.imageT;
 
+
+/*** Checks whether the given image has been drawn to since created or since last time clearImage
+  * was called. This is useful when using images as a caching mechanism, to check if the image is
+  * up to date.
+ */
 let isImageDrawnTo: Reprocessing_Types.Types.imageT => bool;
 
-let clearImage: Reprocessing_Types.Types.imageT => unit;
+
+/*** Clears image such that `isImageDrawnTo` returns false.
+ */
+let clearImage:
+  (Reprocessing_Types.Types.imageT, Reprocessing_Types.Types.glEnvT) => unit;
