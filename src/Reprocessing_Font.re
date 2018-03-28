@@ -233,7 +233,7 @@ module Font = {
     switch fnt^ {
     | None => ()
     | Some(fnt) =>
-      switch fnt.image^ {
+      switch fnt.image.glData {
       | Some(img) =>
         let offset = ref(x);
         let lastChar = ref(None);

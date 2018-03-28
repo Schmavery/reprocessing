@@ -15,13 +15,28 @@ let getProgram =
   Gl.shaderSource(~context, ~shader=vertexShader, ~source=vertexShaderSource);
   Gl.compileShader(~context, vertexShader);
   let compiledCorrectly =
-    Gl.getShaderParameter(~context, ~shader=vertexShader, ~paramName=Gl.Compile_status) == 1;
+    Gl.getShaderParameter(
+      ~context,
+      ~shader=vertexShader,
+      ~paramName=Gl.Compile_status
+    )
+    == 1;
   if (compiledCorrectly) {
-    let fragmentShader = Gl.createShader(~context, RGLConstants.fragment_shader);
-    Gl.shaderSource(~context, ~shader=fragmentShader, ~source=fragmentShaderSource);
+    let fragmentShader =
+      Gl.createShader(~context, RGLConstants.fragment_shader);
+    Gl.shaderSource(
+      ~context,
+      ~shader=fragmentShader,
+      ~source=fragmentShaderSource
+    );
     Gl.compileShader(~context, fragmentShader);
     let compiledCorrectly =
-      Gl.getShaderParameter(~context, ~shader=fragmentShader, ~paramName=Gl.Compile_status) == 1;
+      Gl.getShaderParameter(
+        ~context,
+        ~shader=fragmentShader,
+        ~paramName=Gl.Compile_status
+      )
+      == 1;
     if (compiledCorrectly) {
       let program = Gl.createProgram(~context);
       Gl.attachShader(~context, ~program, ~shader=vertexShader);
@@ -30,29 +45,39 @@ let getProgram =
       Gl.deleteShader(~context, fragmentShader);
       Gl.linkProgram(~context, program);
       let linkedCorrectly =
-        Gl.getProgramParameter(~context, ~program, ~paramName=Gl.Link_status) == 1;
+        Gl.getProgramParameter(~context, ~program, ~paramName=Gl.Link_status)
+        == 1;
       if (linkedCorrectly) {
-        Some(program)
+        Some(program);
       } else {
-        print_endline @@ "Linking error: " ++ Gl.getProgramInfoLog(~context, program);
-        None
-      }
+        print_endline @@
+        "Linking error: "
+        ++ Gl.getProgramInfoLog(~context, program);
+        None;
+      };
     } else {
-      print_endline @@ "Fragment shader error: " ++ Gl.getShaderInfoLog(~context, fragmentShader);
-      None
-    }
+      print_endline @@
+      "Fragment shader error: "
+      ++ Gl.getShaderInfoLog(~context, fragmentShader);
+      None;
+    };
   } else {
-    print_endline @@ "Vertex shader error: " ++ Gl.getShaderInfoLog(~context, vertexShader);
-    None
-  }
+    print_endline @@
+    "Vertex shader error: "
+    ++ Gl.getShaderInfoLog(~context, vertexShader);
+    None;
+  };
 };
 
 let createCanvas = (window, height: int, width: int) : glEnv => {
   Gl.Window.setWindowSize(~window, ~width, ~height);
   let context = Gl.Window.getContext(window);
-  Gl.viewport(~context, ~x=(-1), ~y=(-1), ~width, ~height);
+  Gl.viewport(~context, ~x=-1, ~y=-1, ~width, ~height);
   Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=1.);
-  Gl.clear(~context, ~mask=RGLConstants.color_buffer_bit lor RGLConstants.depth_buffer_bit);
+  Gl.clear(
+    ~context,
+    ~mask=RGLConstants.color_buffer_bit lor RGLConstants.depth_buffer_bit
+  );
 
   /*** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
   let camera = {projectionMatrix: Gl.Mat4.create()};
@@ -66,21 +91,30 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
         ~fragmentShader=Reprocessing_Shaders.fragmentShaderSource
       )
     ) {
-    | None => failwith("Could not create the program and/or the shaders. Aborting.")
+    | None =>
+      failwith("Could not create the program and/or the shaders. Aborting.")
     | Some(program) => program
     };
   Gl.useProgram(~context, program);
 
   /*** Get the attribs ahead of time to be used inside the render function **/
-  let aVertexPosition = Gl.getAttribLocation(~context, ~program, ~name="aVertexPosition");
+  let aVertexPosition =
+    Gl.getAttribLocation(~context, ~program, ~name="aVertexPosition");
   Gl.enableVertexAttribArray(~context, ~attribute=aVertexPosition);
-  let aVertexColor = Gl.getAttribLocation(~context, ~program, ~name="aVertexColor");
+  let aVertexColor =
+    Gl.getAttribLocation(~context, ~program, ~name="aVertexColor");
   Gl.enableVertexAttribArray(~context, ~attribute=aVertexColor);
-  let pMatrixUniform = Gl.getUniformLocation(~context, ~program, ~name="uPMatrix");
-  Gl.uniformMatrix4fv(~context, ~location=pMatrixUniform, ~value=camera.projectionMatrix);
+  let pMatrixUniform =
+    Gl.getUniformLocation(~context, ~program, ~name="uPMatrix");
+  Gl.uniformMatrix4fv(
+    ~context,
+    ~location=pMatrixUniform,
+    ~value=camera.projectionMatrix
+  );
 
   /*** Get attribute and uniform locations for later usage in the draw code. **/
-  let aTextureCoord = Gl.getAttribLocation(~context, ~program, ~name="aTextureCoord");
+  let aTextureCoord =
+    Gl.getAttribLocation(~context, ~program, ~name="aTextureCoord");
   Gl.enableVertexAttribArray(~context, ~attribute=aTextureCoord);
 
   /*** Generate texture buffer that we'll use to pass image data around. **/
@@ -120,7 +154,12 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
 
   /*** Enable blend and tell OpenGL how to blend. */
   Gl.enable(~context, RGLConstants.blend);
-  Gl.blendFunc(~context, RGLConstants.src_alpha, RGLConstants.one_minus_src_alpha);
+
+  Gl.blendFunc(
+    ~context,
+    RGLConstants.src_alpha,
+    RGLConstants.one_minus_src_alpha
+  );
 
   /***
    * Will mutate the projectionMatrix to be an ortho matrix with the given boundaries.
@@ -141,7 +180,11 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
     window,
     gl: context,
     batch: {
-      vertexArray: Gl.Bigarray.create(Gl.Bigarray.Float32, circularBufferSize * vertexSize),
+      vertexArray:
+        Gl.Bigarray.create(
+          Gl.Bigarray.Float32,
+          circularBufferSize * vertexSize
+        ),
       elementArray: Gl.Bigarray.create(Gl.Bigarray.Uint16, circularBufferSize),
       vertexPtr: 0,
       elementPtr: 0,
@@ -161,7 +204,11 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
       released: Reprocessing_Common.KeySet.empty,
       down: Reprocessing_Common.KeySet.empty
     },
-    mouse: {pos: (0, 0), prevPos: (0, 0), pressed: false},
+    mouse: {
+      pos: (0, 0),
+      prevPos: (0, 0),
+      pressed: false
+    },
     style: {
       fillColor: Some({r: 0., g: 0., b: 0., a: 1.}),
       strokeWeight: 3,
@@ -173,9 +220,27 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
     styleStack: [],
     matrix: Matrix.createIdentity(),
     matrixStack: [],
-    frame: {count: 1, rate: 10, deltaTime: 0.001},
-    size: {height, width, resizeable: true}
-  }
+    frame: {
+      count: 1,
+      rate: 10,
+      deltaTime: 0.001
+    },
+    size: {
+      height,
+      width,
+      resizeable: true
+    }
+  };
+};
+
+let makeLocalBatch = env => {
+  vertexArray:
+    Gl.Bigarray.create(Gl.Bigarray.Float32, circularBufferSize * vertexSize),
+  elementArray: Gl.Bigarray.create(Gl.Bigarray.Uint16, circularBufferSize),
+  vertexPtr: 0,
+  elementPtr: 0,
+  currTex: None,
+  nullTex: env.batch.nullTex
 };
 
 let drawGeometry =
@@ -189,7 +254,11 @@ let drawGeometry =
     ) => {
   /* Bind `vertexBuffer`, a pointer to chunk of memory to be sent to the GPU to the "register" called
      `array_buffer` */
-  Gl.bindBuffer(~context=env.gl, ~target=RGLConstants.array_buffer, ~buffer=env.vertexBuffer);
+  Gl.bindBuffer(
+    ~context=env.gl,
+    ~target=RGLConstants.array_buffer,
+    ~buffer=env.vertexBuffer
+  );
 
   /*** Copy all of the data over into whatever's in `array_buffer` (so here it's `vertexBuffer`) **/
   Gl.bufferData(
@@ -253,10 +322,20 @@ let drawGeometry =
   );
 
   /*** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
-  Gl.bindTexture(~context=env.gl, ~target=RGLConstants.texture_2d, ~texture=textureBuffer);
+  Gl.bindTexture(
+    ~context=env.gl,
+    ~target=RGLConstants.texture_2d,
+    ~texture=textureBuffer
+  );
 
   /*** Final call which actually tells the GPU to draw. **/
-  Gl.drawElements(~context=env.gl, ~mode, ~count, ~type_=RGLConstants.unsigned_short, ~offset=0)
+  Gl.drawElements(
+    ~context=env.gl,
+    ~mode,
+    ~count,
+    ~type_=RGLConstants.unsigned_short,
+    ~offset=0
+  );
 };
 
 /*
@@ -266,7 +345,7 @@ let drawGeometry =
  * That function creates a new big array with a new size given the offset and len but does NOT copy the
  * underlying array of memory. So mutation done to that sub array will be reflected in the original one.
  */
-let flushGlobalBatch = (env) =>
+let flushGlobalBatch = env =>
   if (env.batch.elementPtr > 0) {
     let textureBuffer =
       switch env.batch.currTex {
@@ -274,8 +353,18 @@ let flushGlobalBatch = (env) =>
       | Some(textureBuffer) => textureBuffer
       };
     drawGeometry(
-      ~vertexArray=Gl.Bigarray.sub(env.batch.vertexArray, ~offset=0, ~len=env.batch.vertexPtr),
-      ~elementArray=Gl.Bigarray.sub(env.batch.elementArray, ~offset=0, ~len=env.batch.elementPtr),
+      ~vertexArray=
+        Gl.Bigarray.sub(
+          env.batch.vertexArray,
+          ~offset=0,
+          ~len=env.batch.vertexPtr
+        ),
+      ~elementArray=
+        Gl.Bigarray.sub(
+          env.batch.elementArray,
+          ~offset=0,
+          ~len=env.batch.elementPtr
+        ),
       ~mode=RGLConstants.triangles,
       ~count=env.batch.elementPtr,
       ~textureBuffer,
@@ -283,7 +372,7 @@ let flushGlobalBatch = (env) =>
     );
     env.batch.currTex = None;
     env.batch.vertexPtr = 0;
-    env.batch.elementPtr = 0
+    env.batch.elementPtr = 0;
   };
 
 let maybeFlushBatch = (~texture, ~el, ~vert, env) =>
@@ -293,7 +382,7 @@ let maybeFlushBatch = (~texture, ~el, ~vert, env) =>
       + vert >= circularBufferSize
       || env.batch.elementPtr > 0
       && env.batch.currTex !== texture) {
-    flushGlobalBatch(env)
+    flushGlobalBatch(env);
   };
 
 /*
@@ -374,7 +463,7 @@ let addRectToGlobalBatch =
   set(elementArrayToMutate, j + 4, ii + 2);
   set(elementArrayToMutate, j + 5, ii + 3);
   env.batch.vertexPtr = i + 4 * vertexSize;
-  env.batch.elementPtr = j + 6
+  env.batch.elementPtr = j + 6;
 };
 
 let drawTriangle = (env, (x1, y1), (x2, y2), (x3, y3), ~color as {r, g, b, a}) => {
@@ -413,11 +502,19 @@ let drawTriangle = (env, (x1, y1), (x2, y2), (x3, y3), ~color as {r, g, b, a}) =
   set(elementArrayToMutate, j + 1, ii + 1);
   set(elementArrayToMutate, j + 2, ii + 2);
   env.batch.vertexPtr = i + 3 * vertexSize;
-  env.batch.elementPtr = j + 3
+  env.batch.elementPtr = j + 3;
 };
 
 let drawLineWithMatrix =
-    (~p1 as (xx1, yy1), ~p2 as (xx2, yy2), ~matrix, ~color, ~width, ~project, env) => {
+    (
+      ~p1 as (xx1, yy1),
+      ~p2 as (xx2, yy2),
+      ~matrix,
+      ~color,
+      ~width,
+      ~project,
+      env
+    ) => {
   let transform = Matrix.matptmul(matrix);
   let dx = xx2 -. xx1;
   let dy = yy2 -. yy1;
@@ -425,7 +522,8 @@ let drawLineWithMatrix =
   let radius = width /. 2.;
   let xthing = dy /. mag *. radius;
   let ything = -. dx /. mag *. radius;
-  let (projectx, projecty) = project ? (dx /. mag *. radius, xthing) : (0., 0.);
+  let (projectx, projecty) =
+    project ? (dx /. mag *. radius, xthing) : (0., 0.);
   let x1 = xx2 +. xthing +. projectx;
   let y1 = yy2 +. ything +. projecty;
   let x2 = xx1 +. xthing -. projectx;
@@ -441,7 +539,7 @@ let drawLineWithMatrix =
     ~topRight=transform((x3, y3)),
     ~topLeft=transform((x4, y4)),
     ~color
-  )
+  );
 };
 
 let drawArc =
@@ -458,7 +556,12 @@ let drawArc =
     ) => {
   let transform = Matrix.matptmul(matrix);
   let noOfFans = int_of_float(radx +. rady) / 2 + 10;
-  maybeFlushBatch(~texture=None, ~vert=vertexSize * (noOfFans + 3), ~el=3 * noOfFans, env);
+  maybeFlushBatch(
+    ~texture=None,
+    ~vert=vertexSize * (noOfFans + 3),
+    ~el=3 * noOfFans,
+    env
+  );
   let (start, stop) = stop < start ? (stop, start) : (start, stop);
   let pi = 4.0 *. atan(1.0);
   let anglePerFan = 2. *. pi /. float_of_int(noOfFans);
@@ -471,10 +574,9 @@ let drawArc =
   let start_i =
     if (isPie) {
       /* Start one earlier and force the first point to be the center */
-      int_of_float(start /. anglePerFan)
-      - 3
+      int_of_float(start /. anglePerFan) - 3;
     } else {
-      int_of_float(start /. anglePerFan) - 2
+      int_of_float(start /. anglePerFan) - 2;
     };
   let stop_i = int_of_float(stop /. anglePerFan) + 1;
   for (i in start_i to stop_i) {
@@ -485,10 +587,14 @@ let drawArc =
             /* force the first point to be the center */
             xCenterOfCircle,
             yCenterOfCircle
-          )
+          );
         } else {
-          let angle = max(min(anglePerFan *. float_of_int(i + 1), stop), start);
-          (xCenterOfCircle +. cos(angle) *. radx, yCenterOfCircle +. sin(angle) *. rady)
+          let angle =
+            max(min(anglePerFan *. float_of_int(i + 1), stop), start);
+          (
+            xCenterOfCircle +. cos(angle) *. radx,
+            yCenterOfCircle +. sin(angle) *. rady
+          );
         }
       );
     let ii = (i - start_i) * vertexSize + vertexArrayOffset;
@@ -504,7 +610,7 @@ let drawArc =
        have 3 elements, one pointing at the first vertex, one pointing at the previously added vertex and one
        pointing at the current vertex. This mimicks the behavior of triangle_fan. */
     if (i - start_i < 3) {
-      set(elementData, i - start_i + elementArrayOffset, ii / vertexSize)
+      set(elementData, i - start_i + elementArrayOffset, ii / vertexSize);
     } else {
       /* We've already added 3 elements, for i = 0, 1 and 2. From now on, we'll add 3 elements _per_ i.
          To calculate the correct offset in `elementData` we remove 3 from i as if we're starting from 0 (the
@@ -514,15 +620,26 @@ let drawArc =
       let jj = (i - start_i - 3) * 3 + elementArrayOffset + 3;
       set(elementData, jj, vertexArrayOffset / vertexSize);
       set(elementData, jj + 1, get(elementData, jj - 1));
-      set(elementData, jj + 2, ii / vertexSize)
-    }
+      set(elementData, jj + 2, ii / vertexSize);
+    };
   };
   env.batch.vertexPtr = env.batch.vertexPtr + (noOfFans + 3) * vertexSize;
-  env.batch.elementPtr = env.batch.elementPtr + (stop_i - start_i - 3) * 3 + 3
+  env.batch.elementPtr = env.batch.elementPtr + (stop_i - start_i - 3) * 3 + 3;
 };
 
-let drawEllipse = (env, center, radx: float, rady: float, matrix: array(float), c) =>
-  drawArc(env, center, radx, rady, 0., Reprocessing_Constants.tau, false, matrix, c);
+let drawEllipse =
+    (env, center, radx: float, rady: float, matrix: array(float), c) =>
+  drawArc(
+    env,
+    center,
+    radx,
+    rady,
+    0.,
+    Reprocessing_Constants.tau,
+    false,
+    matrix,
+    c
+  );
 
 let drawArcStroke =
     (
@@ -543,7 +660,12 @@ let drawArcStroke =
   let elementData = env.batch.elementArray;
   let noOfFans = int_of_float(radx +. rady) / 2 + 10;
   let set = Gl.Bigarray.set;
-  maybeFlushBatch(~texture=None, ~vert=noOfFans * 2 * vertexSize, ~el=noOfFans * 6, env);
+  maybeFlushBatch(
+    ~texture=None,
+    ~vert=noOfFans * 2 * vertexSize,
+    ~el=noOfFans * 6,
+    env
+  );
   let (start, stop) = stop < start ? (stop, start) : (start, stop);
   let pi = 4.0 *. atan(1.0);
   let anglePerFan = 2. *. pi /. float_of_int(noOfFans);
@@ -601,12 +723,18 @@ let drawArcStroke =
       set(elementData, elementArrayOffset + 4, prevInner);
       set(elementData, elementArrayOffset + 5, currInner);
       env.batch.elementPtr = env.batch.elementPtr + 6;
-      prevEl := currEl
-    }
+      prevEl := currEl;
+    };
   };
   if (! isOpen) {
-    let startPt = (xCenterOfCircle +. cos(start) *. radx, yCenterOfCircle +. sin(start) *. rady);
-    let stopPt = (xCenterOfCircle +. cos(stop) *. radx, yCenterOfCircle +. sin(stop) *. rady);
+    let startPt = (
+      xCenterOfCircle +. cos(start) *. radx,
+      yCenterOfCircle +. sin(start) *. rady
+    );
+    let stopPt = (
+      xCenterOfCircle +. cos(stop) *. radx,
+      yCenterOfCircle +. sin(stop) *. rady
+    );
     let centerOfCircle = (xCenterOfCircle, yCenterOfCircle);
     if (isPie) {
       drawLineWithMatrix(
@@ -627,7 +755,14 @@ let drawArcStroke =
         ~project=false,
         env
       );
-      drawEllipse(env, centerOfCircle, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
+      drawEllipse(
+        env,
+        centerOfCircle,
+        halfStrokeWidth,
+        halfStrokeWidth,
+        matrix,
+        strokeColor
+      );
     } else {
       drawLineWithMatrix(
         ~p1=startPt,
@@ -637,80 +772,103 @@ let drawArcStroke =
         ~width=strokeWidth,
         ~project=false,
         env
-      )
+      );
     };
-    drawEllipse(env, startPt, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor);
-    drawEllipse(env, stopPt, halfStrokeWidth, halfStrokeWidth, matrix, strokeColor)
-  }
+    drawEllipse(
+      env,
+      startPt,
+      halfStrokeWidth,
+      halfStrokeWidth,
+      matrix,
+      strokeColor
+    );
+    drawEllipse(
+      env,
+      stopPt,
+      halfStrokeWidth,
+      halfStrokeWidth,
+      matrix,
+      strokeColor
+    );
+  };
 };
 
 let loadImage = (env: glEnv, filename, isPixel) : imageT => {
-  let imageRef = ref(None);
+  let imageRef = {glData: None, drawnTo: false};
   Gl.loadImage(
     ~filename,
     ~callback=
-      (imageData) =>
+      imageData =>
         switch imageData {
-        | None => failwith("Could not load image '" ++ (filename ++ "'.")) /* TODO: handle this better? */
+        | None => failwith("Could not load image '" ++ filename ++ "'.") /* TODO: handle this better? */
         | Some(img) =>
-          let env = env;
-          let textureBuffer = Gl.createTexture(~context=env.gl);
+          let context = env.gl;
+          let texture = Gl.createTexture(~context);
           let height = Gl.getImageHeight(img);
           let width = Gl.getImageWidth(img);
           let filter = isPixel ? Constants.nearest : Constants.linear;
-          imageRef := Some({img, textureBuffer, height, width});
-          Gl.bindTexture(~context=env.gl, ~target=Constants.texture_2d, ~texture=textureBuffer);
+          imageRef.glData = Some({texture, height, width, framebuffer: None});
+          Gl.bindTexture(
+            ~context,
+            ~target=Constants.texture_2d,
+            ~texture
+          );
           Gl.texImage2DWithImage(
-            ~context=env.gl,
+            ~context,
             ~target=Constants.texture_2d,
             ~level=0,
             ~image=img
           );
           Gl.texParameteri(
-            ~context=env.gl,
+            ~context,
             ~target=Constants.texture_2d,
             ~pname=Constants.texture_mag_filter,
             ~param=filter
           );
           Gl.texParameteri(
-            ~context=env.gl,
+            ~context,
             ~target=Constants.texture_2d,
             ~pname=Constants.texture_min_filter,
             ~param=filter
           );
           Gl.texParameteri(
-            ~context=env.gl,
+            ~context,
             ~target=Constants.texture_2d,
             ~pname=Constants.texture_wrap_s,
             ~param=Constants.clamp_to_edge
           );
           Gl.texParameteri(
-            ~context=env.gl,
+            ~context,
             ~target=Constants.texture_2d,
             ~pname=Constants.texture_wrap_t,
             ~param=Constants.clamp_to_edge
-          )
+          );
         },
     ()
   );
-  imageRef
+  imageRef;
 };
+
 let loadImageFromMemory = (env: glEnv, data, isPixel) : imageT => {
-  let imageRef = ref(None);
+  let imageRef = {glData: None, drawnTo: false};
   Gl.loadImageFromMemory(
     ~data,
     ~callback=
-      (imageData) =>
+      imageData =>
         switch imageData {
         | None => failwith("Could not load image") /* TODO: handle this better? */
         | Some(img) =>
           let env = env;
-          let textureBuffer = Gl.createTexture(~context=env.gl);
+          let texture = Gl.createTexture(~context=env.gl);
           let height = Gl.getImageHeight(img);
           let width = Gl.getImageWidth(img);
           let filter = isPixel ? Constants.nearest : Constants.linear;
-          imageRef := Some({img, textureBuffer, height, width});
-          Gl.bindTexture(~context=env.gl, ~target=Constants.texture_2d, ~texture=textureBuffer);
+          imageRef.glData = Some({texture, height, width, framebuffer: None});
+          Gl.bindTexture(
+            ~context=env.gl,
+            ~target=Constants.texture_2d,
+            ~texture
+          );
           Gl.texImage2DWithImage(
             ~context=env.gl,
             ~target=Constants.texture_2d,
@@ -740,16 +898,16 @@ let loadImageFromMemory = (env: glEnv, data, isPixel) : imageT => {
             ~target=Constants.texture_2d,
             ~pname=Constants.texture_wrap_t,
             ~param=Constants.clamp_to_edge
-          )
+          );
         },
     ()
   );
-  imageRef
+  imageRef;
 };
 
 let drawImage =
     (
-      {width: imgw, height: imgh, textureBuffer},
+      {width: imgw, height: imgh, texture},
       ~p1 as (x1, y1),
       ~p2 as (x2, y2),
       ~p3 as (x3, y3),
@@ -765,7 +923,7 @@ let drawImage =
     | Some(c) => c
     | None => {r: 1., g: 1., b: 1., a: 1.}
     };
-  maybeFlushBatch(~texture=Some(textureBuffer), ~vert=32, ~el=6, env);
+  maybeFlushBatch(~texture=Some(texture), ~vert=32, ~el=6, env);
   let (fsubx, fsuby, fsubw, fsubh) = (
     float_of_int(subx) /. float_of_int(imgw),
     float_of_int(suby) /. float_of_int(imgh),
@@ -817,25 +975,27 @@ let drawImage =
   set(elementArray, jj + 5, ii / vertexSize + 3);
   env.batch.vertexPtr = ii + 4 * vertexSize;
   env.batch.elementPtr = jj + 6;
-  env.batch.currTex = Some(textureBuffer)
+  env.batch.currTex = Some(texture);
 };
 
-let drawImageWithMatrix = (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
+let drawImageWithMatrix =
+    (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
   let transform = Matrix.matptmul(env.matrix);
   let p1 = transform((float_of_int @@ x + width, float_of_int @@ y + height));
   let p2 = transform((float_of_int(x), float_of_int @@ y + height));
   let p3 = transform((float_of_int @@ x + width, float_of_int(y)));
   let p4 = transform((float_of_int(x), float_of_int(y)));
-  drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env)
+  drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env);
 };
 
-let drawImageWithMatrixf = (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
+let drawImageWithMatrixf =
+    (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
   let transform = Matrix.matptmul(env.matrix);
   let p1 = transform((x +. width, y +. height));
   let p2 = transform((x, y +. height));
   let p3 = transform((x +. width, y));
   let p4 = transform((x, y));
-  drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env)
+  drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env);
 };
 
 
@@ -845,7 +1005,13 @@ let resetSize = (env, width, height) => {
   env.size.height = height;
   let (pixelWidth, pixelHeight) =
     Gl.Window.(getPixelWidth(env.window), getPixelHeight(env.window));
-  Gl.viewport(~context=env.gl, ~x=0, ~y=0, ~width=pixelWidth, ~height=pixelHeight);
+  Gl.viewport(
+    ~context=env.gl,
+    ~x=0,
+    ~y=0,
+    ~width=pixelWidth,
+    ~height=pixelHeight
+  );
   Gl.clearColor(~context=env.gl, ~r=0., ~g=0., ~b=0., ~a=1.);
   Gl.Mat4.ortho(
     ~out=env.camera.projectionMatrix,
@@ -862,5 +1028,169 @@ let resetSize = (env, width, height) => {
     ~context=env.gl,
     ~location=env.pMatrixUniform,
     ~value=env.camera.projectionMatrix
-  )
+  );
 };
+
+let createImage = (width, height, env) => {
+  let context = env.gl;
+  let texture = Gl.createTexture(~context);
+  let isPixel = true;
+  let filter = isPixel ? Constants.nearest : Constants.linear;
+  Gl.bindTexture(~context, ~target=Constants.texture_2d, ~texture);
+  Gl.texImage2D_null(
+    ~context,
+    ~target=Constants.texture_2d,
+    ~level=0,
+    ~width,
+    ~height
+  );
+  Gl.texParameteri(
+    ~context,
+    ~target=Constants.texture_2d,
+    ~pname=Constants.texture_mag_filter,
+    ~param=filter
+  );
+  Gl.texParameteri(
+    ~context,
+    ~target=Constants.texture_2d,
+    ~pname=Constants.texture_min_filter,
+    ~param=filter
+  );
+  Gl.texParameteri(
+    ~context,
+    ~target=Constants.texture_2d,
+    ~pname=Constants.texture_wrap_s,
+    ~param=Constants.clamp_to_edge
+  );
+  Gl.texParameteri(
+    ~context,
+    ~target=Constants.texture_2d,
+    ~pname=Constants.texture_wrap_t,
+    ~param=Constants.clamp_to_edge
+  );
+
+  let framebuffer = Gl.createFramebuffer(~context);
+  Gl.bindFramebuffer(~context, ~target=Constants.framebuffer, ~framebuffer);
+  /*** Enable blend and tell OpenGL how to blend. */
+  /*Gl.enable(~context, Constants.blend);*/
+  /*Gl.blendFunc(~context, Constants.src_alpha, Constants.one_minus_src_alpha);*/
+  Gl.framebufferTexture2D(
+    ~context,
+    ~target=Constants.framebuffer,
+    ~attachment=Constants.color_attachment0,
+    ~texTarget=Constants.texture_2d,
+    ~texture
+  );
+  Gl.bindDefaultFramebuffer(~context, ~target=Constants.framebuffer);
+  {
+    glData: Some({framebuffer: Some(framebuffer), texture, width, height}),
+    drawnTo: false
+  };
+};
+
+let drawOnImage = (image, env, cb) =>
+  switch image.glData {
+  | None => ()
+  | Some(glData) =>
+    let context = env.gl;
+    /* Create the framebuffer on the fly if it wasn't created (when you start drawing to an image
+         you loaded from a file for example).
+       */
+    let framebuffer =
+      switch glData.framebuffer {
+      | None =>
+        Gl.bindTexture(
+          ~context,
+          ~target=Constants.texture_2d,
+          ~texture=glData.texture
+        );
+        let framebuffer = Gl.createFramebuffer(~context);
+        Gl.bindFramebuffer(
+          ~context,
+          ~target=Constants.framebuffer,
+          ~framebuffer
+        );
+        Gl.framebufferTexture2D(
+          ~context,
+          ~target=Constants.framebuffer,
+          ~attachment=Constants.color_attachment0,
+          ~texTarget=Constants.texture_2d,
+          ~texture=glData.texture
+        );
+        framebuffer;
+      | Some(framebuffer) => framebuffer
+      };
+    Gl.bindFramebuffer(~context, ~target=Constants.framebuffer, ~framebuffer);
+    /* Create a new env that we pass to the callback */
+    let newEnv = {
+      ...env,
+      batch: makeLocalBatch(env),
+      camera: {
+        projectionMatrix: Gl.Mat4.create()
+      },
+      style: {
+        ...env.style,
+        strokeWeight: env.style.strokeWeight /* we need this because ocaml doesn't support record spread without any value added */
+      },
+      matrix: Matrix.createIdentity(),
+      matrixStack: List.map(m => {
+        let mm = Matrix.createIdentity();
+        Matrix.copyInto(~src=m, ~dst=mm);
+        mm
+      }, env.matrixStack),
+      styleStack: List.map(s => {
+        {...s, strokeWeight: s.strokeWeight}
+      }, env.styleStack),
+      size: {
+        ...env.size,
+        width: glData.width,
+        height: glData.height
+      }
+    };
+    Matrix.copyInto(~src=env.matrix, ~dst=newEnv.matrix);
+    {
+      /* Set the size of the viewport.
+         This may be wrong on retina screens... I'm not 100% sure.
+
+         Also calculate a new ortho matrix and send it to the GPU immediately.
+
+                      Ben - March 25th 2018
+          */
+      Gl.viewport(
+        ~context,
+        ~x=0,
+        ~y=0,
+        ~width=glData.width,
+        ~height=glData.height
+      );
+      Gl.Mat4.ortho(
+        ~out=newEnv.camera.projectionMatrix,
+        ~left=0.,
+        ~right=float_of_int(glData.width),
+        ~bottom=0.,
+        ~top=float_of_int(glData.height),
+        ~near=0.,
+        ~far=1.
+      );
+      Gl.uniformMatrix4fv(
+        ~context=newEnv.gl,
+        ~location=newEnv.pMatrixUniform,
+        ~value=newEnv.camera.projectionMatrix
+      );
+    };
+    Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=0.);
+    cb(newEnv);
+    flushGlobalBatch(newEnv);
+    image.drawnTo = true;
+    Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=1.);
+    /* Reset everything back to normal */
+    Gl.bindDefaultFramebuffer(~context, ~target=Constants.framebuffer);
+    let (pixelWidth, pixelHeight) =
+      Gl.Window.(getPixelWidth(env.window), getPixelHeight(env.window));
+    Gl.viewport(~context, ~x=0, ~y=0, ~width=pixelWidth, ~height=pixelHeight);
+    Gl.uniformMatrix4fv(
+      ~context,
+      ~location=env.pMatrixUniform,
+      ~value=env.camera.projectionMatrix
+    );
+  };

@@ -48,7 +48,8 @@ let shear: (~x: float, ~y: float, Reprocessing_Types.Types.glEnvT) => unit;
 
 
 /*** Sets the color used to fill shapes.*/
-let fill: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
+let fill:
+  (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
 /*** Disables filling geometry. If both `noStroke` and `noFill` are called,
@@ -60,7 +61,8 @@ let noFill: Reprocessing_Types.Types.glEnvT => unit;
 /*** Sets the fill value for displaying images. Images can be tinted to specified colors
    * or made transparent by including an alpha value.
  */
-let tint: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
+let tint:
+  (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
 /*** Removes the current fill value for displaying images and reverts to displaying
@@ -70,7 +72,8 @@ let noTint: Reprocessing_Types.Types.glEnvT => unit;
 
 
 /*** Sets the color used to draw lines and borders around shapes. */
-let stroke: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
+let stroke:
+  (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
 /*** Disables drawing the stroke (outline). If both noStroke() and noFill()
@@ -88,7 +91,9 @@ let strokeWeight: (int, Reprocessing_Types.Types.glEnvT) => unit;
 /*** Sets the style for rendering line endings. These ends are either squared,
   * extended, or rounded.
  */
-let strokeCap: (Reprocessing_Types.Types.strokeCapT, Reprocessing_Types.Types.glEnvT) => unit;
+let strokeCap:
+  (Reprocessing_Types.Types.strokeCapT, Reprocessing_Types.Types.glEnvT) =>
+  unit;
 
 
 /*** Sets the style to modify the location from which rectangles are drawn by
@@ -105,7 +110,8 @@ let strokeCap: (Reprocessing_Types.Types.strokeCapT, Reprocessing_Types.Types.gl
   * but uses the third and fourth parameters to specify half of the shapes's width
   * and height.
  */
-let rectMode: (Reprocessing_Types.Types.rectModeT, Reprocessing_Types.Types.glEnvT) => unit;
+let rectMode:
+  (Reprocessing_Types.Types.rectModeT, Reprocessing_Types.Types.glEnvT) => unit;
 
 
 /*** The `pushStyle` function saves the current style settings and `popStyle`
@@ -233,7 +239,13 @@ let subImagef:
    * every angle at ninety degrees.
  */
 let rectf:
-  (~pos: (float, float), ~width: float, ~height: float, Reprocessing_Types.Types.glEnvT) => unit;
+  (
+    ~pos: (float, float),
+    ~width: float,
+    ~height: float,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
 
 
 /*** Draws a rectangle to the screen. A rectangle is a four-sided shape with
@@ -242,7 +254,14 @@ let rectf:
    * This is the same as `rectf`, but converts all its integer arguments to floats
    * as a convenience.
  */
-let rect: (~pos: (int, int), ~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) => unit;
+let rect:
+  (
+    ~pos: (int, int),
+    ~width: int,
+    ~height: int,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
 
 
 /*** Draws a curved line on the screen. The first parameter specifies
@@ -250,7 +269,13 @@ let rect: (~pos: (int, int), ~width: int, ~height: int, Reprocessing_Types.Types
    * control point. The middle parameters specify the start and stop of the curve.
  */
 let curve:
-  ((float, float), (float, float), (float, float), (float, float), Reprocessing_Common.glEnv) =>
+  (
+    (float, float),
+    (float, float),
+    (float, float),
+    (float, float),
+    Reprocessing_Common.glEnv
+  ) =>
   unit;
 
 
@@ -260,7 +285,13 @@ let curve:
    * drawn with a width of one pixel by default, but this can be changed with
    * the `strokeWeight` function.
  */
-let linef: (~p1: (float, float), ~p2: (float, float), Reprocessing_Types.Types.glEnvT) => unit;
+let linef:
+  (
+    ~p1: (float, float),
+    ~p2: (float, float),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
 
 
 /*** Draws a line (a direct path between two points) to the screen.
@@ -272,14 +303,21 @@ let linef: (~p1: (float, float), ~p2: (float, float), Reprocessing_Types.Types.g
    * This is the same as `linef`, but converts all its integer arguments to floats
    * as a convenience.
  */
-let line: (~p1: (int, int), ~p2: (int, int), Reprocessing_Types.Types.glEnvT) => unit;
+let line:
+  (~p1: (int, int), ~p2: (int, int), Reprocessing_Types.Types.glEnvT) => unit;
 
 
 /*** Draws an ellipse (oval) to the screen. An ellipse with equal width and
    * height is a circle.
  */
 let ellipsef:
-  (~center: (float, float), ~radx: float, ~rady: float, Reprocessing_Types.Types.glEnvT) => unit;
+  (
+    ~center: (float, float),
+    ~radx: float,
+    ~rady: float,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
 
 
 /*** Draws an ellipse (oval) to the screen. An ellipse with equal width and
@@ -289,7 +327,13 @@ let ellipsef:
    * floats as a convenience.
  */
 let ellipse:
-  (~center: (int, int), ~radx: int, ~rady: int, Reprocessing_Types.Types.glEnvT) => unit;
+  (
+    ~center: (int, int),
+    ~radx: int,
+    ~rady: int,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
 
 
 /***  A quad is a quadrilateral, a four sided polygon. It is similar to a
@@ -343,7 +387,11 @@ let pixelf:
    * floats as a convenience.
  */
 let pixel:
-  (~pos: (int, int), ~color: Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) =>
+  (
+    ~pos: (int, int),
+    ~color: Reprocessing_Types.Types.colorT,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
   unit;
 
 
@@ -364,7 +412,13 @@ let trianglef:
    * floats as a convenience.
  */
 let triangle:
-  (~p1: (int, int), ~p2: (int, int), ~p3: (int, int), Reprocessing_Types.Types.glEnvT) => unit;
+  (
+    ~p1: (int, int),
+    ~p2: (int, int),
+    ~p3: (int, int),
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
 
 
 /*** Draws a Bezier curve on the screen. These curves are defined by a
@@ -442,7 +496,8 @@ let arc:
    * pixelated)
  */
 let loadFont:
-  (~filename: string, ~isPixel: bool=?, Reprocessing_Types.Types.glEnvT) => Reprocessing_Font.fontT;
+  (~filename: string, ~isPixel: bool=?, Reprocessing_Types.Types.glEnvT) =>
+  Reprocessing_Font.fontT;
 
 
 /*** Draws text to the screen.
@@ -480,4 +535,21 @@ let clear: Reprocessing_Types.Types.glEnvT => unit;
    * each frame, but it can be used inside `setup` to set the background on the
    * first frame of animation or if the backgound need only be set once.
  */
-let background: (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
+let background:
+  (Reprocessing_Types.Types.colorT, Reprocessing_Types.Types.glEnvT) => unit;
+
+let withImage:
+  (
+    Reprocessing_Types.Types.imageT,
+    Reprocessing_Types.Types.glEnvT,
+    Reprocessing_Types.Types.glEnvT => unit
+  ) =>
+  unit;
+
+let createImage:
+  (~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) =>
+  Reprocessing_Types.Types.imageT;
+
+let isImageDrawnTo: Reprocessing_Types.Types.imageT => bool;
+
+let clearImage: Reprocessing_Types.Types.imageT => unit;

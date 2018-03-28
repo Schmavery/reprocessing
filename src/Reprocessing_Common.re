@@ -70,13 +70,17 @@ let circularBufferSize = 6 * 10000;
 let vertexSize = 8;
 
 type _imageT = {
-  textureBuffer: Gl.textureT,
-  img: Gl.imageT,
+  framebuffer: option(Gl.framebufferT),
+  texture: Gl.textureT,
+  /* both redundant with tgls, maybe make Gl expose functions to get the width/height */
   height: int,
   width: int
 };
 
-type imageT = ref(option(_imageT));
+type imageT = {
+  mutable glData: option(_imageT),
+  mutable drawnTo: bool,
+};
 
 type soundLoadStatusT =
   | Loading

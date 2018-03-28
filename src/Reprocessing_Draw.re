@@ -72,7 +72,7 @@ let subImage =
       ~texHeight as subh,
       env
     ) =>
-  switch img^ {
+  switch img.glData {
   | None => print_endline("image not ready yet, just doing nothing :D")
   | Some(i) =>
     Internal.drawImageWithMatrix(i, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env)
@@ -89,14 +89,14 @@ let subImagef =
       ~texHeight as subh,
       env
     ) =>
-  switch img^ {
+  switch img.glData {
   | None => print_endline("image not ready yet, just doing nothing :D")
   | Some(i) =>
     Internal.drawImageWithMatrixf(i, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env)
   };
 
 let image = (img, ~pos as (x, y), ~width=?, ~height=?, env: glEnv) =>
-  switch img^ {
+  switch img.glData {
   | None => print_endline("image not ready yet, just doing nothing :D")
   | Some({width: imgw, height: imgh} as img) =>
     switch (width, imgw, height, imgh) {
@@ -532,3 +532,11 @@ let background = (color, env: glEnv) => {
     ~color
   )
 };
+
+let createImage = (~width, ~height, env) => Internal.createImage(width, height, env);
+
+let withImage = (image, env, cb) => Internal.drawOnImage(image, env, cb);
+
+let isImageDrawnTo = image => image.drawnTo;
+
+let clearImage = image => image.drawnTo = false;
