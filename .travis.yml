@@ -5,9 +5,13 @@ node_js:
 cache:
   directories:
     - node_modules
+before_script:
+  - sudo apt-get update
+  - sudo apt-get install \
+      dbus \
+      ibus
 script:
   - npm install
   - npm run build
   - npm run build:bytecode
   - npm run build:native
-
