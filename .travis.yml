@@ -2,15 +2,14 @@ dist: trusty
 language: node_js
 node_js:
   - 8
-sudo: required
+addons:
+  apt:
+    packages:
+      - libdbus-1-dev
+      - libibus-1.0-dev
 cache:
   directories:
     - node_modules
-before_script:
-  - sudo apt-get update && \
-    sudo apt-get install -qq \
-      libdbus-1-dev \
-      libibus-1.0-dev
 script:
   - npm install
   - npm run build
