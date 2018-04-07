@@ -6,10 +6,10 @@ cache:
   directories:
     - node_modules
 before_script:
-  - sudo apt-get update
-  - sudo apt-get install \
-      dbus \
-      ibus
+  - sudo apt-get update && \
+    sudo apt-get install -qq \
+      libdbus-1-dev \
+      libibus-1.0-dev
 script:
   - npm install
   - npm run build
