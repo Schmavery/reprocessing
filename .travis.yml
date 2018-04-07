@@ -5,6 +5,7 @@ node_js:
 addons:
   apt:
     packages:
+      - fcitx-libs
       - libdbus-1-dev
       - libibus-1.0-dev
 cache:
