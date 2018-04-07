@@ -7,7 +7,6 @@ addons:
     packages:
       - libsdl2-dev
       - fcitx-libs-dev
-      - libdbus-1-dev
       - libibus-1.0-dev
 cache:
   directories:
