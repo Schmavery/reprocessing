@@ -1,0 +1,18 @@
+dist: trusty
+language: node_js
+node_js:
+  - 8
+addons:
+  apt:
+    packages:
+      - libsdl2-dev
+      - fcitx-libs-dev
+      - libibus-1.0-dev
+cache:
+  directories:
+    - node_modules
+script:
+  - npm install
+  - npm run build
+  - npm run build:bytecode
+  - npm run build:native
