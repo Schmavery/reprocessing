@@ -29,7 +29,7 @@ type hotreloadT('a) = {
   mutable keyTyped: ('a, Reprocessing_Common.glEnv) => 'a
 };
 
-let hotreloadData = Obj.magic(ref(None));
+let hotreloadData = Obj.magic(Hashtbl.create(10));
 
 let afterDraw = (f, env: Common.glEnv) => {
   open Common;
@@ -53,32 +53,47 @@ let unwrapOrDefault = (default, opt) =>
 
 let identity = (a, _) => a;
 
-let hotreload = (filename) => {
+let defaultScreen = "reprocessing-default";
+
+let currentScreen = ref(defaultScreen);
+let setScreenId = id => currentScreen := id;
+let clearScreenId = () => currentScreen := defaultScreen;
+
+let pauseFns = Hashtbl.create(10);
+
+let playPause = (id, play) => {
+  switch (Hashtbl.find(pauseFns, id)) {
+  | exception Not_found => None
+  | fn => {Some(fn(play))}
+  }
+};
+
+let hotreload = (~screen=defaultScreen, filename) => {
   /* ... */
   let _a = Reprocessing_Draw.translate;
   let _b = Reprocessing_Utils.color;
   let _c = Reprocessing_Constants.red;
   let _d = Reprocessing_Common.circularBufferSize;
   let _e = Reprocessing_Events.keycodeMap;
-  hotreloadData :=
-    Some({
-      started: false,
-      filename,
-      draw: identity,
-      keyPressed: identity,
-      keyReleased: identity,
-      keyTyped: identity,
-      mouseMove: identity,
-      mouseDragged: identity,
-      mouseDown: identity,
-      mouseUp: identity
-    });
+  Hashtbl.replace(hotreloadData, screen, {
+    started: false,
+    filename,
+    draw: identity,
+    keyPressed: identity,
+    keyReleased: identity,
+    keyTyped: identity,
+    mouseMove: identity,
+    mouseDragged: identity,
+    mouseDown: identity,
+    mouseUp: identity
+  });
   Reprocessing_Hotreload.checkRebuild(filename)
 };
 
 let run =
     (
       ~setup,
+      ~screen=?,
       ~draw=?,
       ~mouseMove=?,
       ~mouseDragged=?,
@@ -89,10 +104,15 @@ let run =
       ~keyTyped=?,
       ()
     ) => {
+  let screen = switch screen {
+  | None => currentScreen^
+  | Some(screen) => screen
+  };
   let unwrap = unwrapOrDefault(identity);
   let fns =
-    switch hotreloadData^ {
-    | None => {
+    switch (Hashtbl.find(hotreloadData, screen)) {
+    | exception Not_found => {
+      let hr = {
         started: false,
         filename: "",
         draw: unwrap(draw),
@@ -103,8 +123,11 @@ let run =
         mouseDragged: unwrap(mouseDragged),
         mouseDown: unwrap(mouseDown),
         mouseUp: unwrap(mouseUp)
-      }
-    | Some(hr) =>
+      };
+      Hashtbl.replace(hotreloadData, screen, hr);
+      hr
+    }
+    | hr =>
       hr.draw = unwrap(draw);
       hr.keyPressed = unwrap(keyPressed);
       hr.keyReleased = unwrap(keyReleased);
@@ -122,7 +145,7 @@ let run =
     Reprocessing_Utils.noiseSeed(Random.int(Reprocessing_Utils.pow(~base=2, ~exp=30 - 1)));
     let env =
       Reprocessing_Internal.createCanvas(
-        Reprocessing_ClientWrapper.init(~argv=Sys.argv),
+        Reprocessing_ClientWrapper.init(~screen, ~argv=Sys.argv),
         200,
         200
       );
@@ -230,16 +253,16 @@ let run =
     };
 
     /*** Start the render loop. **/
-    Gl.render(
+    let playPauseFn = Gl.render(
       ~window=env.window,
       ~displayFunc=
         (f) => {
           if (env.frame.count === 2) {
             reDrawPreviousBufferOnSecondFrame()
           };
-          switch hotreloadData^ {
-          | Some(_) => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
-          | None => ()
+          switch (Hashtbl.find(hotreloadData, screen)) {
+          | exception Not_found => ()
+          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
@@ -292,6 +315,7 @@ let run =
           userState := fns.keyReleased(userState^, env)
         },
       ()
-    )
+    );
+    Hashtbl.replace(pauseFns, screen, playPauseFn);
   }
 };

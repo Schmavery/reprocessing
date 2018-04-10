@@ -1,6 +1,7 @@
 module NoHotreloading = struct
+  (* "Hotreload only supported when compiling to bytecode." *)
   let checkRebuild _ =
-    failwith "Hotreload only supported when compiling to bytecode."
+    false
 end
 
 #if BSB_BACKEND = "bytecode" then

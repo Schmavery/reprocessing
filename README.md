@@ -10,30 +10,41 @@ The 2nd simplest way to try is to clone [reprocessing-example](https://github.co
 
 See [below](#projects-using-reprocessing) for projects using Reprocessing!
 
+```reason;shared(sandbox)
+[@bs.val] external sandboxCanvasId: string = "";
+[@bs.val] external sandboxCanvas: 'canvas = "";
+[@bs.val] external containerDiv: 'node = "";
+[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+let id = sandboxCanvasId;
+addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+Reprocessing.setScreenId(sandboxCanvasId);
+```
+
 ## Getting Started
 ```bash
 npm install schmavery/reprocessing
 ```
 
 ### Example
-```reason
+```reason;use(sandbox);canvas
 open Reprocessing;
 
 let setup = (env) => {
-  Env.size(~width=600, ~height=600, env);
+  Env.size(~width=200, ~height=200, env);
 };
 
 let draw = (_state, env) => {
   Draw.background(Constants.black, env);
   Draw.fill(Constants.red, env);
-  Draw.rect(~pos=(150, 150), ~width=300, ~height=300, env)
+  Draw.rect(~pos=(50, 50), ~width=100, ~height=100, env)
 };
 
 run(~setup, ~draw, ());
 ```
 
 ### Build
-```
+```sh
 npm run build
 ```
 
@@ -56,6 +67,7 @@ See also [FlappyBird](https://github.com/Schmavery/FlappyBird) or [2048](https:/
 
 - There are no built-in variables like `width` and `mouseX`.  Instead, these are functions that are called, passing in an environment object that is always provided.
 ```reason
+# open Reprocessing
 let draw = (state, env) => {
   let w = Env.width(env);
   print_endline("The current width is:" ++ string_of_int(w))
@@ -67,7 +79,9 @@ let draw = (state, env) => {
 - Because of the limitations of Reason, several utility functions that would otherwise accept either an integer or a float now expose a version with an `f` suffix, which supports floats.  Ex: `random` vs `randomf`.
 
 - Points are expressed as tuples.  Instead of exposing a `mouseX` and `mouseY`, there is a `mouse`, which is a tuple of x and y values.
+
 ```reason
+# open Reprocessing
 let draw = (state, env) => {
   let (x, y) = Env.mouse(env);
   print_endline("The current mouse position is:" ++ (string_of_int(x) ++ string_of_int(y)))
@@ -76,7 +90,7 @@ let draw = (state, env) => {
 
 
 # Using Fonts
-The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it. 
+The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it.
 
 Check out [font-generator](https://github.com/bsansouci/font-generator) for a tool that can take any truetype or opentype font and output font files that Reprocessing can use.
 
