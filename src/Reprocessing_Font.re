@@ -1,5 +1,13 @@
 open Reasongl;
 
+/** # Fonts & Text
+ *
+ * This module is internal - you probably shouldn't depend on any implementation details.
+ *
+ * Take a look at [Draw.text](./Reprocessing_Draw.html#value-text) for information on drawing text.
+ *
+ */
+
 module Internal = Reprocessing_Internal;
 
 open Reprocessing_Common;

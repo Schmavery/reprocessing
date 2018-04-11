@@ -1,5 +1,34 @@
 open Reprocessing_Common;
 
+/**
+ * The Draw module
+ *
+ * This is where all the fancy things happen.
+ *
+ * ```reason;shared(sandbox)
+ * [@bs.val] external sandboxCanvasId: string = "";
+ * [@bs.val] external sandboxCanvas: 'canvas = "";
+ * [@bs.val] external containerDiv: 'node = "";
+ * [@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+ * let id = sandboxCanvasId;
+ * addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+ * addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+ * Reprocessing.setScreenId(sandboxCanvasId);
+ * ```
+ *
+ * ```reason;shared(draw);use(sandbox)
+ * open Reprocessing;
+ * run(~setup=(_) => (), ~draw=((), env) => {
+ * %{code}%
+ * })
+ * ```
+ *
+ * ```canvas;use(draw)
+ * fill(Constants.red, env);
+ * rect(~pos=Env.mouse(env), ~width=5, ~height=5, env);
+ * ```
+ */;
+
 module Internal = Reprocessing_Internal;
 
 module Matrix = Reprocessing_Matrix;

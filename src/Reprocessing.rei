@@ -23,6 +23,12 @@
  *
  * @doc Utils, Constants, Draw, Env, Events
  *
+ * ## Handling Multiple Canvases
+ *
+ * (only supported on web target)
+ *
+ * @doc setScreenId, clearScreenId, playPause
+ *
  * @includes
 */;
 
@@ -52,9 +58,30 @@ include Reprocessing_Types.TypesT;
 
 let hotreload: (~screen: string=?, string) => bool;
 
+/** Set the ID that will be used by subsequent calls to `run()` that don't have an explicitly-passed `~screen`.
+ *
+ * If a canvas exists on the document with the given ID, then that canvas will be used. Otherwise a canvas will be created & appended to the body.
+ *
+ * ```no-run
+ * # let _ = (setup, draw) => {
+ * Reprocessing.setScreenId("my-fancy-id");
+ * /* This will render to the canvas with id "my-fancy-id" */
+ * Reprocessing.run(~setup, ~draw, ());
+ * # }
+ * ```
+*/
 let setScreenId: string => unit;
 let clearScreenId: unit => unit;
 
+/** Play/pause the screen specified by the given ID. If you pass true, it will try to play it, otherwise pause.
+ *
+ * The return value indicates the status:
+ * - None: no screen found
+ * - Some(true): the screen is (now/still) playing
+ * - Some(false): the screen is (now/still) paused
+ *
+ * Calling this function will not necessarily change the state. Inspect the result to determine success.
+ */
 let playPause: (string, bool) => option(bool);
 
 
