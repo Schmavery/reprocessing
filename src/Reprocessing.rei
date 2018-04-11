@@ -11,7 +11,7 @@
  *
  * Put the following in an `indexhot.re`
  *
- * ```reason;dont-run
+ * ```reason;no-run
  * Reprocessing.hotreload("./index.re")
  * ```
  *

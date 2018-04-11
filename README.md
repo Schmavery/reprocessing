@@ -10,6 +10,7 @@ The 2nd simplest way to try is to clone [reprocessing-example](https://github.co
 
 See [below](#projects-using-reprocessing) for projects using Reprocessing!
 
+<!--!
 ```reason;shared(sandbox)
 [@bs.val] external sandboxCanvasId: string = "";
 [@bs.val] external sandboxCanvas: 'canvas = "";
@@ -20,6 +21,7 @@ addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, f
 addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
 Reprocessing.setScreenId(sandboxCanvasId);
 ```
+-->
 
 ## Getting Started
 ```bash
@@ -66,8 +68,8 @@ See also [FlappyBird](https://github.com/Schmavery/FlappyBird) or [2048](https:/
 - For state management, we encourage the use of the `state` value that Reprocessing manages for the user.  To use this, decide on a datatype representing the state and return the initial value from `setup`.  This will be persisted behind the scenes and passed to every callback (such as `draw` and `mouseDown`).  Each callback should return the new value of the state (or the old value if it doesn't change).
 
 - There are no built-in variables like `width` and `mouseX`.  Instead, these are functions that are called, passing in an environment object that is always provided.
-```reason
-# open Reprocessing
+```reason;prefix(1);no-run
+open Reprocessing;
 let draw = (state, env) => {
   let w = Env.width(env);
   print_endline("The current width is:" ++ string_of_int(w))
@@ -80,8 +82,8 @@ let draw = (state, env) => {
 
 - Points are expressed as tuples.  Instead of exposing a `mouseX` and `mouseY`, there is a `mouse`, which is a tuple of x and y values.
 
-```reason
-# open Reprocessing
+```reason;prefix(1);no-run
+open Reprocessing;
 let draw = (state, env) => {
   let (x, y) = Env.mouse(env);
   print_endline("The current mouse position is:" ++ (string_of_int(x) ++ string_of_int(y)))
@@ -95,9 +97,12 @@ The story for using fonts in your Reprocessing app is still under some developme
 Check out [font-generator](https://github.com/bsansouci/font-generator) for a tool that can take any truetype or opentype font and output font files that Reprocessing can use.
 
 The assets folder of this repo also has an [example](https://github.com/Schmavery/reprocessing/tree/master/assets/font) of a font that can be copied to your project and used.  In order to use a font once you have the files:
-```
+```prefix(2);suffix(1);no-run
+open Reprocessing;
+let fn = (filename, env) => {
 let font = Draw.loadFont(~filename, env);
 Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
+}
 ```
 
 ## Projects using Reprocessing
