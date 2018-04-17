@@ -1,6 +1,9 @@
 # Reprocessing
 
 [![Build Status](https://travis-ci.org/Schmavery/reprocessing.svg?branch=master)](https://travis-ci.org/Schmavery/reprocessing)
+[![Build status](https://ci.appveyor.com/api/projects/status/jgaaw641624db0pq/branch/master?svg=true&passingText=windows%20-%20OK&failingText=windows%20-%20Failing)](https://ci.appveyor.com/project/Schmavery/reprocessing/branch/master)
+
+
 
 This is a high-level drawing library, inspired by [Processing](https://processing.org), allowing you to write code that'll run on the web (using WebGL) and natively (using OpenGL).
 
