@@ -21,6 +21,8 @@ script:
   - npm run build
   - npm run build:bytecode
   - npm run build:native
+  
+before_install: if [[ `npm -v` != 4* ]]; then npm i -g npm@4; fi
 
 branches:
   only:
