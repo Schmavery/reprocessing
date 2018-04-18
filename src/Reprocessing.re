@@ -136,7 +136,7 @@ let run =
       hr.mouseDragged = unwrap(mouseDragged);
       hr.mouseDown = unwrap(mouseDown);
       hr.mouseUp = unwrap(mouseUp);
-      print_endline("Succesfully changed functions");
+      print_endline("Successfully changed functions");
       hr
     };
   if (! fns.started) {
