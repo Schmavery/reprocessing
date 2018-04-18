@@ -1,4 +1,4 @@
-## Reprocessing
+# Reprocessing
 
 Reprocessing is a high-level drawing library, inspired by [Processing](https://processing.org), allowing you to write code that'll run on the web (using WebGL) and natively (using OpenGL).
 
