@@ -4,3 +4,4 @@ node_modules
 .merlin
 npm-debug.log
 docs
+lib

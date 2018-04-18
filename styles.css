@@ -8,12 +8,21 @@ body {
 body {
   font-size: 17px;
   line-height: 26px;
-  font-weight: 400;
-  letter-spacing: -0.021em;
   font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 
-  font-weight: 200;
-  letter-spacing: 0.04em;
+  font-weight: 400;
+
+  font-synthesis: none;
+  -moz-font-feature-settings: 'kern';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  direction: ltr;
+
+  line-height: 1.52947;
+  letter-spacing: -0.021em;
+  background-color: white;
+  font-style: normal;
+  color: #333333;
 }
 
 h4.item {
@@ -101,6 +110,10 @@ div.compile-error {
   border-top-right-radius: 3px;
 }
 
+/*p {
+   width: 600px;
+}
+*/
 .code-post,
 .code-pre,
 .CodeMirror,
@@ -117,16 +130,27 @@ p code {
   font-size: 15px;
   line-height: 1.5em;
 
-  font-weight: 200;
-  color: #666;
+  font-weight: normal;
+  color: #333;
 }
 
 .body {
   margin-left: 24px;
   margin-bottom: 48px;
-  line-height: 1.5em;
-  font-size: 20px;
-  letter-spacing: 1px;
+  font-size: 17px;
+
+  font-weight: 400;
+
+  font-synthesis: none;
+  -moz-font-feature-settings: 'kern';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  direction: ltr;
+
+  line-height: 1.52947;
+  letter-spacing: -0.021em;
+  background-color: white;
+  font-style: normal;
 }
 .body-empty,
 .include-body .body {
@@ -149,6 +173,7 @@ h1, h2 {
 }
 h1, h2, h3, h4 {
   color: #444;
+  line-height: 32px;
 }
 
 h4.module {
@@ -199,14 +224,17 @@ a:hover, a:focus {
 .container {
   display: flex;
   justify-content: center;
-  margin: 48px auto;
+  margin: 0px auto;
+  position: relative;
+  top: -48px;
 }
 
 .main {
-  width: 600px;
+   width: 800px;
   padding: 0 16px;
   box-sizing: border-box;
   position: relative;
+  margin-top: 24px;
 }
 
 .edit-link {
@@ -233,8 +261,10 @@ a, a:visited,
   position: -webkit-sticky;
   top: 0;
   overflow: auto;
-  max-height: 100vh;
+  max-height: 90vh;
   word-break: break-word;
+  padding-top: 48px;
+  padding-bottom: 48px;
 }
 
 .table-of-contents {
@@ -246,13 +276,13 @@ a, a:visited,
   display: flex;
   flex-direction: column;
   padding: 8px;
-  font-size: 14px;
+  font-size: 16px;
   padding-bottom: 32px;
 }
 
 .table-of-contents .toc-header,
 .project-listing .project-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   margin: 16px 0 8px;
 }
@@ -267,7 +297,7 @@ a, a:visited,
   padding: 8px;
 }
 
-@media(max-width: 1000px) {
+@media(max-width: 1200px) {
   .sidebar {
     position: static;
     width: 600px;
@@ -299,7 +329,7 @@ a, a:visited,
   }
 }
 
-@media(max-width: 620px) {
+@media(max-width: 820px) {
   .sidebar-expander,
   .sidebar {
     width: auto;
@@ -335,7 +365,7 @@ a, a:visited,
 }
 
 .table-of-contents a.header {
-  font-weight: 400;
+  font-weight: 300;
 }
 
 a.level-1 {
@@ -379,16 +409,22 @@ a.level-5 {
 
 pre.code > code {
   color: #aaa;
+  font-size: 15px;
+  line-height: 1.26667;
+  font-weight: 400;
+  letter-spacing: -0.027em;
+  font-family: "SF Mono", Menlo, monospace, "SF Pro Icons";
 }
 
 .code-block > .CodeMirror,
 pre.code {
-  border-radius: 3px;
-  box-shadow: 0 0.5px 3px #aaa;
-  background-color: white;
+  /*box-shadow: 0 0.5px 3px #aaa;*/
+  background-color: #f9fafa;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
 }
 .code .ident, .code .pattern-ident {
-    color: #000;
+    color: #333;
 }
 
 .code .module-identifier {
@@ -432,7 +468,7 @@ pre.code {
 }
 
 .code .string {
-    color: #33a20d;
+    color: #c41a16;
 }
 
 .code .int {
@@ -465,7 +501,7 @@ pre.code {
   pointer-events: none;
   margin-top: 10px;
   margin-left: 10px;
-  box-shadow: 0 1px 6px #555;
+  box-shadow: 0px 1px 3px #e6e6e6;
   border-radius: 3px;
 }
 
@@ -562,7 +598,7 @@ pre.code {
   cursor: pointer;
 }
 
-@media(max-width: 1000px) {
+@media(max-width: 1200px) {
   .block-target-container {
     position: static;
     margin-left: 0;
