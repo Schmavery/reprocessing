@@ -7,6 +7,8 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install --production
+  # install the build system
+  - npm install bsansouci/bsb-native#2.1.1
 
 # Post-install test scripts.
 test_script:
