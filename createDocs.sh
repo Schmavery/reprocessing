@@ -6,10 +6,7 @@ cp index.md README.md
 
 sed -i "" -e 's/Reprocessing_ClientWrapper.init/Reasongl.Gl.Window.init/' src/Reprocessing.re
 
-./node_modules/bs-platform/lib/bsb.exe -clean-world
-./node_modules/bs-platform/lib/bsb.exe -make-world -backend native
-./node_modules/bs-platform/lib/bsb.exe -make-world -backend bytecode
-./node_modules/bs-platform/lib/bsb.exe -make-world -backend js
+./node_modules/bs-platform/lib/bsb.exe -clean-world -make-world -backend js
 
 ls src
 
