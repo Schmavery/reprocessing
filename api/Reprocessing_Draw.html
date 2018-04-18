@@ -1,0 +1,786 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>Reprocessing_Draw</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="../index.html">Home</a></div>
+      <div class='table-of-contents'>
+      <div class='toc-header'>Page Contents</div>
+      <a href="#The-Draw-module" class='level-1 header'>The Draw module</a>
+<a href="#Core-drawing-operations" class='level-2 header'>Core drawing operations</a>
+<a href="#value-rect" class='level-3 value'>rect</a>
+<a href="#value-rectf" class='level-3 value'>rectf</a>
+<a href="#value-clear" class='level-3 value'>clear</a>
+<a href="#value-background" class='level-3 value'>background</a>
+<a href="#value-line" class='level-3 value'>line</a>
+<a href="#value-linef" class='level-3 value'>linef</a>
+<a href="#value-ellipse" class='level-3 value'>ellipse</a>
+<a href="#value-ellipsef" class='level-3 value'>ellipsef</a>
+<a href="#value-quad" class='level-3 value'>quad</a>
+<a href="#value-quadf" class='level-3 value'>quadf</a>
+<a href="#value-pixel" class='level-3 value'>pixel</a>
+<a href="#value-pixelf" class='level-3 value'>pixelf</a>
+<a href="#value-triangle" class='level-3 value'>triangle</a>
+<a href="#value-trianglef" class='level-3 value'>trianglef</a>
+<a href="#value-arc" class='level-3 value'>arc</a>
+<a href="#value-arcf" class='level-3 value'>arcf</a>
+<a href="#value-curve" class='level-3 value'>curve</a>
+<a href="#Style-operations" class='level-2 header'>Style operations</a>
+<a href="#value-fill" class='level-3 value'>fill</a>
+<a href="#value-noFill" class='level-3 value'>noFill</a>
+<a href="#value-stroke" class='level-3 value'>stroke</a>
+<a href="#value-noStroke" class='level-3 value'>noStroke</a>
+<a href="#value-strokeWeight" class='level-3 value'>strokeWeight</a>
+<a href="#value-strokeCap" class='level-3 value'>strokeCap</a>
+<a href="#value-tint" class='level-3 value'>tint</a>
+<a href="#value-noTint" class='level-3 value'>noTint</a>
+<a href="#value-pushStyle" class='level-3 value'>pushStyle</a>
+<a href="#value-popStyle" class='level-3 value'>popStyle</a>
+<a href="#Text" class='level-2 header'>Text</a>
+<a href="#value-loadFont" class='level-3 value'>loadFont</a>
+<a href="#value-text" class='level-3 value'>text</a>
+<a href="#Images" class='level-2 header'>Images</a>
+<a href="#value-loadImage" class='level-3 value'>loadImage</a>
+<a href="#value-image" class='level-3 value'>image</a>
+<a href="#value-subImage" class='level-3 value'>subImage</a>
+<a href="#value-subImagef" class='level-3 value'>subImagef</a>
+<a href="#Matrix-transform-operations" class='level-2 header'>Matrix/transform operations</a>
+<a href="#value-translate" class='level-3 value'>translate</a>
+<a href="#value-rotate" class='level-3 value'>rotate</a>
+<a href="#value-scale" class='level-3 value'>scale</a>
+<a href="#value-shear" class='level-3 value'>shear</a>
+<a href="#value-pushMatrix" class='level-3 value'>pushMatrix</a>
+<a href="#value-popMatrix" class='level-3 value'>popMatrix</a>
+<a href="#value-rectMode" class='level-3 value'>rectMode</a>
+<a href="#value-bezier" class='level-3 value'>bezier</a>
+<a href="#value-textWidth" class='level-3 value'>textWidth</a>
+<a href="#value-withImage" class='level-3 value'>withImage</a>
+<a href="#value-createImage" class='level-3 value'>createImage</a>
+<a href="#value-isImageDrawnTo" class='level-3 value'>isImageDrawnTo</a>
+<a href="#value-clearImage" class='level-3 value'>clearImage</a>
+      </div>
+      <div class='project-listing'><div class='project-title'>Package modules</div><a href="Reprocessing.html">Reprocessing</a>
+<a href="Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="Reprocessing_Utils.html">Reprocessing_Utils</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/./src/Reprocessing_Draw.rei" class="edit-link">Edit</a>
+    <a href="#The-Draw-module" id="The-Draw-module"><h1>The Draw module</h1></a>
+
+<p>This is where all the fancy things happen.</p>
+
+
+
+
+<div class='code-block'>
+  
+  <pre class='code' data-block-id='3' id='block-3'><code><span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">fill</span>(<span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.red</span>, <span class='ident' data-type="Reprocessing.glEnvT">env</span>);
+<span class='ident' data-type="(
+  ~pos: (int, int),
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">rect</span>(~pos=<span class='ident' data-type="Reprocessing_Types.Types.glEnvT => (int, int)">Env.mouse</span>(<span class='ident' data-type="Reprocessing.glEnvT">env</span>), ~width=<span class='int' data-type="int">5</span>, ~height=<span class='int' data-type="int">5</span>, <span class='ident' data-type="Reprocessing.glEnvT">env</span>);</code></pre>
+  
+  <script type='docre-source' data-block-id="3">#[@bs.val] external sandboxCanvasId: string = "";
+#[@bs.val] external sandboxCanvas: 'canvas = "";
+#[@bs.val] external containerDiv: 'node = "";
+#[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+#let id = sandboxCanvasId;
+#addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+#addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+#Reprocessing.setScreenId(sandboxCanvasId);
+#open Reprocessing;
+#open Draw;
+#run(~setup=env => Env.size(~width=200, ~height=200, env), ~draw=((), env) => {
+fill(Constants.red, env);
+rect(~pos=Env.mouse(env), ~width=5, ~height=5, env);
+#}, ())</script>
+  <div data-block-id='3' data-context="canvas" class='block-target'></div><script type='docre-bundle' data-block-id='3'>
+;(function() { // generated by pack.re
+let modules = {}
+let initializers = {
+    1: function(module, exports, require) {// Generated by BUCKLESCRIPT VERSION 2.1.1, PLEASE EDIT WITH CARE
+'use strict';
+
+var Reprocessing           = window.packRequire("./lib/js/src/Reprocessing.js");
+var Reprocessing_Env       = window.packRequire("./lib/js/src/Reprocessing_Env.js");
+var Reprocessing_Draw      = window.packRequire("./lib/js/src/Reprocessing_Draw.js");
+var Reprocessing_Constants = window.packRequire("./lib/js/src/Reprocessing_Constants.js");
+
+var id = sandboxCanvasId;
+
+containerDiv.addEventListener("mouseleave", (function () {
+        Reprocessing.playPause(id, /* false */0);
+        return /* () */0;
+      }));
+
+containerDiv.addEventListener("mouseenter", (function () {
+        Reprocessing.playPause(id, /* true */1);
+        return /* () */0;
+      }));
+
+Reprocessing.setScreenId(sandboxCanvasId);
+
+Reprocessing.run((function (env) {
+        return Reprocessing_Env.size(200, 200, env);
+      }), /* None */0, /* Some */[(function (_, env) {
+          Reprocessing_Draw.fill(Reprocessing_Constants.red, env);
+          return Reprocessing_Draw.rect(Reprocessing_Env.mouse(env), 5, 5, env);
+        })], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0);
+
+exports.id = id;
+/* id Not a pure module */
+//# sourceURL=./node_modules/.docre/DOCRE_CODE_BLOCK_3.re_ppx.js
+}
+};
+let nameMap = {
+  "./node_modules/.docre/DOCRE_CODE_BLOCK_3.re_ppx.js": 1
+}
+let require = (id) => {
+  if (!modules[id]) {
+    modules[id] = {exports: {}}
+    initializers[id](modules[id], modules[id].exports, require)
+  }
+  return modules[id].exports
+};
+  require(1)})();</script>
+</div>
+
+<a href="#Core-drawing-operations" id="Core-drawing-operations"><h2>Core drawing operations</h2></a>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-rect" id="value-rect">rect</a> = (
+  ~pos: (int, int),
+  ~width: int,
+  ~height: int,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws a rectangle to the screen. A rectangle is a four-sided shape with
+every angle at ninety degrees.</p>
+<p>This is the same as <code>rectf</code>, but converts all its integer arguments to floats
+as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-rectf" id="value-rectf">rectf</a> = (
+  ~pos: (float, float),
+  ~width: float,
+  ~height: float,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws a rectangle to the screen. A rectangle is a four-sided shape with
+every angle at ninety degrees.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-clear" id="value-clear">clear</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>Clears the entire screen. Normally, background is used for this purpose,
+clear will have different results in web and native.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-background" id="value-background">background</a> = (<a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>The <code>background</code> function sets the color used for the background of the
+Processing window. The default background is black. This function is
+typically used within <code>draw</code> to clear the display window at the beginning of
+each frame, but it can be used inside <code>setup</code> to set the background on the
+first frame of animation or if the backgound need only be set once.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-line" id="value-line">line</a> = (
+  ~p1: (int, int),
+  ~p2: (int, int),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws a line (a direct path between two points) to the screen.
+To color a line, use the <code>stroke</code> function. A line cannot be filled,
+therefore the <code>fill</code> function will not affect the color of a line. Lines are
+drawn with a width of one pixel by default, but this can be changed with
+the <code>strokeWeight</code> function.</p>
+<p>This is the same as <code>linef</code>, but converts all its integer arguments to floats
+as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-linef" id="value-linef">linef</a> = (
+  ~p1: (float, float),
+  ~p2: (float, float),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws a line (a direct path between two points) to the screen.
+To color a line, use the <code>stroke</code> function. A line cannot be filled,
+therefore the <code>fill</code> function will not affect the color of a line. Lines are
+drawn with a width of one pixel by default, but this can be changed with
+the <code>strokeWeight</code> function.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-ellipse" id="value-ellipse">ellipse</a> = (
+  ~center: (int, int),
+  ~radx: int,
+  ~rady: int,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws an ellipse (oval) to the screen. An ellipse with equal width and
+height is a circle.</p>
+<p>This is the same as <code>ellipsef</code>, but converts all its integer arguments to
+floats as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-ellipsef" id="value-ellipsef">ellipsef</a> = (
+  ~center: (float, float),
+  ~radx: float,
+  ~rady: float,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws an ellipse (oval) to the screen. An ellipse with equal width and
+height is a circle.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-quad" id="value-quad">quad</a> = (
+  ~p1: (int, int),
+  ~p2: (int, int),
+  ~p3: (int, int),
+  ~p4: (int, int),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>A quad is a quadrilateral, a four sided polygon. It is similar to a
+rectangle, but the angles between its edges are not constrained to ninety
+degrees. The parameter p1 sets the first vertex and the subsequest points
+should proceed clockwise or counter-clockwise around the defined shape.</p>
+<p>This is the same as <code>quadf</code>, but converts all its integer arguments to
+floats as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-quadf" id="value-quadf">quadf</a> = (
+  ~p1: (float, float),
+  ~p2: (float, float),
+  ~p3: (float, float),
+  ~p4: (float, float),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>A quad is a quadrilateral, a four sided polygon. It is similar to a
+rectangle, but the angles between its edges are not constrained to ninety
+degrees. The parameter p1 sets the first vertex and the subsequest points
+should proceed clockwise or counter-clockwise around the defined shape.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-pixel" id="value-pixel">pixel</a> = (
+  ~pos: (int, int),
+  ~color: <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Adds a single point with a radius defined by strokeWeight</p>
+<p>This is the same as <code>pixelf</code>, but converts all its integer arguments to
+floats as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-pixelf" id="value-pixelf">pixelf</a> = (
+  ~pos: (float, float),
+  ~color: <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p> Adds a single point with a radius defined by strokeWeight</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-triangle" id="value-triangle">triangle</a> = (
+  ~p1: (int, int),
+  ~p2: (int, int),
+  ~p3: (int, int),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>A triangle is a plane created by connecting three points.</p>
+<p>This is the same as <code>trianglef</code>, but converts all its integer arguments to
+floats as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-trianglef" id="value-trianglef">trianglef</a> = (
+  ~p1: (float, float),
+  ~p2: (float, float),
+  ~p3: (float, float),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p> A triangle is a plane created by connecting three points.</p>
+</div></div>
+
+Invalid doc item referenced: bexier
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-arc" id="value-arc">arc</a> = (
+  ~center: (int, int),
+  ~radx: int,
+  ~rady: int,
+  ~start: float,
+  ~stop: float,
+  ~isOpen: bool,
+  ~isPie: bool,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws an arc to the screen. Arcs are drawn along the outer edge of an
+ellipse defined by the center, radx, and rady parameters. Use the
+start and stop parameters to specify the angles (in radians) at which
+to draw the arc. isPie defines whether or not lines should be drawn to
+the center at the start and stop points of the arc rather than simply
+connecting the points.  If isOpen is true, no line will be drawn other
+than the arc between start and stop.</p>
+<p>This is the same as <code>arcf</code>, but converts all its integer arguments to
+floats as a convenience.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-arcf" id="value-arcf">arcf</a> = (
+  ~center: (float, float),
+  ~radx: float,
+  ~rady: float,
+  ~start: float,
+  ~stop: float,
+  ~isOpen: bool,
+  ~isPie: bool,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws an arc to the screen. Arcs are drawn along the outer edge of an
+ellipse defined by the center, radx, and rady parameters. Use the
+start and stop parameters to specify the angles (in radians) at which
+to draw the arc. isPie defines whether or not lines should be drawn to
+the center at the start and stop points of the arc rather than simply
+connecting the points.  If isOpen is true, no line will be drawn other
+than the arc between start and stop.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-curve" id="value-curve">curve</a> = (
+  (float, float),
+  (float, float),
+  (float, float),
+  (float, float),
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body '><p>Draws a curved line on the screen. The first parameter specifies
+the beginning control point and the last parameter specifies the ending
+control point. The middle parameters specify the start and stop of the curve.</p>
+</div></div><a href="#Style-operations" id="Style-operations"><h2>Style operations</h2></a>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-fill" id="value-fill">fill</a> = (<a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p> Sets the color used to fill shapes.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-noFill" id="value-noFill">noFill</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>Disables filling geometry. If both <code>noStroke</code> and <code>noFill</code> are called,
+nothing will be drawn to the screen.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-stroke" id="value-stroke">stroke</a> = (<a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p> Sets the color used to draw lines and borders around shapes.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-noStroke" id="value-noStroke">noStroke</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>Disables drawing the stroke (outline). If both noStroke() and noFill()
+are called, nothing will be drawn to the screen.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-strokeWeight" id="value-strokeWeight">strokeWeight</a> = (int, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>Sets the width of the stroke used for lines, points, and the border around
+shapes. All widths are set in units of pixels.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-strokeCap" id="value-strokeCap">strokeCap</a> = (<a href="Reprocessing_Types.html#type-Types.strokeCapT" title="Reprocessing_Types.Types.strokeCapT">strokeCapT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>Sets the style for rendering line endings. These ends are either squared,
+extended, or rounded.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-tint" id="value-tint">tint</a> = (<a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>Sets the fill value for displaying images. Images can be tinted to specified colors
+or made transparent by including an alpha value.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-noTint" id="value-noTint">noTint</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>Removes the current fill value for displaying images and reverts to displaying
+images with their original hues.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-pushStyle" id="value-pushStyle">pushStyle</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>The <code>pushStyle</code> function saves the current style settings and <code>popStyle</code>
+restores the prior settings. Note that these functions are always used
+together. They allow you to change the style settings and later return to
+what you had. When a new style is started with <code>pushStyle</code>, it builds on the
+current style information. The <code>pushStyle</code> and <code>popStyle</code> functions can be
+embedded to provide more control.</p>
+<p>The style information controlled by the following functions are included in
+the style: fill, stroke, strokeWeight</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-popStyle" id="value-popStyle">popStyle</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>The <code>pushStyle</code> function saves the current style settings and
+<code>popStyle</code> restores the prior settings; these functions are always used
+together. They allow you to change the style settings and later return to
+what you had. When a new style is started with <code>pushStyle</code>, it builds on the
+current style information. The <code>pushStyle</code> and <code>popStyle</code> functions can be
+embedded to provide more control.</p>
+<p>The style information controlled by the following functions are included in
+the style: fill, stroke, strokeWeight</p>
+</div></div><a href="#Text" id="Text"><h2>Text</h2></a>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-loadFont" id="value-loadFont">loadFont</a> = (
+  ~filename: string,
+  ~?isPixel: option(bool),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => <a href="Reprocessing_Font.html#type-fontT" title="Reprocessing_Font.fontT">fontT</a></h4>
+
+<div class='body '><p>Loads a font and returns a handle to it. This will lazily load and
+attempting to draw an font that has not finished loading will result
+in nothing being drawn.
+In general, all fonts should be loaded in <code>setup</code> to preload them at
+the start of the program.
+If isPixel is set to true, then when scaling the font, it will use
+GL_NEAREST (you want this setting if your font is meant to look
+pixelated)</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-text" id="value-text">text</a> = (
+  ~?font: option(<a href="Reprocessing_Font.html#type-fontT" title="Reprocessing_Font.fontT">fontT</a>),
+  ~body: string,
+  ~pos: (int, int),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws text to the screen.</p>
+<p>To use a font, use <a href='#value-loadFont'>loadFont</a> in your <code>setup()</code> function. If you don&#39;t specify a font, the default font is used.</p>
+<div class='code-block'>
+  
+  <pre class='code' data-block-id='4' id='block-4'><code><span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.background</span>(<span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.white</span>, <span class='ident' data-type="Reprocessing.glEnvT">env</span>);
+<span class='ident' data-type="(
+  ~?font: option(Reprocessing_Font.fontT),
+  ~body: string,
+  ~pos: (int, int),
+  Reprocessing_Types.Types.glEnvT
+) => unit">text</span>(~body=<span class='string' data-type="string">&quot;Hello folks&quot;</span>, ~pos=(<span class='int' data-type="int">5</span>, <span class='int' data-type="int">40</span>), <span class='ident' data-type="Reprocessing.glEnvT">env</span>);</code></pre>
+  
+  <script type='docre-source' data-block-id="4">#[@bs.val] external sandboxCanvasId: string = "";
+#[@bs.val] external sandboxCanvas: 'canvas = "";
+#[@bs.val] external containerDiv: 'node = "";
+#[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+#let id = sandboxCanvasId;
+#addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+#addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+#Reprocessing.setScreenId(sandboxCanvasId);
+#open Reprocessing;
+#open Draw;
+#run(~setup=env => Env.size(~width=200, ~height=200, env), ~draw=((), env) => {
+Draw.background(Constants.white, env);
+text(~body="Hello folks", ~pos=(5, 40), env);
+#}, ())</script>
+  <div data-block-id='4' data-context="canvas" class='block-target'></div><script type='docre-bundle' data-block-id='4'>
+;(function() { // generated by pack.re
+let modules = {}
+let initializers = {
+    1: function(module, exports, require) {// Generated by BUCKLESCRIPT VERSION 2.1.1, PLEASE EDIT WITH CARE
+'use strict';
+
+var Reprocessing           = window.packRequire("./lib/js/src/Reprocessing.js");
+var Reprocessing_Env       = window.packRequire("./lib/js/src/Reprocessing_Env.js");
+var Reprocessing_Draw      = window.packRequire("./lib/js/src/Reprocessing_Draw.js");
+var Reprocessing_Constants = window.packRequire("./lib/js/src/Reprocessing_Constants.js");
+
+var id = sandboxCanvasId;
+
+containerDiv.addEventListener("mouseleave", (function () {
+        Reprocessing.playPause(id, /* false */0);
+        return /* () */0;
+      }));
+
+containerDiv.addEventListener("mouseenter", (function () {
+        Reprocessing.playPause(id, /* true */1);
+        return /* () */0;
+      }));
+
+Reprocessing.setScreenId(sandboxCanvasId);
+
+Reprocessing.run((function (env) {
+        return Reprocessing_Env.size(200, 200, env);
+      }), /* None */0, /* Some */[(function (_, env) {
+          Reprocessing_Draw.background(Reprocessing_Constants.white, env);
+          return Reprocessing_Draw.text(/* None */0, "Hello folks", /* tuple */[
+                      5,
+                      40
+                    ], env);
+        })], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0);
+
+exports.id = id;
+/* id Not a pure module */
+//# sourceURL=./node_modules/.docre/DOCRE_CODE_BLOCK_4.re_ppx.js
+}
+};
+let nameMap = {
+  "./node_modules/.docre/DOCRE_CODE_BLOCK_4.re_ppx.js": 1
+}
+let require = (id) => {
+  if (!modules[id]) {
+    modules[id] = {exports: {}}
+    initializers[id](modules[id], modules[id].exports, require)
+  }
+  return modules[id].exports
+};
+  require(1)})();</script>
+</div></div></div><a href="#Images" id="Images"><h2>Images</h2></a>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-loadImage" id="value-loadImage">loadImage</a> = (
+  ~filename: string,
+  ~?isPixel: option(bool),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => <a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a></h4>
+
+<div class='body '><p>Loads an image and returns a handle to it. This will lazily load and
+attempting to draw an image that has not finished loading will result
+in nothing being drawn.
+In general, all images should be loaded in <code>setup</code> to preload them at
+the start of the program.
+If isPixel is set to true, then when scaling the image, it will use
+GL_NEAREST (you want this setting if your image is meant to look
+pixelated)</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-image" id="value-image">image</a> = (
+  <a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a>,
+  ~pos: (int, int),
+  ~?width: option(int),
+  ~?height: option(int),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>The <code>image</code> function draws an image to the display window.
+The image should be loaded using the <code>loadImage</code> function.
+The image is displayed at its original size unless width and
+height are optionally specified.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-subImage" id="value-subImage">subImage</a> = (
+  <a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a>,
+  ~pos: (int, int),
+  ~width: int,
+  ~height: int,
+  ~texPos: (int, int),
+  ~texWidth: int,
+  ~texHeight: int,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>The <code>subImage</code> function draws a section of an image to the
+display window. The image should be loaded using the
+<code>loadImage</code> function. The image is displayed at the size
+specified by width and height.  texPos, texWidth, and
+texHeight describe the section of the full image that
+should be drawn.</p>
+<p>This function is useful for a spritesheet-style of
+drawing strategy.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-subImagef" id="value-subImagef">subImagef</a> = (
+  <a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a>,
+  ~pos: (float, float),
+  ~width: float,
+  ~height: float,
+  ~texPos: (int, int),
+  ~texWidth: int,
+  ~texHeight: int,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>The <code>subImagef</code> function draws a section of an image to the
+display window. The image should be loaded using the
+<code>loadImage</code> function. The image is displayed at the size
+specified by width and height.  texPos, texWidth, and
+texHeight describe the section of the full image that
+should be drawn.</p>
+<p>This function is useful for a spritesheet-style of
+drawing strategy.</p>
+</div></div><a href="#Matrix-transform-operations" id="Matrix-transform-operations"><h2>Matrix/transform operations</h2></a>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-translate" id="value-translate">translate</a> = (~x: float, ~y: float, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>Specifies an amount to displace objects within the display window.
+The dx parameter specifies left/right translation, the dy parameter
+specifies up/down translation.</p>
+<p>Transformations are cumulative and apply to everything that happens
+after and subsequent calls to the function accumulates the effect.
+For example, calling <code>translate dx::50 dy::0 env</code> and then
+<code>translate dx::20 dy::0 env</code> is the same as <code>translate dx::70 dy::0 env</code>.
+If <code>translate</code> is called within <code>draw</code>, the transformation is reset
+when the loop begins again. This function can be further controlled
+by using <code>pushMatrix</code> and <code>popMatrix</code>.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-rotate" id="value-rotate">rotate</a> = (float, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>Rotates the amount specified by the angle parameter. Angles must be
+specified in radians (values from 0 to two_pi), or they can be converted
+from degrees to radians with the <code>radians</code> function.</p>
+<p>The coordinates are always rotated around their relative position to the
+origin. Positive numbers rotate objects in a clockwise direction and
+negative numbers rotate in the couterclockwise direction. Transformations
+apply to everything that happens afterward, and subsequent calls to the
+function compound the effect. For example, calling
+<code>rotate Constants.pi/2. env</code> once and then calling <code>rotate Constants.pi/2. env</code>
+a second time is the same as a single <code>rotate Constants.pi env</code>. All
+tranformations are reset when <code>draw</code> begins again.</p>
+<p>Technically, <code>rotate</code> multiplies the current transformation matrix by a
+rotation matrix. This function can be further controlled by <code>pushMatrix</code>
+and <code>popMatrix</code>.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-scale" id="value-scale">scale</a> = (~x: float, ~y: float, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>The scale() function increases or decreases the size of a shape by expanding
+and contracting vertices.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-shear" id="value-shear">shear</a> = (~x: float, ~y: float, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>The shear() function shears the matrix along the axes the amount
+specified by the angle parameters. Angles should be specified in radians
+(values from 0 to PI*2) or converted to radians with the Utils.radians()
+function.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-pushMatrix" id="value-pushMatrix">pushMatrix</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>Pushes the current transformation matrix onto the matrix stack. Understanding pushMatrix() and popMatrix()
+requires understanding the concept of a matrix stack. The pushMatrix() function saves the current coordinate
+system to the stack and popMatrix() restores the prior coordinate system. pushMatrix() and popMatrix() are
+used in conjuction with the other transformation methods and may be embedded to control the scope of
+the transformations.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-popMatrix" id="value-popMatrix">popMatrix</a> = <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit</h4>
+
+<div class='body '><p>Pops the current transformation matrix off the matrix stack. Understanding pushing and popping requires
+understanding the concept of a matrix stack. The pushMatrix() function saves the current coordinate system to
+the stack and popMatrix() restores the prior coordinate system. pushMatrix() and popMatrix() are used in
+conjuction with the other transformation methods and may be embedded to control the scope of the transformations.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-rectMode" id="value-rectMode">rectMode</a> = (<a href="Reprocessing_Types.html#type-Types.rectModeT" title="Reprocessing_Types.Types.rectModeT">rectModeT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p>Sets the style to modify the location from which rectangles are drawn by
+changing the way in which parameters given to rect() and rectf() are intepreted.</p>
+<p>The default mode is rectMode(Corner), which interprets the position of rect()
+as the upper-left corner of the shape, while the third and fourth parameters
+are its width and height.</p>
+<p>rectMode(Center) interprets the position of rect() as the shape&#39;s center point,
+while the third and fourth parameters are its width and height.</p>
+<p>rectMode(Radius) also uses the position of rect() as the shape&#39;s center point,
+but uses the third and fourth parameters to specify half of the shapes&#39;s width
+and height.</p>
+</div></div><p>other items defined</p><div class='doc-item'><h4 class='item'>let <a href="#value-bezier" id="value-bezier">bezier</a> = (
+  ~p1: (float, float),
+  ~p2: (float, float),
+  ~p3: (float, float),
+  ~p4: (float, float),
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => unit</h4>
+
+<div class='body '><p>Draws a Bezier curve on the screen. These curves are defined by a
+series of anchor and control points. The parameter p1 specifies the
+first anchor point and the last parameter specifies the other anchor
+point. The middle parameters p2 and p3 specify the control points
+which define the shape of the curve. Bezier curves were developed
+by French engineer Pierre Bezier.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-textWidth" id="value-textWidth">textWidth</a> = (
+  ~?font: option(<a href="Reprocessing_Font.html#type-fontT" title="Reprocessing_Font.fontT">fontT</a>),
+  ~body: string,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => int</h4>
+
+<div class='body '><p>Calculates width of text using a specific font.
+The font should be loaded using the <code>loadFont</code> function.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-withImage" id="value-withImage">withImage</a> = (<a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a> => unit) => unit</h4>
+
+<div class='body '><p>Makes draw calls inside the callback draw to the given image instead of to the screen.
+The callback is called with a new env which will make all draw calls done inside the callback
+draw on the image instead of the main canvas.
+This is useful to basically cache draw calls onto an image which can then be drawn to the
+screen very cheaply at any point after.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-createImage" id="value-createImage">createImage</a> = (
+  ~width: int,
+  ~height: int,
+  <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>
+) => <a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a></h4>
+
+<div class='body '><p> Returns a new image which can be drawn to.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-isImageDrawnTo" id="value-isImageDrawnTo">isImageDrawnTo</a> = <a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a> => bool</h4>
+
+<div class='body '><p>Checks whether the given image has been drawn to since created or since last time clearImage
+was called. This is useful when using images as a caching mechanism, to check if the image is
+up to date.</p>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-clearImage" id="value-clearImage">clearImage</a> = (<a href="Reprocessing_Types.html#type-Types.imageT" title="Reprocessing_Types.Types.imageT">imageT</a>, <a href="Reprocessing_Types.html#type-Types.glEnvT" title="Reprocessing_Types.Types.glEnvT">glEnvT</a>) => unit</h4>
+
+<div class='body '><p> Clears image such that <code>isImageDrawnTo</code> returns false.</p>
+</div></div>
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

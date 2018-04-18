@@ -1,0 +1,233 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>Reprocessing_Utils</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="../index.html">Home</a></div>
+      <div class='table-of-contents'>
+      <div class='toc-header'>Page Contents</div>
+      <a href="#Reprocessing_Utils" class='level-1 header'>Reprocessing_Utils</a>
+<a href="#value-color" class='level-2 value'>color</a>
+<a href="#value-colorf" class='level-2 value'>colorf</a>
+<a href="#value-round" class='level-2 value'>round</a>
+<a href="#value-sq" class='level-2 value'>sq</a>
+<a href="#value-pow" class='level-2 value'>pow</a>
+<a href="#value-constrain" class='level-2 value'>constrain</a>
+<a href="#value-remapf" class='level-2 value'>remapf</a>
+<a href="#value-remap" class='level-2 value'>remap</a>
+<a href="#value-norm" class='level-2 value'>norm</a>
+<a href="#value-randomf" class='level-2 value'>randomf</a>
+<a href="#value-random" class='level-2 value'>random</a>
+<a href="#value-randomSeed" class='level-2 value'>randomSeed</a>
+<a href="#value-randomGaussian" class='level-2 value'>randomGaussian</a>
+<a href="#value-lerpf" class='level-2 value'>lerpf</a>
+<a href="#value-lerp" class='level-2 value'>lerp</a>
+<a href="#value-lerpColor" class='level-2 value'>lerpColor</a>
+<a href="#value-distf" class='level-2 value'>distf</a>
+<a href="#value-dist" class='level-2 value'>dist</a>
+<a href="#value-magf" class='level-2 value'>magf</a>
+<a href="#value-mag" class='level-2 value'>mag</a>
+<a href="#value-degrees" class='level-2 value'>degrees</a>
+<a href="#value-radians" class='level-2 value'>radians</a>
+<a href="#value-noise" class='level-2 value'>noise</a>
+<a href="#value-noiseSeed" class='level-2 value'>noiseSeed</a>
+<a href="#value-split" class='level-2 value'>split</a>
+<a href="#value-intersectRectCircle" class='level-2 value'>intersectRectCircle</a>
+<a href="#value-intersectRectRect" class='level-2 value'>intersectRectRect</a>
+      </div>
+      <div class='project-listing'><div class='project-title'>Package modules</div><a href="Reprocessing.html">Reprocessing</a>
+<a href="Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="Reprocessing_Utils.html">Reprocessing_Utils</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/./src/Reprocessing_Utils.rei" class="edit-link">Edit</a>
+    <a href="#Reprocessing_Utils" id="Reprocessing_Utils"><h1>Reprocessing_Utils</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item'>let <a href="#value-color" id="value-color">color</a> = (~r: int, ~g: int, ~b: int, ~a: int) => <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-colorf" id="value-colorf">colorf</a> = (
+  ~r: float,
+  ~g: float,
+  ~b: float,
+  ~a: float
+) => <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-round" id="value-round">round</a> = float => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-sq" id="value-sq">sq</a> = int => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-pow" id="value-pow">pow</a> = (~base: int, ~exp: int) => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-constrain" id="value-constrain">constrain</a> = (~amt: 'a, ~low: 'a, ~high: 'a) => 'a</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-remapf" id="value-remapf">remapf</a> = (
+  ~value: float,
+  ~low1: float,
+  ~high1: float,
+  ~low2: float,
+  ~high2: float
+) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-remap" id="value-remap">remap</a> = (
+  ~value: int,
+  ~low1: int,
+  ~high1: int,
+  ~low2: int,
+  ~high2: int
+) => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-norm" id="value-norm">norm</a> = (
+  ~value: float,
+  ~low: float,
+  ~high: float
+) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-randomf" id="value-randomf">randomf</a> = (~min: float, ~max: float) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-random" id="value-random">random</a> = (~min: int, ~max: int) => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-randomSeed" id="value-randomSeed">randomSeed</a> = int => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-randomGaussian" id="value-randomGaussian">randomGaussian</a> = unit => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-lerpf" id="value-lerpf">lerpf</a> = (
+  ~low: float,
+  ~high: float,
+  ~value: float
+) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-lerp" id="value-lerp">lerp</a> = (~low: int, ~high: int, ~value: float) => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-lerpColor" id="value-lerpColor">lerpColor</a> = (
+  ~low: <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>,
+  ~high: <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a>,
+  ~value: float
+) => <a href="Reprocessing_Types.html#type-Types.colorT" title="Reprocessing_Types.Types.colorT">colorT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-distf" id="value-distf">distf</a> = (
+  ~p1: (float, float),
+  ~p2: (float, float)
+) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-dist" id="value-dist">dist</a> = (~p1: (int, int), ~p2: (int, int)) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-magf" id="value-magf">magf</a> = (float, float) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-mag" id="value-mag">mag</a> = (int, int) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-degrees" id="value-degrees">degrees</a> = float => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-radians" id="value-radians">radians</a> = float => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-noise" id="value-noise">noise</a> = (float, float, float) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-noiseSeed" id="value-noiseSeed">noiseSeed</a> = int => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-split" id="value-split">split</a> = (string, ~sep: char) => list(string)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-intersectRectCircle" id="value-intersectRectCircle">intersectRectCircle</a> = (
+  ~rectPos: (float, float),
+  ~rectW: float,
+  ~rectH: float,
+  ~circlePos: (float, float),
+  ~circleRad: float
+) => bool</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-intersectRectRect" id="value-intersectRectRect">intersectRectRect</a> = (
+  ~rect1Pos: (float, float),
+  ~rect1W: float,
+  ~rect1H: float,
+  ~rect2Pos: (float, float),
+  ~rect2W: float,
+  ~rect2H: float
+) => bool</h4>
+
+<div class='body body-empty'></div></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

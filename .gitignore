@@ -3,3 +3,4 @@ node_modules
 .jenga
 .merlin
 npm-debug.log
+docs

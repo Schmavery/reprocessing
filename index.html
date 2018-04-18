@@ -1,152 +1,207 @@
-<head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/codemirror.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/codemirror.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/theme/monokai.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/mode/mllike/mllike.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.15.2/addon/edit/matchbrackets.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/addon/edit/closebrackets.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/keymap/sublime.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="theme.css">
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
-    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-   crossorigin="anonymous"></script>
-   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.3.2/gl-matrix-min.js"></script>
-   <title>Reprocessing playground</title>
-</head>
-
-<body style="background-color: #272822; font-family: 'Open Sans', sans-serif;">
-
-<nav class="navbar navbar-inverse navbar-static-top" style="margin-bottom: 0px">
-  <div class="container-fluid">
-    <div class="collapse navbar-collapse navbar-header"> <!-- Hides brand on small width -->
-      <div class="navbar-brand" style="color: white"><a href="https://github.com/schmavery/reprocessing" target="_blank">Reprocessing on GitHub</a></div>
-    </div>
-
-    <div>
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a href="#" id = "examplesLabel" class="dropdown-toggle" data-toggle="dropdown">Red Square<span class="caret"></span></a>
-          <ul id="examplesDropdown" class="dropdown-menu">
-          </ul>
-        </li>
-        <li><button class="btn navbar-btn navbar-button" data-loading-text="Getting link..."type="button" id="share">Share</button></li>
-        <li><button class="btn navbar-btn navbar-button" onclick="onEditChanges()">Compile</button></li>
-        <li><button class="btn navbar-btn navbar-button" onclick="onRefmtChanges()">Reformat</button></li>
-      </ul>
-
-      <div class="checkbox navbar-btn navbar-right">
-      </div>
-
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-</nav>
-
-<div id="shareModal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h4 class="modal-title">Share</h4>
-        <h4 class="modal-title" onclick="onRefmtChanges()">Reformat</h4>
-        <h4 class="modal-title" onclick="onEditChanges()">Compile</h4>
-      </div>
-      <div class="modal-body">
-        <div class = "row">
-          <div class = "col-sm-10" id="shareModalBody">
-          </div>
-          <div class="col-sm-2">
-           <button class="btn" id="copyButton" data-clipboard-target="#shareModalBody">
-            <span class="glyphicon glyphicon-copy"  id="copyGlyph" aria-hidden="true"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='./styles.css'>
+<script defer src='./script.js'></script>
+<title>Home</title>
+<body>
+<script>window.relativeToRoot="."</script>
+<script defer src="./block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
 </div>
 
-
-<div>
-
-  <div class="tab-full">
-    <div class="tab" style="width: 50%">
-    <h3>Reason</h2>
+    
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="./search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="./index.html">Home</a></div>
+      <div class='table-of-contents'>
+      <div class='toc-header'>Page Contents</div>
+      <a href="#reprocessing" class='level-2 header'>Reprocessing</a>
+<a href="#getting-started" class='level-3 header'>Getting Started</a>
+<a href="#example" class='level-3 header'>Example</a>
+<a href="#build" class='level-3 header'>Build</a>
+<a href="#projects-using-reprocessing" class='level-2 header'>Projects using Reprocessing</a>
+      </div>
+      <div class='project-listing'><div class='project-title'>Package modules</div><a href="./api/Reprocessing.html">Reprocessing</a>
+<a href="./api/Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="./api/Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="./api/Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="./api/Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="./api/Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="./api/Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="./api/Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="./api/Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="./api/Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="./api/Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="./api/Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="./api/Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="./api/Reprocessing_Utils.html">Reprocessing_Utils</a></div>
     </div>
-    <div class="tab" style="width: 25%">
-      <h3>Console</h2>
     </div>
-  </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/./docs/../README.md" class="edit-link">Edit</a>
+    <a href="#reprocessing" id="reprocessing"><h2>Reprocessing</h2></a>
 
-    <div class = "right-border" style="width: 50%;float:left">
-        <textarea id="ocamlcode#1">
-open Reprocessing.Draw;
-open Reprocessing.Env;
-open Reprocessing.Utils;
+<p>Reprocessing is a high-level drawing library, inspired by <a href="https://processing.org" target="_blank" rel="noopener nofollow" title="" class="external-link">Processing</a>, allowing you to write code that&#39;ll run on the web (using WebGL) and natively (using OpenGL).</p>
+<!--!
+```reason;shared(sandbox)
+[@bs.val] external sandboxCanvasId: string = "";
+[@bs.val] external sandboxCanvas: 'canvas = "";
+[@bs.val] external containerDiv: 'node = "";
+[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+let id = sandboxCanvasId;
+addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+Reprocessing.setScreenId(sandboxCanvasId);
+```
+-->
 
-type state = (int, int);
+<a href="#getting-started" id="getting-started"><h3>Getting Started</h3></a><pre class='bash'><code class='bash'>npm install schmavery/reprocessing</code></pre>
 
-let squareSize = 300;
+<a href="#example" id="example"><h3>Example</h3></a><div class='code-block'>
+  
+  <pre class='code' data-block-id='0' id='block-0'><code>open Reprocessing;
 
-let setup env => {
-  size width::600 height::600 env;
-  fill Reprocessing.Constants.red env;
-  (0, 0)
+let <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT => unit">setup</span> = (<span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>) =&gt; {
+  <span class='ident' data-type="(
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Env.size</span>(~width=<span class='int' data-type="int">200</span>, ~height=<span class='int' data-type="int">200</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
 };
 
-let draw squarePos env => {
-  background (color r::150 g::255 b::255) env;
-  let (sx, sy) = squarePos;
-  let (px, py) = pmouse env;
-  let (x, y) as squarePos =
-    if (
-      mousePressed env &&
-      px > sx && px < sx + squareSize && py > sy && py < sy + squareSize
-    ) {
-      let (mx, my) = mouse env;
-      let dx = mx - px;
-      let dy = my - py;
-      (sx + dx, sy + dy)
-    } else {
-      squarePos
-    };
-  rect pos::(x, y) width::squareSize height::squareSize env;
-  squarePos
+let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> = (<span class='pattern-ident' data-type="'a">_state</span>, <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>) =&gt; {
+  <span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.background</span>(<span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.black</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.fill</span>(<span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.red</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="(
+  ~pos: (int, int),
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.rect</span>(~pos=(<span class='int' data-type="int">50</span>, <span class='int' data-type="int">50</span>), ~width=<span class='int' data-type="int">100</span>, ~height=<span class='int' data-type="int">100</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>)
 };
 
-Reprocessing.run ::setup ::draw ();
-        </textarea>
-    </div>
-    <div style="width: 50%; float:right">
-        <textarea id="error" style="background-color: #e0e0e0">
+<span class='ident' data-type="(
+  ~setup: Reprocessing.glEnvT => unit,
+  ~?screen: option(string),
+  ~?draw: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseMove: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseDragged: option(
+    (unit, Reprocessing.glEnvT) => unit
+  ),
+  ~?mouseDown: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseUp: option((unit, Reprocessing.glEnvT) => unit),
+  ~?keyPressed: option((unit, Reprocessing.glEnvT) => unit),
+  ~?keyReleased: option(
+    (unit, Reprocessing.glEnvT) => unit
+  ),
+  ~?keyTyped: option((unit, Reprocessing.glEnvT) => unit),
+  unit
+) => unit">run</span>(~<span class='ident' data-type="Reprocessing.glEnvT => unit">setup</span>, ~<span class='ident' data-type="(unit, Reprocessing.glEnvT) => unit">draw</span>, <span class='constructor' data-type="unit">()</span>);</code></pre>
+  
+  <script type='docre-source' data-block-id="0">#[@bs.val] external sandboxCanvasId: string = "";
+#[@bs.val] external sandboxCanvas: 'canvas = "";
+#[@bs.val] external containerDiv: 'node = "";
+#[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+#let id = sandboxCanvasId;
+#addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+#addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+#Reprocessing.setScreenId(sandboxCanvasId);
+open Reprocessing;
 
-        </textarea>
-    </div>
-    <div style="width: 50%; float:right">
-        <textarea id="output" style="background-color: #e0e0e0">
+let setup = (env) => {
+  Env.size(~width=200, ~height=200, env);
+};
 
-        </textarea>
-    </div>
+let draw = (_state, env) => {
+  Draw.background(Constants.black, env);
+  Draw.fill(Constants.red, env);
+  Draw.rect(~pos=(50, 50), ~width=100, ~height=100, env)
+};
 
-    <div style="width: 50%;float:right" id="canvas-wrapper">
-       <canvas id="main-canvas" />
-        <textarea id="jscode#1" style="background-color: #008803">
-</textarea>
-    </div>
+run(~setup, ~draw, ());</script>
+  <div data-block-id='0' data-context="canvas" class='block-target'></div><script type='docre-bundle' data-block-id='0'>
+;(function() { // generated by pack.re
+let modules = {}
+let initializers = {
+    1: function(module, exports, require) {// Generated by BUCKLESCRIPT VERSION 2.1.1, PLEASE EDIT WITH CARE
+'use strict';
+
+var Reprocessing           = window.packRequire("./lib/js/src/Reprocessing.js");
+var Reprocessing_Env       = window.packRequire("./lib/js/src/Reprocessing_Env.js");
+var Reprocessing_Draw      = window.packRequire("./lib/js/src/Reprocessing_Draw.js");
+var Reprocessing_Constants = window.packRequire("./lib/js/src/Reprocessing_Constants.js");
+
+var id = sandboxCanvasId;
+
+containerDiv.addEventListener("mouseleave", (function () {
+        Reprocessing.playPause(id, /* false */0);
+        return /* () */0;
+      }));
+
+containerDiv.addEventListener("mouseenter", (function () {
+        Reprocessing.playPause(id, /* true */1);
+        return /* () */0;
+      }));
+
+Reprocessing.setScreenId(sandboxCanvasId);
+
+function setup(env) {
+  return Reprocessing_Env.size(200, 200, env);
+}
+
+function draw(_, env) {
+  Reprocessing_Draw.background(Reprocessing_Constants.black, env);
+  Reprocessing_Draw.fill(Reprocessing_Constants.red, env);
+  return Reprocessing_Draw.rect(/* tuple */[
+              50,
+              50
+            ], 100, 100, env);
+}
+
+Reprocessing.run(setup, /* None */0, /* Some */[draw], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0);
+
+exports.id    = id;
+exports.setup = setup;
+exports.draw  = draw;
+/* id Not a pure module */
+//# sourceURL=./node_modules/.docre/DOCRE_CODE_BLOCK_0.re_ppx.js
+}
+};
+let nameMap = {
+  "./node_modules/.docre/DOCRE_CODE_BLOCK_0.re_ppx.js": 1
+}
+let require = (id) => {
+  if (!modules[id]) {
+    modules[id] = {exports: {}}
+    initializers[id](modules[id], modules[id].exports, require)
+  }
+  return modules[id].exports
+};
+  require(1)})();</script>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js"></script>
-<script src="./docs-assets/refmt.js" ></script>
-<script src="./reprocessing.js" ></script>
-<script src="./docs-assets/edit.js" ></script>
-<script src="./docs-assets/exports.js">    </script>
-<script src="./docs-assets/pre_load.js"></script>
-<script src="./docs-assets/init.js"></script>
-</body>
+
+<a href="#build" id="build"><h3>Build</h3></a><pre class='sh'><code class='sh'>npm run build</code></pre>
+
+<p>This will draw a simple red square on a black background.  Compare this to <a href="https://github.com/bsansouci/reasonglexampleproject/blob/simple/src/index.re" target="_blank" rel="noopener nofollow" title="" class="external-link">reglexampleproject</a>, which takes 200+ lines to do the exact same thing.  This difference is even more notable on bigger projects.  Check out the code for a <a href="https://github.com/Schmavery/reprocessing/blob/master/examples/redsquare.re" target="_blank" rel="noopener nofollow" title="" class="external-link">draggable red square</a>.</p>
+<a href="#projects-using-reprocessing" id="projects-using-reprocessing"><h2>Projects using Reprocessing</h2></a>
+
+<ul><li><a href="https://github.com/jaredly/gravitron" target="_blank" rel="noopener nofollow" title="" class="external-link">Gravitron</a></li><li><a href="https://github.com/bsansouci/ludum-dare-40" target="_blank" rel="noopener nofollow" title="" class="external-link">Oh No! Zombies!</a></li><li><a href="https://github.com/bsansouci/reprocessing-example/tree/2048" target="_blank" rel="noopener nofollow" title="" class="external-link">2048</a></li><li><a href="https://github.com/bsansouci/reprocessing-example/tree/livestream-flappybird" target="_blank" rel="noopener nofollow" title="" class="external-link">FlappyBird</a></li><li><a href="https://github.com/illbexyz/repong" target="_blank" rel="noopener nofollow" title="" class="external-link">Pong</a></li><li><a href="https://github.com/ekosz/reprocessing-example-flow-field" target="_blank" rel="noopener nofollow" title="" class="external-link">Perlin Noise Flow Field</a></li><li><a href="https://github.com/Rigellute/L-system-reasonml" target="_blank" rel="noopener nofollow" title="" class="external-link">L-System</a></li></ul>
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  
