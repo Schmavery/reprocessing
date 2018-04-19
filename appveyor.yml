@@ -6,9 +6,7 @@ install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install the build system
-  - npm install bsansouci/bsb-native#2.1.1
-  # install modules
-  - npm install --production
+  - npm install
 
 # Post-install test scripts.
 test_script:
