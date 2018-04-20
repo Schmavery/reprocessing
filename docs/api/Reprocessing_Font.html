@@ -1,0 +1,210 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>Reprocessing_Font</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="../index.html">Home</a>
+<a href="../fonts/LICENSE.html">LICENSE</a></div>
+      <div class='toc-header'>Page Contents</div>
+      <div class='table-of-contents'>
+      <a href="#Reprocessing_Font" class='level-1 header'>Reprocessing_Font</a>
+<a href="#module-Internal" class='level-2 module'>Internal</a>
+<a href="#value-intCompare" class='level-2 value'>intCompare</a>
+<a href="#module-Font" class='level-2 module'>Font</a>
+<a href="#module-Font.IntMap" class='level-3 module'>IntMap</a>
+<a href="#module-Font.IntPairMap" class='level-3 module'>IntPairMap</a>
+<a href="#type-Font.charT" class='level-3 type'>charT</a>
+<a href="#type-Font.internalType" class='level-3 type'>internalType</a>
+<a href="#type-Font.t" class='level-3 type'>t</a>
+<a href="#value-Font.defaultFont" class='level-3 value'>defaultFont</a>
+<a href="#value-Font.parse_num" class='level-3 value'>parse_num</a>
+<a href="#value-Font.parse_string" class='level-3 value'>parse_string</a>
+<a href="#value-Font.pop_line" class='level-3 value'>pop_line</a>
+<a href="#value-Font.parse_char_fmt" class='level-3 value'>parse_char_fmt</a>
+<a href="#value-Font.parse_kern_fmt" class='level-3 value'>parse_kern_fmt</a>
+<a href="#value-Font.replaceFilename" class='level-3 value'>replaceFilename</a>
+<a href="#value-Font.getCharMapAndKernMap" class='level-3 value'>getCharMapAndKernMap</a>
+<a href="#value-Font.parseFontFormat" class='level-3 value'>parseFontFormat</a>
+<a href="#value-Font.getChar" class='level-3 value'>getChar</a>
+<a href="#value-Font.drawChar" class='level-3 value'>drawChar</a>
+<a href="#value-Font.drawString" class='level-3 value'>drawString</a>
+<a href="#value-Font.calcStringWidth" class='level-3 value'>calcStringWidth</a>
+<a href="#value-Font.loadDefaultFont" class='level-3 value'>loadDefaultFont</a>
+<a href="#type-fontT" class='level-2 type'>fontT</a>
+      </div>
+      <div class='project-title'>Package modules</div><div class='project-listing'><a href="Reprocessing.html">Reprocessing</a>
+<a href="Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="Reprocessing_Utils.html">Reprocessing_Utils</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/src/Reprocessing_Font.re" class="edit-link">Edit</a>
+    <a href="#Reprocessing_Font" id="Reprocessing_Font"><h1>Reprocessing_Font</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Internal" id="module-Internal">Internal</a> : <a href="Reprocessing_Internal.html">Reprocessing_Internal</a></h4></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-intCompare" id="value-intCompare">intCompare</a> = (int, int) => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Font" id="module-Font">Font</a></h4><div class='body module-body'><p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Font.IntMap" id="module-Font.IntMap">IntMap</a> : Map.Make</h4></div>
+
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Font.IntPairMap" id="module-Font.IntPairMap">IntPairMap</a> : Map.Make</h4></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-Font.charT" id="type-Font.charT">charT</a> = {
+  x: float,
+  y: float,
+  width: float,
+  height: float,
+  xoffset: float,
+  yoffset: float,
+  xadvance: float
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-Font.internalType" id="type-Font.internalType">internalType</a> = {
+  chars: <a href="#module-Font.IntMap">IntMap</a>.<a href="#type-Font.IntMap.t">t</a>(<a href="#type-Font.charT">charT</a>),
+  kerning: <a href="#module-Font.IntPairMap">IntPairMap</a>.<a href="#type-Font.IntPairMap.t">t</a>(float),
+  res: float,
+  lineHeight: float,
+  image: <a href="Reprocessing_Common.html#type-imageT" title="Reprocessing_Common.imageT">imageT</a>
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-Font.t" id="type-Font.t">t</a> = Pervasives.ref(option(<a href="#type-Font.internalType">internalType</a>))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.defaultFont" id="value-Font.defaultFont">defaultFont</a> = Pervasives.ref(option(<a href="#type-Font.internalType">internalType</a>))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.parse_num" id="value-Font.parse_num">parse_num</a> = <a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a> => (<a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a>, float)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.parse_string" id="value-Font.parse_string">parse_string</a> = <a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a> => (<a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a>, string)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.pop_line" id="value-Font.pop_line">pop_line</a> = <a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a> => <a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.parse_char_fmt" id="value-Font.parse_char_fmt">parse_char_fmt</a> = (<a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a>, int, <a href="#module-Font.IntMap">IntMap</a>.<a href="#type-Font.IntMap.t">t</a>(<a href="#type-Font.charT">charT</a>)) => (
+  <a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a>,
+  <a href="#module-Font.IntMap">IntMap</a>.<a href="#type-Font.IntMap.t">t</a>(<a href="#type-Font.charT">charT</a>)
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.parse_kern_fmt" id="value-Font.parse_kern_fmt">parse_kern_fmt</a> = (
+  <a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a>,
+  int,
+  <a href="#module-Font.IntPairMap">IntPairMap</a>.<a href="#type-Font.IntPairMap.t">t</a>(float)
+) => (<a href="Reprocessing_Common.html#module-Stream" title="Reprocessing_Common.Stream">Stream</a>.<a href="Reprocessing_Common.html#type-Stream.t">t</a>, <a href="#module-Font.IntPairMap">IntPairMap</a>.<a href="#type-Font.IntPairMap.t">t</a>(float))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.replaceFilename" id="value-Font.replaceFilename">replaceFilename</a> = (string, string) => string</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.getCharMapAndKernMap" id="value-Font.getCharMapAndKernMap">getCharMapAndKernMap</a> = string => (
+  <a href="#module-Font.IntMap">IntMap</a>.<a href="#type-Font.IntMap.t">t</a>(<a href="#type-Font.charT">charT</a>),
+  <a href="#module-Font.IntPairMap">IntPairMap</a>.<a href="#type-Font.IntPairMap.t">t</a>(float),
+  string,
+  float,
+  float
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.parseFontFormat" id="value-Font.parseFontFormat">parseFontFormat</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  string,
+  bool
+) => Pervasives.ref(option(<a href="#type-Font.internalType">internalType</a>))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.getChar" id="value-Font.getChar">getChar</a> = (<a href="#type-Font.internalType">internalType</a>, char) => <a href="#type-Font.charT">charT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.drawChar" id="value-Font.drawChar">drawChar</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  <a href="#type-Font.internalType">internalType</a>,
+  option(<a href="Reprocessing_Common.html#type-_imageT" title="Reprocessing_Common._imageT">_imageT</a>),
+  char,
+  option(char),
+  float,
+  float
+) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.drawString" id="value-Font.drawString">drawString</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  option(Pervasives.ref(option(<a href="#type-Font.internalType">internalType</a>))),
+  string,
+  float,
+  float
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.calcStringWidth" id="value-Font.calcStringWidth">calcStringWidth</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  option(Pervasives.ref(option(<a href="#type-Font.internalType">internalType</a>))),
+  string
+) => float</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Font.loadDefaultFont" id="value-Font.loadDefaultFont">loadDefaultFont</a> = <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a> => unit</h4>
+
+<div class='body body-empty'></div></div>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-fontT" id="type-fontT">fontT</a> = Pervasives.ref(option(<a href="#type-Font.internalType" title="Font.internalType">internalType</a>))</h4>
+
+<div class='body body-empty'></div></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

@@ -2,7 +2,7 @@
  *
  * This is where all the fancy things happen.
  *
- * ```reason;shared(sandbox)
+ * ```reason;shared(sandbox);hide
  * [@bs.val] external sandboxCanvasId: string = "";
  * [@bs.val] external sandboxCanvas: 'canvas = "";
  * [@bs.val] external containerDiv: 'node = "";
@@ -13,7 +13,7 @@
  * Reprocessing.setScreenId(sandboxCanvasId);
  * ```
  *
- * ```reason;shared(draw);use(sandbox)
+ * ```reason;shared(draw);use(sandbox);hide;skip
  * open Reprocessing;
  * open Draw;
  * run(~setup=env => Env.size(~width=200, ~height=200, env), ~draw=((), env) => {

@@ -14,6 +14,10 @@ module Common = Reprocessing_Common;
 
 module Events = Reprocessing_Events;
 
+module Reprocessing_ClientWrapper = {
+  let init = Reasongl.Gl.Window.init;
+};
+
 include Reprocessing_Types.Types;
 
 type hotreloadT('a) = {
