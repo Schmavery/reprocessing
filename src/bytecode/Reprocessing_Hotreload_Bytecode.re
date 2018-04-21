@@ -2,9 +2,8 @@ let load_plug = fname => {
   let fname = Dynlink.adapt_filename(fname);
   if (Sys.file_exists(fname)) {
     try (Dynlink.loadfile(fname)) {
-    | Dynlink.Error(err) as e =>
-      print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err));
-      /*raise(e);*/
+    | Dynlink.Error(err) =>
+      print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err))
     | _ => failwith("Unknown error while loading plugin")
     };
   } else {
@@ -36,7 +35,15 @@ let bsb = "node_modules" +/ ".bin" +/ "bsb";
 let checkRebuild = (firstTime, filePath) => {
   if (firstTime) {
     /* Compile once synchronously because we're going to load it immediately after this. */
-    switch (Unix.system(bsb ++ " -build-library Index")) {
+    switch (
+      Unix.system(
+        bsb
+        ++ " -build-library "
+        ++ String.capitalize(
+             Filename.chop_extension(Filename.basename(filePath))
+           )
+      )
+    ) {
     | WEXITED(0) => ()
     | WEXITED(_)
     | WSIGNALED(_)
@@ -45,7 +52,14 @@ let checkRebuild = (firstTime, filePath) => {
     let pid =
       Unix.create_process(
         bsb,
-        [|bsb, "-w", "-build-library", "Index"|],
+        [|
+          bsb,
+          "-w",
+          "-build-library",
+          String.capitalize(
+            Filename.chop_extension(Filename.basename(filePath))
+          )
+        |],
         Unix.stdin,
         Unix.stdout,
         Unix.stderr
@@ -55,7 +69,7 @@ let checkRebuild = (firstTime, filePath) => {
     at_exit(() => Unix.kill(pid, 9));
     ();
   };
-  let filePath = "./lib/bs/bytecode/lib.cma";
+  let filePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
   if (Sys.file_exists(filePath)) {
     let {Unix.st_mtime} = Unix.stat(filePath);
     if (st_mtime > last_st_mtime^) {
