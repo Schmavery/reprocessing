@@ -919,11 +919,12 @@ let drawImage =
     | None => {r: 1., g: 1., b: 1., a: 1.}
     };
   maybeFlushBatch(~texture=Some(texture), ~vert=32, ~el=6, env);
+  /* TODO: fix very hacky MSAA artifact issue properly.. lines on edges of spritesheet */
   let (fsubx, fsuby, fsubw, fsubh) = (
-    float_of_int(subx) /. float_of_int(imgw),
-    float_of_int(suby) /. float_of_int(imgh),
-    float_of_int(subw) /. float_of_int(imgw),
-    float_of_int(subh) /. float_of_int(imgh)
+    float_of_int(subx) /. float_of_int(imgw) +. 0.0004,
+    float_of_int(suby) /. float_of_int(imgh) +. 0.0004,
+    float_of_int(subw) /. float_of_int(imgw) -. 0.0008,
+    float_of_int(subh) /. float_of_int(imgh) -. 0.0008
   );
   let set = Gl.Bigarray.set;
   let ii = env.batch.vertexPtr;
