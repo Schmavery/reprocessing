@@ -796,6 +796,7 @@ let loadImage = (env: glEnv, filename, isPixel) : imageT => {
   let imageRef = {glData: None, drawnTo: false};
   Gl.loadImage(
     ~filename,
+    ~loadOption=LoadRGBA,
     ~callback=
       imageData =>
         switch imageData {
@@ -848,6 +849,7 @@ let loadImageFromMemory = (env: glEnv, data, isPixel) : imageT => {
   let imageRef = {glData: None, drawnTo: false};
   Gl.loadImageFromMemory(
     ~data,
+    ~loadOption=LoadRGBA,
     ~callback=
       imageData =>
         switch imageData {
