@@ -5,10 +5,10 @@ let load_plug = fname => {
     | Dynlink.Error(err) as e =>
       print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err));
       raise(e);
-    | _ => failwith("Unknown error while loading plugin")
+    | _ => print_endline("Unknown error while loading plugin")
     };
   } else {
-    failwith("Plugin file does not exist");
+    print_endline("Plugin file does not exist");
   };
 };
 
@@ -26,10 +26,7 @@ let folder = Dynlink.is_native ? "native" : "bytecode";
 
 let (+/) = Filename.concat;
 
-let ocamlPath =
-  "node_modules" +/ "bs-platform" +/ "vendor" +/ "ocaml" +/ ocaml;
-
-let refmtexe = "node_modules" +/ "bs-platform" +/ "lib" +/ "refmt3.exe";
+let filePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
 
 let bsb = "node_modules" +/ ".bin" +/ "bsb";
 
@@ -70,7 +67,6 @@ let checkRebuild = (firstTime, filePath) => {
     at_exit(() => Unix.kill(pid, 9));
     ();
   };
-  let filePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
   if (Sys.file_exists(filePath)) {
     let {Unix.st_mtime} = Unix.stat(filePath);
     if (st_mtime > last_st_mtime^) {
