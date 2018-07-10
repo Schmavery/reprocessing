@@ -4,7 +4,6 @@ let load_plug = fname => {
     try (Dynlink.loadfile(fname)) {
     | Dynlink.Error(err) as e =>
       print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err));
-      raise(e);
     | _ => print_endline("Unknown error while loading plugin")
     };
   } else {
@@ -26,7 +25,7 @@ let folder = Dynlink.is_native ? "native" : "bytecode";
 
 let (+/) = Filename.concat;
 
-let filePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
+let libFilePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
 
 let bsb = "node_modules" +/ ".bin" +/ "bsb";
 
@@ -67,11 +66,11 @@ let checkRebuild = (firstTime, filePath) => {
     at_exit(() => Unix.kill(pid, 9));
     ();
   };
-  if (Sys.file_exists(filePath)) {
-    let {Unix.st_mtime} = Unix.stat(filePath);
+  if (Sys.file_exists(libFilePath)) {
+    let {Unix.st_mtime} = Unix.stat(libFilePath);
     if (st_mtime > last_st_mtime^) {
       print_endline("Reloading hotloaded module");
-      load_plug(filePath);
+      load_plug(libFilePath);
       last_st_mtime := st_mtime;
       true;
     } else {
