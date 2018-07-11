@@ -70,7 +70,6 @@ let checkRebuild = (firstTime, filePath) => {
   if (Sys.file_exists(libFilePath)) {
     let {Unix.st_mtime} = Unix.stat(libFilePath);
     if (st_mtime > last_st_mtime^) {
-      print_endline("Reloading hotloaded module");
       load_plug(libFilePath);
       last_st_mtime := st_mtime;
       true;
