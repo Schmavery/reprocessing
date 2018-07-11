@@ -27,14 +27,14 @@ let (+/) = Filename.concat;
 
 let libFilePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
 
-let bsb = "node_modules" +/ ".bin" +/ "bsb";
+let bsb = "node_modules" +/ "bs-platform" +/ "lib" +/ "bsb";
 
 let checkRebuild = (firstTime, filePath) => {
   if (firstTime) {
     /* Compile once synchronously because we're going to load it immediately after this. */
     switch (
       Unix.system(
-        bsb
+        "node " ++ bsb
         ++ " -build-library "
         ++ String.capitalize(
              Filename.chop_extension(Filename.basename(filePath)),
@@ -48,8 +48,9 @@ let checkRebuild = (firstTime, filePath) => {
     };
     let pid =
       Unix.create_process(
-        bsb,
+        "node",
         [|
+          "node",
           bsb,
           "-w",
           "-build-library",
