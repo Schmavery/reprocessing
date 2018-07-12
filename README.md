@@ -119,3 +119,17 @@ let fn = (filename, env) => {
 - [Pong](https://github.com/illbexyz/repong)
 - [Perlin Noise Flow Field](https://github.com/ekosz/reprocessing-example-flow-field)
 - [L-System](https://github.com/Rigellute/L-system-reasonml)
+- [My Dear Farm](https://github.com/bsansouci/ludum-dare-41)
+- [Retro](https://github.com/jslauthor/reprocessing-retro)
+- [Game Of Life](https://github.com/romanschejbal/reasonml-gol)
+- [Tetris](https://github.com/rdavison/retetris)
+- [Purple Maze](https://github.com/jaredly/purple-maze)
+- [Egg](https://github.com/danieljharvey/reason-egg)
+
+## Talks and articles about Reprocessing
+- [Wonky Game Physics in Reason and Lessons Learned](https://www.youtube.com/watch?v=PUBJwiECPoc)
+- [Making a cross-platform mobile game in Reason/OCaml](https://jaredforsyth.com/posts/making-a-cross-platform-mobile-game-in-reason-ocaml/)
+- [2048 live-coding](https://www.youtube.com/watch?v=UDOEd5jS0Ac)
+- [FlappyBird live-coding](https://www.youtube.com/watch?v=5aD3aPvNpyQ)
+
+Please open a PR to add any cool projects, talks or articles about Reprocessing that are missing above!
