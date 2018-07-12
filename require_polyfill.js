@@ -49,6 +49,7 @@ var projectRoot = currentScript.dataset['project-root'] || currentScript.dataset
 if (projectRoot == null) {
   throw new Error('The attribute `data-project-root` isn\'t found in the script tag. You need to provide the root (in which node_modules reside).')
 }
+
 var nodeModulesDir = projectRoot + '/node_modules/';
 
 var modulesCache = {};
@@ -61,9 +62,29 @@ var ensureEndsWithJs = function(path) {
     return path + '.js';
   }
 };
+
+let dir_sep = "/";
+function concat(dirname, filename) {
+  if (filename[0] === dir_sep) {
+    return filename;
+  }
+  
+  var l = dirname.length;
+  if (l === 0 || dirname[l - 1 | 0] === dir_sep) {
+    return dirname + filename;
+  } else {
+    return dirname + (dir_sep + filename);
+  }
+}
+
 function loadScript(scriptPath) {
   var request = new XMLHttpRequest();
-
+  var splitp = scriptPath.split(dir_sep);
+  for (let i = 0; i < splitp.length; i++) {
+    if (splitp[i] === "node_modules") {
+      scriptPath = splitp.slice(i, splitp.length).join(dir_sep);
+    }
+  }
   request.open("GET", scriptPath, false); // sync
   request.send();
   var dirSeparatorIndex = scriptPath.lastIndexOf('/');
@@ -79,7 +100,7 @@ function loadScript(scriptPath) {
       resolvedPath = ensureEndsWithJs(__dirname + path);
     } else if (path.indexOf('/') === -1) {
       // require('react')
-      var packageJson = pathNormalize(nodeModulesDir + path + '/package.json');
+      var packageJson = pathNormalize(concat(nodeModulesDir, path + '/package.json'));
       if (packageJsonMainCache[packageJson] == null) {
         var jsonRequest = new XMLHttpRequest();
         jsonRequest.open("GET", packageJson, false);
@@ -93,12 +114,12 @@ function loadScript(scriptPath) {
         } else if (!main.endsWith('.js')) {
           main = main + '.js';
         }
-        packageJsonMainCache[packageJson] = nodeModulesDir + path + '/' + main;
+        packageJsonMainCache[packageJson] = concat(nodeModulesDir, concat(path, main));
       }
       resolvedPath = packageJsonMainCache[packageJson];
     } else {
       // require('react/bar')
-      resolvedPath = ensureEndsWithJs(nodeModulesDir + path);
+      resolvedPath = ensureEndsWithJs(concat(nodeModulesDir, path));
     };
     resolvedPath = pathNormalize(resolvedPath);
     if (modulesCache[resolvedPath] != null) {
