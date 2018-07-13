@@ -1,5 +1,5 @@
 {
-  "name": "Reprocessing",
+  "name": "reprocessing",
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
