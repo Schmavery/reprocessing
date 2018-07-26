@@ -179,26 +179,27 @@ let image = (img, ~pos as (x, y), ~width=?, ~height=?, env: glEnv) =>
     }
   };
 
-let linef = (~p1, ~p2, env: glEnv) =>
-  switch env.style.strokeColor {
-  | None => () /* don't draw stroke */
-  | Some(color) =>
-    let width = float_of_int(env.style.strokeWeight);
-    let radius = width /. 2.;
-    let project = env.style.strokeCap == Project;
-    Internal.drawLineWithMatrix(
-      ~p1,
-      ~p2,
-      ~matrix=env.matrix,
-      ~color,
-      ~width,
-      ~project,
-      env
-    );
-    if (env.style.strokeCap == Round) {
-      Internal.drawEllipse(env, p1, radius, radius, env.matrix, color);
-      Internal.drawEllipse(env, p2, radius, radius, env.matrix, color);
-    };
+let linef = (~p1, ~p2, env: glEnv) => {
+  let color = switch env.style.strokeColor {
+  | None =>  Reprocessing_Constants.black /* default color black */
+  | Some(color) => color
+  };
+  let width = float_of_int(env.style.strokeWeight);
+  let radius = width /. 2.;
+  let project = env.style.strokeCap == Project;
+  Internal.drawLineWithMatrix(
+    ~p1,
+    ~p2,
+    ~matrix=env.matrix,
+    ~color,
+    ~width,
+    ~project,
+    env
+  );
+  if (env.style.strokeCap == Round) {
+    Internal.drawEllipse(env, p1, radius, radius, env.matrix, color);
+    Internal.drawEllipse(env, p2, radius, radius, env.matrix, color);
+  };
   };
 
 let line = (~p1 as (x1, y1), ~p2 as (x2, y2), env: glEnv) =>
