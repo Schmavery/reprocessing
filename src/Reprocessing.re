@@ -260,9 +260,8 @@ let run =
           if (env.frame.count === 2) {
             reDrawPreviousBufferOnSecondFrame()
           };
-          switch (Hashtbl.find(hotreloadData, screen)) {
-          | exception Not_found => ()
-          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
+          if (fns.filename != "") {
+            ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
