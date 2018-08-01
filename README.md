@@ -125,6 +125,7 @@ let fn = (filename, env) => {
 - [Tetris](https://github.com/rdavison/retetris)
 - [Purple Maze](https://github.com/jaredly/purple-maze)
 - [Egg](https://github.com/danieljharvey/reason-egg)
+- [Remandelbrot](https://github.com/sscaff1/remandelbrot)
 
 ## Talks and articles about Reprocessing
 - [Wonky Game Physics in Reason and Lessons Learned](https://www.youtube.com/watch?v=PUBJwiECPoc)
