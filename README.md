@@ -9,7 +9,7 @@ This is a high-level drawing library, inspired by [Processing](https://processin
 
 
 ## Example
-The [web environment](https://schmavery.github.io/reprocessing/) is the simplest way to try reprocessing. (It uses an older verison of the Reason syntax though, we're working on fixing that).
+The [web environment](https://schmavery.github.io/reprocessing/) is the simplest way to try reprocessing. (It uses an older version of the Reason syntax though, we're working on fixing that).
 
 The 2nd simplest way to try is to clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example).
 
