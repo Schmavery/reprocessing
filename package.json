@@ -25,6 +25,9 @@
   ],
   "license": "MIT",
   "author": "bsansouci & schmavery",
+  "peerDependencies": {
+    "bs-platform": "bsansouci/bsb-native#3.2.0",
+  },
   "devDependencies": {
     "bs-platform": "bsansouci/bsb-native#3.2.0",
     "docre": "bsansouci/docre"
