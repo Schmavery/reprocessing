@@ -4,7 +4,7 @@ let load_plug = fname => {
     try (Dynlink.loadfile(fname)) {
     | Dynlink.Error(err) =>
       print_endline("ERROR loading plugin: " ++ Dynlink.error_message(err))
-    | _ => failwith("Unknown error while loading plugin")
+    | e => failwith("Unknown error while loading plugin: " ++ Printexc.to_string(e))
     };
   } else {
     failwith("Plugin file does not exist");
