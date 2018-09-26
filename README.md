@@ -33,7 +33,9 @@ Reprocessing.setScreenId(sandboxCanvasId);
 npm install schmavery/reprocessing
 ```
 
-### Example
+### Code Example
+_Clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example) and follow instructions there to setup a new project._
+
 ```reason ;use(sandbox);canvas
 open Reprocessing;
 
