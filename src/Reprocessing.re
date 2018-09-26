@@ -87,7 +87,7 @@ let hotreload = (~screen=defaultScreen, filename) => {
     mouseDown: identity,
     mouseUp: identity
   });
-  Reprocessing_Hotreload.checkRebuild(filename)
+  Reprocessing_Hotreload.checkRebuild(true, filename)
 };
 
 let run =
@@ -261,7 +261,7 @@ let run =
             reDrawPreviousBufferOnSecondFrame()
           };
           if (fns.filename != "") {
-            ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
+            ignore @@ Reprocessing_Hotreload.checkRebuild(false, fns.filename)
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
