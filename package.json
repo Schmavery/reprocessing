@@ -1,6 +1,6 @@
 {
   "name": "reprocessing",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A high-level cross-platform drawing library for ReasonML, inspired by Processing",
   "scripts": {
     "build": "bsb -make-world -backend js",
