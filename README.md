@@ -9,7 +9,7 @@ This is a high-level drawing library, inspired by [Processing](https://processin
 
 
 ## Example
-The [web environment](https://schmavery.github.io/reprocessing/) is the simplest way to try reprocessing. (It uses an older verison of the Reason syntax though, we're working on fixing that).
+The [interactive docs](https://schmavery.github.io/reprocessing/) are the simplest way to try reprocessing. (They are generated using [redoc](https://github.com/jaredly/redoc)!).
 
 The 2nd simplest way to try is to clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example).
 
@@ -33,7 +33,9 @@ Reprocessing.setScreenId(sandboxCanvasId);
 npm install reprocessing
 ```
 
-### Example
+### Code Example
+_Clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example) and follow instructions there to setup a new project._
+
 ```reason ;use(sandbox);canvas
 open Reprocessing;
 
@@ -125,6 +127,7 @@ let fn = (filename, env) => {
 - [Tetris](https://github.com/rdavison/retetris)
 - [Purple Maze](https://github.com/jaredly/purple-maze)
 - [Egg](https://github.com/danieljharvey/reason-egg)
+- [Remandelbrot](https://github.com/sscaff1/remandelbrot)
 
 ## Talks and articles about Reprocessing
 - [Wonky Game Physics in Reason and Lessons Learned](https://www.youtube.com/watch?v=PUBJwiECPoc)

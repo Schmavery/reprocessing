@@ -87,7 +87,7 @@ let hotreload = (~screen=defaultScreen, filename) => {
     mouseDown: identity,
     mouseUp: identity
   });
-  Reprocessing_Hotreload.checkRebuild(filename)
+  Reprocessing_Hotreload.checkRebuild(true, filename)
 };
 
 let run =
@@ -258,11 +258,19 @@ let run =
       ~displayFunc=
         (f) => {
           if (env.frame.count === 2) {
-            reDrawPreviousBufferOnSecondFrame()
+            reDrawPreviousBufferOnSecondFrame();
+
+            /* @Hack Workaround for https://github.com/Schmavery/reprocessing/issues/117.
+              Seems like we need to set the window size at the first frame for Mojave to behave.
+              
+                      Ben — September 26th 2018
+               */
+            let height = Gl.Window.getHeight(env.window);
+            let width = Gl.Window.getWidth(env.window);
+            Reasongl.Gl.Window.setWindowSize(~window=env.window, ~width, ~height);
           };
-          switch (Hashtbl.find(hotreloadData, screen)) {
-          | exception Not_found => ()
-          | _ => ignore @@ Reprocessing_Hotreload.checkRebuild(fns.filename)
+          if (fns.filename != "") {
+            ignore @@ Reprocessing_Hotreload.checkRebuild(false, fns.filename)
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
