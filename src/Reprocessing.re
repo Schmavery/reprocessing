@@ -258,7 +258,16 @@ let run =
       ~displayFunc=
         (f) => {
           if (env.frame.count === 2) {
-            reDrawPreviousBufferOnSecondFrame()
+            reDrawPreviousBufferOnSecondFrame();
+
+            /* @Hack Workaround for https://github.com/Schmavery/reprocessing/issues/117.
+              Seems like we need to set the window size at the first frame for Mojave to behave.
+              
+                      Ben — September 26th 2018
+               */
+            let height = Gl.Window.getHeight(env.window);
+            let width = Gl.Window.getWidth(env.window);
+            Reasongl.Gl.Window.setWindowSize(~window=env.window, ~width, ~height);
           };
           if (fns.filename != "") {
             ignore @@ Reprocessing_Hotreload.checkRebuild(false, fns.filename)
