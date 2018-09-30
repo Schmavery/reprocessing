@@ -25,11 +25,6 @@ let folder = Dynlink.is_native ? "native" : "bytecode";
 
 let (+/) = Filename.concat;
 
-let ocamlPath =
-  "node_modules" +/ "bs-platform" +/ "vendor" +/ "ocaml" +/ ocaml;
-
-let refmtexe = "node_modules" +/ "bs-platform" +/ "lib" +/ "refmt3.exe";
-
 let bsb = "node_modules" +/ ".bin" +/ "bsb";
 
 let checkRebuild = (firstTime, filePath) => {
