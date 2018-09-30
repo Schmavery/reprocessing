@@ -221,10 +221,27 @@ let loadImage:
   Reprocessing_Types.Types.imageT;
 
 
+/** The `imagef` function draws an image to the display window.
+   * The image should be loaded using the `loadImage` function.
+   * The image is displayed at its original size unless width and
+   * height are optionally specified.
+ */
+let imagef:
+  (
+    Reprocessing_Types.Types.imageT,
+    ~pos: (float, float),
+    ~width: float=?,
+    ~height: float=?,
+    Reprocessing_Types.Types.glEnvT
+  ) =>
+  unit;
+
 /** The `image` function draws an image to the display window.
    * The image should be loaded using the `loadImage` function.
    * The image is displayed at its original size unless width and
    * height are optionally specified.
+   * 
+   * This is the same as `imagef` but takes in integers instead of floats for convenience.
  */
 let image:
   (
@@ -301,8 +318,7 @@ let rectf:
 /** Draws a rectangle to the screen. A rectangle is a four-sided shape with
    * every angle at ninety degrees.
    *
-   * This is the same as `rectf`, but converts all its integer arguments to floats
-   * as a convenience.
+   * This is the same as `rectf` but takes in integers instead of floats for convenience.
  */
 let rect:
   (

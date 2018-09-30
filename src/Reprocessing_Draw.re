@@ -155,6 +155,32 @@ let subImagef =
     )
   };
 
+let imagef = (img, ~pos as (x, y), ~width=?, ~height=?, env: glEnv) =>
+  switch img.glData {
+  | None => print_endline("image not ready yet, just doing nothing :D")
+  | Some({width: imgw, height: imgh} as img) =>
+    let imgwf = float_of_int(imgw);
+    let imghf = float_of_int(imgh);
+    switch (width, imgwf, height, imghf) {
+    | (None, w, None, h)
+    | (None, w, Some(h), _)
+    | (Some(w), _, None, h)
+    | (Some(w), _, Some(h), _) =>
+      Internal.drawImageWithMatrixf(
+        img,
+        ~x,
+        ~y,
+        ~width=w,
+        ~height=h,
+        ~subx=0,
+        ~suby=0,
+        ~subw=imgw,
+        ~subh=imgh,
+        env
+      )
+    }
+  };
+
 let image = (img, ~pos as (x, y), ~width=?, ~height=?, env: glEnv) =>
   switch img.glData {
   | None => print_endline("image not ready yet, just doing nothing :D")

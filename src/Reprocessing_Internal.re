@@ -975,16 +975,6 @@ let drawImage =
   env.batch.currTex = Some(texture);
 };
 
-let drawImageWithMatrix =
-    (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
-  let transform = Matrix.matptmul(env.matrix);
-  let p1 = transform((float_of_int @@ x + width, float_of_int @@ y + height));
-  let p2 = transform((float_of_int(x), float_of_int @@ y + height));
-  let p3 = transform((float_of_int @@ x + width, float_of_int(y)));
-  let p4 = transform((float_of_int(x), float_of_int(y)));
-  drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env);
-};
-
 let drawImageWithMatrixf =
     (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
   let transform = Matrix.matptmul(env.matrix);
@@ -993,6 +983,11 @@ let drawImageWithMatrixf =
   let p3 = transform((x +. width, y));
   let p4 = transform((x, y));
   drawImage(image, ~p1, ~p2, ~p3, ~p4, ~subx, ~suby, ~subw, ~subh, env);
+};
+
+let drawImageWithMatrix =
+    (image, ~x, ~y, ~width, ~height, ~subx, ~suby, ~subw, ~subh, env) => {
+  drawImageWithMatrixf(image, ~x=float_of_int(x), ~y=float_of_int(y), ~width=float_of_int(width), ~height=float_of_int(height), ~subx, ~suby, ~subw, ~subh, env)
 };
 
 
