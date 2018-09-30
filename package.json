@@ -26,7 +26,6 @@
   "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "bs-platform": "bsansouci/bsb-native#3.2.0",
-    "docre": "bsansouci/docre"
+    "bsb-native": "4.0.6"
   }
 }
