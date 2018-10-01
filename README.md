@@ -30,7 +30,7 @@ Reprocessing.setScreenId(sandboxCanvasId);
 
 ## Getting Started
 ```bash
-npm install schmavery/reprocessing
+npm install reprocessing
 ```
 
 ### Code Example
