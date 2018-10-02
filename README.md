@@ -120,6 +120,7 @@ let fn = (filename, env) => {
 - [FlappyBird](https://github.com/bsansouci/reprocessing-example/tree/livestream-flappybird)
 - [Chrome T-Rex](https://github.com/fabe/t-rex-runner-reason)
 - [Pong](https://github.com/illbexyz/repong)
+- [Ticky-Tacky](https://github.com/blaketarter/reticky-tacky)
 - [Perlin Noise Flow Field](https://github.com/ekosz/reprocessing-example-flow-field)
 - [L-System](https://github.com/Rigellute/L-system-reasonml)
 - [My Dear Farm](https://github.com/bsansouci/ludum-dare-41)
