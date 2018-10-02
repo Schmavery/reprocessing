@@ -118,6 +118,7 @@ let fn = (filename, env) => {
 - [Oh No! Zombies!](https://github.com/bsansouci/ludum-dare-40)
 - [2048](https://github.com/bsansouci/reprocessing-example/tree/2048)
 - [FlappyBird](https://github.com/bsansouci/reprocessing-example/tree/livestream-flappybird)
+- [Chrome T-Rex](https://github.com/fabe/t-rex-runner-reason)
 - [Pong](https://github.com/illbexyz/repong)
 - [Perlin Noise Flow Field](https://github.com/ekosz/reprocessing-example-flow-field)
 - [L-System](https://github.com/Rigellute/L-system-reasonml)
