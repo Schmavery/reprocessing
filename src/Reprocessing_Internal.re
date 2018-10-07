@@ -69,10 +69,15 @@ let getProgram =
   };
 };
 
-let createCanvas = (window, height: int, width: int) : glEnv => {
-  Gl.Window.setWindowSize(~window, ~width, ~height);
+let createCanvas = (window, _, _) : glEnv => {
+  let (width, height) = (Gl.Window.getWidth(window), Gl.Window.getHeight(window));
+  /*Gl.Window.setWindowSize(~window, ~width, ~height);*/
   let context = Gl.Window.getContext(window);
-  Gl.viewport(~context, ~x=-1, ~y=-1, ~width, ~height);
+  let (pixelWidth, pixelHeight) =
+    Gl.Window.(getPixelWidth(window), getPixelHeight(window));
+  Gl.viewport(~context, ~x=(-1), ~y=(-1), ~width=pixelWidth, ~height=pixelHeight);
+  
+  /*Gl.viewport(~context, ~x=(-1), ~y=(-1), ~width=Gl.Window.getPixelWidth(window), ~height=Gl.Window.getPixelHeight(window));*/
   Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=1.);
   Gl.clear(
     ~context,
@@ -174,6 +179,13 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
     ~near=0.,
     ~far=1.
   );
+  
+  Gl.uniformMatrix4fv(
+    ~context=context,
+    ~location=pMatrixUniform,
+    ~value=camera.projectionMatrix
+  );
+
   {
     camera,
     window,
@@ -206,7 +218,9 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
     mouse: {
       pos: (0, 0),
       prevPos: (0, 0),
-      pressed: false
+      pressed: false,
+      changedTouches: [],
+      touches: Hashtbl.create(10)
     },
     style: {
       fillColor: Some({r: 0., g: 0., b: 0., a: 1.}),
@@ -795,8 +809,9 @@ let drawArcStroke =
 let loadImage = (env: glEnv, filename, isPixel) : imageT => {
   let imageRef = {glData: None, drawnTo: false};
   Gl.loadImage(
+    ~context=env.gl,
     ~filename,
-    ~loadOption=LoadRGBA,
+    ~loadOption=Reasongl.Gl.LoadRGBA,
     ~callback=
       imageData =>
         switch imageData {

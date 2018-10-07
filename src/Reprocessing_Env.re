@@ -2,6 +2,10 @@ open Reprocessing_Common;
 
 module Matrix = Reprocessing_Matrix;
 
+let displayWidth = (env) => Reasongl.Gl.Window.getDisplayWidth(env.window);
+
+let displayHeight = (env) => Reasongl.Gl.Window.getDisplayHeight(env.window);
+
 let width = (env) => env.size.width;
 
 let height = (env) => env.size.height;

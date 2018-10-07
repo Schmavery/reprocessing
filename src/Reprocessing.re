@@ -24,9 +24,16 @@ type hotreloadT('a) = {
   mutable mouseDragged: ('a, Reprocessing_Common.glEnv) => 'a,
   mutable mouseDown: ('a, Reprocessing_Common.glEnv) => 'a,
   mutable mouseUp: ('a, Reprocessing_Common.glEnv) => 'a,
+  
+  mutable touchesBegan: ('a, Reprocessing_Common.glEnv) => 'a,
+  mutable touchesMoved: ('a, Reprocessing_Common.glEnv) => 'a,
+  mutable touchesEnded: ('a, Reprocessing_Common.glEnv) => 'a,
+  
   mutable keyPressed: ('a, Reprocessing_Common.glEnv) => 'a,
   mutable keyReleased: ('a, Reprocessing_Common.glEnv) => 'a,
-  mutable keyTyped: ('a, Reprocessing_Common.glEnv) => 'a
+  mutable keyTyped: ('a, Reprocessing_Common.glEnv) => 'a,
+  
+  mutable backPressed: ('a, Reprocessing_Common.glEnv) => option('a)
 };
 
 let hotreloadData = Obj.magic(Hashtbl.create(10));
@@ -85,7 +92,11 @@ let hotreload = (~screen=defaultScreen, filename) => {
     mouseMove: identity,
     mouseDragged: identity,
     mouseDown: identity,
-    mouseUp: identity
+    mouseUp: identity,
+    touchesBegan: identity,
+    touchesMoved: identity,
+    touchesEnded: identity,
+    backPressed: (_, _) => None,
   });
   Reprocessing_Hotreload.checkRebuild(true, filename)
 };
@@ -99,6 +110,10 @@ let run =
       ~mouseDragged=?,
       ~mouseDown=?,
       ~mouseUp=?,
+      ~touchesBegan=?,
+      ~touchesMoved=?,
+      ~touchesEnded=?,
+      ~backPressed=?,
       ~keyPressed=?,
       ~keyReleased=?,
       ~keyTyped=?,
@@ -122,7 +137,11 @@ let run =
         mouseMove: unwrap(mouseMove),
         mouseDragged: unwrap(mouseDragged),
         mouseDown: unwrap(mouseDown),
-        mouseUp: unwrap(mouseUp)
+        mouseUp: unwrap(mouseUp),
+        touchesBegan: unwrap(touchesBegan),
+        touchesMoved: unwrap(touchesMoved),
+        touchesEnded: unwrap(touchesEnded),
+        backPressed: unwrapOrDefault((_, _) => None, backPressed),
       };
       Hashtbl.replace(hotreloadData, screen, hr);
       hr
@@ -136,6 +155,10 @@ let run =
       hr.mouseDragged = unwrap(mouseDragged);
       hr.mouseDown = unwrap(mouseDown);
       hr.mouseUp = unwrap(mouseUp);
+      hr.touchesBegan = unwrap(touchesBegan);
+      hr.touchesMoved = unwrap(touchesMoved);
+      hr.touchesEnded = unwrap(touchesEnded);
+      hr.backPressed = unwrapOrDefault((_, _) => None, backPressed);
       print_endline("Successfully changed functions");
       hr
     };
@@ -143,13 +166,14 @@ let run =
     fns.started = true;
     Random.self_init();
     Reprocessing_Utils.noiseSeed(Random.int(Reprocessing_Utils.pow(~base=2, ~exp=30 - 1)));
-    let env =
+    Reprocessing_ClientWrapper.init(~screen, ~argv=Sys.argv, (window) => {
+      let env =
       Reprocessing_Internal.createCanvas(
-        Reprocessing_ClientWrapper.init(~screen, ~argv=Sys.argv),
+        window,
         200,
         200
       );
-    Reprocessing_Font.Font.loadDefaultFont(env);
+    /*Reprocessing_Font.Font.loadDefaultFont(env);*/
     let userState = ref(setup(env));
 
     /*** This is a basically a hack to get around the default behavior of drawing something inside setup.
@@ -296,6 +320,36 @@ let run =
             userState := fns.mouseMove(userState^, env)
           }
         },
+      ~touchesBegan=(~touches) => {
+        env.mouse.changedTouches = touches;
+        List.iter(({Gl.Events.hash, x, y} as touch) => {
+          Hashtbl.replace(env.mouse.touches, hash, touch)
+        }, touches);
+        userState := fns.touchesBegan(userState^, env) 
+      },
+      ~touchesMoved=(~touches) => {
+        env.mouse.changedTouches = touches;
+        List.iter(({Gl.Events.hash, x, y} as touch) => {
+          Hashtbl.replace(env.mouse.touches, hash, touch)
+        }, touches);
+        userState := fns.touchesMoved(userState^, env)
+      },
+      ~touchesEnded=(~touches) => {
+        env.mouse.changedTouches = touches;
+        List.iter(({Gl.Events.hash, x, y}) => {
+          Hashtbl.remove(env.mouse.touches, hash)
+        }, touches);
+        userState := fns.touchesEnded(userState^, env) 
+      },
+      /*~backPressed=() => {
+        switch (fns.backPressed(userState^, env)) {
+        | None => false
+        | Some(newState) => {
+          userState := newState;
+          true
+        }
+        }
+      },*/
       ~windowResize=
         () =>
           if (env.size.resizeable) {
@@ -325,5 +379,6 @@ let run =
       ()
     );
     Hashtbl.replace(pauseFns, screen, playPauseFn);
+    })
   }
 };

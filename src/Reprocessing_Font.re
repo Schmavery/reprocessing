@@ -176,6 +176,7 @@ module Font = {
   let parseFontFormat = (env, path, isPixel) => {
     let ret = ref(None);
     Gl.File.readFile(
+      ~context=env.gl,
       ~filename=path,
       ~cb=str => {
         let (char_map, kern_map, filename, res, lineHeight) =

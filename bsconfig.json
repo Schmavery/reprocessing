@@ -7,15 +7,15 @@
       "Reprocessing_Constants", "Reprocessing_Font", "Reprocessing_Hotreload",
       "Reprocessing_Draw", "Reprocessing_Internal", "Reprocessing_Matrix"
     ],
-    "subdirs": [{
-      "dir": "bytecode",
-      "backend": ["bytecode"]
-    }]
+    // "subdirs": [{
+    //   "dir": "bytecode",
+    //   "backend": ["bytecode"]
+    // }]
   }, {
     "dir": "examples",
     "type": "dev"
   }],
-  "bs-dependencies": ["Reasongl"],
+  "bs-dependencies": ["reasongl"],
   "entries": [{
     "backend": "bytecode",
     "main-module": "IndexHot"

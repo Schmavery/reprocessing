@@ -1,3 +1,7 @@
+let displayWidth: Reprocessing_Types.Types.glEnvT => int;
+
+let displayHeight: Reprocessing_Types.Types.glEnvT => int;
+
 let width: Reprocessing_Types.Types.glEnvT => int;
 
 let height: Reprocessing_Types.Types.glEnvT => int;
