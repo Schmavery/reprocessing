@@ -173,7 +173,7 @@ let run =
         200,
         200
       );
-    /*Reprocessing_Font.Font.loadDefaultFont(env);*/
+    Reprocessing_Font.Font.loadDefaultFont(env);
     let userState = ref(setup(env));
 
     /*** This is a basically a hack to get around the default behavior of drawing something inside setup.
