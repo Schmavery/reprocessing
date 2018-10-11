@@ -136,3 +136,5 @@ let keycodeMap: int => keycodeT =
   | 221 => CloseBracket
   | 222 => Quote
   | _ => Nothing;
+
+type touchT = Reasongl.Gl.Events.touchT = {hash: float, x: float, y: float};

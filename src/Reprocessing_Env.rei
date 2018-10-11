@@ -10,6 +10,8 @@ let mouse: Reprocessing_Types.Types.glEnvT => (int, int);
 
 let pmouse: Reprocessing_Types.Types.glEnvT => (int, int);
 
+let changedTouches : Reprocessing_Types.Types.glEnvT => list(Reprocessing_Events.touchT);
+
 let mousePressed: Reprocessing_Types.Types.glEnvT => bool;
 
 let keyCode: Reprocessing_Types.Types.glEnvT => Reprocessing_Events.keycodeT;

@@ -14,6 +14,8 @@ let mouse = (env) => env.mouse.pos;
 
 let pmouse = (env) => env.mouse.prevPos;
 
+let changedTouches = (env) => env.mouse.changedTouches;
+
 let mousePressed = (env) => env.mouse.pressed;
 
 let keyCode = (env) => env.keyboard.keyCode;

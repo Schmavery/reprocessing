@@ -36,8 +36,8 @@ type mouseT = {
   mutable pos: (int, int),
   mutable prevPos: (int, int),
   mutable pressed: bool,
-  mutable changedTouches: list(Reasongl.Gl.Events.touchT),
-  mutable touches: Hashtbl.t(float, Reasongl.Gl.Events.touchT),
+  mutable changedTouches: list(Reprocessing_Events.touchT),
+  mutable touches: Hashtbl.t(float, Reprocessing_Events.touchT),
 };
 
 module KeySet =
