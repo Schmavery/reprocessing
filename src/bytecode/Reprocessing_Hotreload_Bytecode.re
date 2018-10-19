@@ -25,7 +25,8 @@ let folder = Dynlink.is_native ? "native" : "bytecode";
 
 let (+/) = Filename.concat;
 
-let bsb = "node_modules" +/ ".bin" +/ "bsb";
+let bsbExtension = Sys.win32 || Sys.cygwin ? ".cmd" : "";
+let bsb = "node_modules" +/ ".bin" +/ ("bsb" ++ bsbExtension);
 
 let checkRebuild = (firstTime, filePath) => {
   if (firstTime) {
