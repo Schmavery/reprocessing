@@ -1,5 +1,5 @@
 {
-  "name": "Reprocessing",
+  "name": "reprocessing",
   "sources": [{
     "dir": "src",
     "public": ["Reprocessing", "Reprocessing_Env", "Reprocessing_Shaders", "Reprocessing_Types",

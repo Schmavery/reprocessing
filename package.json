@@ -1,11 +1,12 @@
 {
-  "name": "Reprocessing",
+  "name": "reprocessing",
   "version": "0.1.0",
   "description": "Processing library for Reason",
   "scripts": {
     "build": "bsb -make-world -backend js",
     "build:bytecode": "bsb -make-world -backend bytecode",
-    "build:native": "bsb -make-world -backend native"
+    "build:native": "bsb -make-world -backend native",
+    "clean": "bsb -clean-world"
   },
   "dependencies": {
     "Reasongl": "github:bsansouci/reasongl"
