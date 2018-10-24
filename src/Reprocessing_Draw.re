@@ -331,11 +331,10 @@ let quadf = (~p1, ~p2, ~p3, ~p4, env: glEnv) => {
       env
     );
     let r = width /. 2.;
-    let m = Matrix.identity;
-    Internal.drawEllipse(env, tp1, r, r, m, color);
-    Internal.drawEllipse(env, tp2, r, r, m, color);
-    Internal.drawEllipse(env, tp3, r, r, m, color);
-    Internal.drawEllipse(env, tp4, r, r, m, color);
+    Internal.drawEllipse(env, p1, r, r, matrix, color);
+    Internal.drawEllipse(env, p2, r, r, matrix, color);
+    Internal.drawEllipse(env, p3, r, r, matrix, color);
+    Internal.drawEllipse(env, p4, r, r, matrix, color);
   };
 };
 
@@ -715,10 +714,9 @@ let trianglef = (~p1, ~p2, ~p3, env: glEnv) => {
       env
     );
     let r = width /. 2.;
-    let m = Matrix.identity;
-    Internal.drawEllipse(env, tp1, r, r, m, color);
-    Internal.drawEllipse(env, tp2, r, r, m, color);
-    Internal.drawEllipse(env, tp3, r, r, m, color);
+    Internal.drawEllipse(env, p1, r, r, matrix, color);
+    Internal.drawEllipse(env, p2, r, r, matrix, color);
+    Internal.drawEllipse(env, p3, r, r, matrix, color);
   };
 };
 
