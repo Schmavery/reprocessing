@@ -145,7 +145,7 @@ let run =
     Reprocessing_Utils.noiseSeed(Random.int(Reprocessing_Utils.pow(~base=2, ~exp=30 - 1)));
     let env =
       Reprocessing_Internal.createCanvas(
-        Reprocessing_ClientWrapper.init(~screen, ~argv=Sys.argv),
+        Reasongl.Gl.Window.init(~screen, ~argv=Sys.argv),
         200,
         200
       );
