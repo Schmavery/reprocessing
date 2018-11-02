@@ -33,6 +33,9 @@ Reprocessing.setScreenId(sandboxCanvasId);
 npm install reprocessing
 ```
 
+> Note: on linux, you may need to also install some libraries):<br>
+`apt install libsdl2-dev fcitx-libs-dev libibus-1.0-dev`
+
 ### Code Example
 _Clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example) and follow instructions there to setup a new project._
 
@@ -66,12 +69,39 @@ Run `npm run build:bytecode` to build to a bytecode executable and run `./lib/bs
 
 Run `npm run build:native` to build to a native executable and run `./lib/bs/native/index.native`.
 
-See also [FlappyBird](https://github.com/Schmavery/FlappyBird) or [2048](https://github.com/bsansouci/reprocessing-example/tree/2048) for slightly bigger examples.
+See [below](#projects-using-reprocessing) for examples!
 
+# FAQs
+### Where do I find `x` function?
+There are a few modules in `Reprocessing` that store most functions you will want to use.
+The best way to find one is to use the *search* on the docs site: https://schmavery.github.io/reprocessing/
+
+In general:
+- `Draw` contains functions that draw to the screen (and affect drawing), like `rect` and `image`.
+- `Env` contains functions involving the environment (or window) you are running in. For example, `mouse` and `size`.
+- `Utils` contains many static helper functions from Processing such as `lerp` and `dist`.
+- `Constants` contains some mathematical and color-related constants, like `pi` and `green`.
+
+### Why do some functions have an `"f"` at the end?
+Several utility functions that would otherwise accept either an integer or a float in Processing expose a version with an `f` suffix, which supports floats.  Ex: `random` vs `randomf`. This lets you use whichever you prefer without needing to convert all the time.
+
+### When do I run loadImage or loadFont?
+It is best to run these functions in the setup function. They are fairly expensive to run and setup is usually the easiest place to load your assets once. Then you can keep a reference to them in your state and draw them as many times as you want!
+
+### How do I use different fonts when drawing text?
+There is a default font in Reprocessing that will be automatically used if you use `Draw.text` without providing a font. However, you frequently want to have your own font!
+
+The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it.
+
+★★★ Check out [font-generator](https://github.com/bsansouci/font-generator) for a tool that can take any truetype or opentype font and output font files that Reprocessing can use.
+
+In order to use a font once you have the files:
+```reason ;prefix(2);suffix(1);no-run
+let font = Draw.loadFont(~filename, env);
+Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
+```
 
 # Some Differences from Processing
-- There is no magic - everything is proper Reason code.  This means that you have to call `Reprocessing.run` with the functions that you want to use.  You also have a couple of options about which utility modules to open.  See the `examples` directory for some different ways to do this.  It is recommended to `open Reprocessing` at the top, and then you can optionally open `Draw`, `Env` and `Utils` to make it look more like Processing code. Alternatively, they can be used directly, as can be seen above.
-
 - For state management, we encourage the use of the `state` value that Reprocessing manages for the user.  To use this, decide on a datatype representing the state and return the initial value from `setup`.  This will be persisted behind the scenes and passed to every callback (such as `draw` and `mouseDown`).  Each callback should return the new value of the state (or the old value if it doesn't change).
 
 - There are no built-in variables like `width` and `mouseX`.  Instead, these are functions that are called, passing in an environment object that is always provided.
@@ -85,8 +115,6 @@ let draw = (state, env) => {
 
 - The builtin `map` function is called `remap` instead to avoid confusion with the well-known `List.map` function which maps over a list of values. As, according to the Processing docs, this function "Re-maps a number from one range to another.", this naming seems appropriate.
 
-- Because of the limitations of Reason, several utility functions that would otherwise accept either an integer or a float now expose a version with an `f` suffix, which supports floats.  Ex: `random` vs `randomf`.
-
 - Points are expressed as tuples.  Instead of exposing a `mouseX` and `mouseY`, there is a `mouse`, which is a tuple of x and y values.
 
 ```reason ;prefix(1);no-run
@@ -95,21 +123,6 @@ let draw = (state, env) => {
   let (x, y) = Env.mouse(env);
   print_endline("The current mouse position is:" ++ (string_of_int(x) ++ string_of_int(y)))
 };
-```
-
-
-# Using Fonts
-The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the [Angel Code font](http://www.angelcode.com/products/bmfont/) format. This is basically a bitmap of packed glyph textures along with a text file that describes it.
-
-Check out [font-generator](https://github.com/bsansouci/font-generator) for a tool that can take any truetype or opentype font and output font files that Reprocessing can use.
-
-The assets folder of this repo also has an [example](https://github.com/Schmavery/reprocessing/tree/master/assets/font) of a font that can be copied to your project and used.  In order to use a font once you have the files:
-```reason ;prefix(2);suffix(1);no-run
-open Reprocessing;
-let fn = (filename, env) => {
-  let font = Draw.loadFont(~filename, env);
-  Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
-}
 ```
 
 ## Projects using Reprocessing
