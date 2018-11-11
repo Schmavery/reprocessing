@@ -32,6 +32,7 @@
  * @includes
 */;
 
+let target : string;
 
 /*** Contains functions having to do with drawing to the screen */
 module Draw = Reprocessing_Draw;

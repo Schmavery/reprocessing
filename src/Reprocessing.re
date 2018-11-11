@@ -16,6 +16,8 @@ module Events = Reprocessing_Events;
 
 include Reprocessing_Types.Types;
 
+let target = Gl.target;
+
 type hotreloadT('a) = {
   mutable started: bool,
   mutable filename: string,
