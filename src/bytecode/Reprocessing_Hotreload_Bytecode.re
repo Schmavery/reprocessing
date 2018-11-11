@@ -61,8 +61,7 @@ let checkRebuild = (firstTime, filePath) => {
         Unix.stderr
       );
     print_endline("bsb running with pid: " ++ string_of_int(pid));
-    /* 9 is SIGKILL */
-    at_exit(() => Unix.kill(pid, 9));
+    at_exit(() => {Unix.kill(pid, Sys.sigkill); Sys.remove(".bsb.lock")});
     ();
   };
   let filePath = "lib" +/ "bs" +/ "bytecode" +/ "lib.cma";
