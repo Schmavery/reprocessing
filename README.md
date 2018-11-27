@@ -101,6 +101,9 @@ let font = Draw.loadFont(~filename, env);
 Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
 ```
 
+### Why is there no support for 3D drawing?
+The original goal for reprocessing was to make something extremely easy to use and build real (2d) games and experiences with in ReasonML. Processing's 2D API does an amazing job at making graphics approachable. It would be really neat to be able to extend this to 3D creations but I do tend to feel that the 3D API is significantly more complex in some ways. It adds several new concepts such as 3d shapes, texture/materials/lighting, and we'd need to extend several functions to optionally support a third dimension. It also doesn't let you avoid the matrix functions which can be counterintuitive and camera logic gets more involved. We may consider trying to add support in the future but it currently isn't on the roadmap.
+
 # Some Differences from Processing
 - For state management, we encourage the use of the `state` value that Reprocessing manages for the user.  To use this, decide on a datatype representing the state and return the initial value from `setup`.  This will be persisted behind the scenes and passed to every callback (such as `draw` and `mouseDown`).  Each callback should return the new value of the state (or the old value if it doesn't change).
 
