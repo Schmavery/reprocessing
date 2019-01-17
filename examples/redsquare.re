@@ -10,6 +10,7 @@ let squareSize = 300;
 
 let setup = (env) => {
   size(~width=600, ~height=600, env);
+  title("Red Square", env);
   fill(Reprocessing.Constants.red, env);
   (0, 0)
 };

@@ -27,6 +27,9 @@ let size = (~width, ~height, env: glEnv) => {
   Reprocessing_Internal.resetSize(env, width, height)
 };
 
+let title = (title, env: glEnv) =>
+  Reasongl.Gl.Window.setWindowTitle(~window=env.window, ~title);
+
 let resizeable = (resizeable, env: glEnv) => env.size.resizeable = resizeable;
 
 let frameRate = (env: glEnv) => env.frame.rate;
