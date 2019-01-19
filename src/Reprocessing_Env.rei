@@ -20,6 +20,8 @@ let keyReleased:
 
 let size: (~width: int, ~height: int, Reprocessing_Types.Types.glEnvT) => unit;
 
+let title: (string, Reprocessing_Types.Types.glEnvT) => unit;
+
 let resizeable: (bool, Reprocessing_Types.Types.glEnvT) => unit;
 
 let frameRate: Reprocessing_Types.Types.glEnvT => int;
