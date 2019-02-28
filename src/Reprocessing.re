@@ -18,8 +18,11 @@ include Reprocessing_Types.Types;
 
 type hotreloadT('a) = {
   mutable started: bool,
+  mutable justHotReloaded: bool,
   mutable filename: string,
+  mutable previousInitialStateHash: int,
   mutable draw: ('a, Reprocessing_Common.glEnv) => 'a,
+  mutable setup: (Reprocessing_Common.glEnv) => 'a,
   mutable mouseMove: ('a, Reprocessing_Common.glEnv) => 'a,
   mutable mouseDragged: ('a, Reprocessing_Common.glEnv) => 'a,
   mutable mouseDown: ('a, Reprocessing_Common.glEnv) => 'a,
@@ -77,8 +80,11 @@ let hotreload = (~screen=defaultScreen, filename) => {
   let _e = Reprocessing_Events.keycodeMap;
   Hashtbl.replace(hotreloadData, screen, {
     started: false,
+    justHotReloaded: false,
+    previousInitialStateHash: 0,
     filename,
     draw: identity,
+    setup: (type a, _: a) => (),
     keyPressed: identity,
     keyReleased: identity,
     keyTyped: identity,
@@ -114,7 +120,10 @@ let run =
     | exception Not_found => {
       let hr = {
         started: false,
+        justHotReloaded: false,
+        previousInitialStateHash: 0,
         filename: "",
+        setup,
         draw: unwrap(draw),
         keyPressed: unwrap(keyPressed),
         keyReleased: unwrap(keyReleased),
@@ -128,7 +137,9 @@ let run =
       hr
     }
     | hr =>
+      hr.justHotReloaded = true;
       hr.draw = unwrap(draw);
+      hr.setup = setup;
       hr.keyPressed = unwrap(keyPressed);
       hr.keyReleased = unwrap(keyReleased);
       hr.keyTyped = unwrap(keyTyped);
@@ -151,6 +162,7 @@ let run =
       );
     Reprocessing_Font.Font.loadDefaultFont(env);
     let userState = ref(setup(env));
+    fns.previousInitialStateHash = Hashtbl.hash(userState^);
 
     /*** This is a basically a hack to get around the default behavior of drawing something inside setup.
          Because OpenGL uses double buffering, drawing in setup will result in a flickering shape, as the data
@@ -262,7 +274,7 @@ let run =
 
             /* @Hack Workaround for https://github.com/Schmavery/reprocessing/issues/117.
               Seems like we need to set the window size at the first frame for Mojave to behave.
-              
+
                       Ben — September 26th 2018
                */
             let height = Gl.Window.getHeight(env.window);
@@ -271,6 +283,15 @@ let run =
           };
           if (fns.filename != "") {
             ignore @@ Reprocessing_Hotreload.checkRebuild(false, fns.filename)
+          };
+          if (fns.justHotReloaded) {
+            let newInitialState = fns.setup(env);
+            let newHash = Hashtbl.hash(newInitialState);
+            if (newHash != fns.previousInitialStateHash) {
+              userState := newInitialState;
+              fns.previousInitialStateHash = newHash;
+            };
+            fns.justHotReloaded = false;
           };
           userState := fns.draw(userState^, env);
           afterDraw(f, env)
