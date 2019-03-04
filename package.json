@@ -1,6 +1,6 @@
 {
   "name": "reprocessing",
-  "version": "0.1.1",
+  "version": "0.3.0",
   "description": "Processing library for Reason",
   "scripts": {
     "build": "bsb -make-world -backend js",
@@ -27,6 +27,6 @@
   "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "bsb-native": "4.0.6"
+    "bsb-native": "4.0.7000"
   }
 }
