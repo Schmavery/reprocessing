@@ -117,6 +117,22 @@ let run =
   let unwrap = unwrapOrDefault(identity);
   let fns =
     switch (Hashtbl.find(hotreloadData, screen)) {
+    | exception Not_found =>
+      {
+        started: false,
+        justHotReloaded: false,
+        previousInitialStateHash: 0,
+        filename: "",
+        setup,
+        draw: unwrap(draw),
+        keyPressed: unwrap(keyPressed),
+        keyReleased: unwrap(keyReleased),
+        keyTyped: unwrap(keyTyped),
+        mouseMove: unwrap(mouseMove),
+        mouseDragged: unwrap(mouseDragged),
+        mouseDown: unwrap(mouseDown),
+        mouseUp: unwrap(mouseUp)
+      };
     | hr =>
       hr.justHotReloaded = true;
       hr.draw = unwrap(draw);
