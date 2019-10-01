@@ -243,14 +243,25 @@ module Font = {
     | Some(fnt) =>
       switch fnt.image.glData {
       | Some(img) =>
-        let offset = ref(x);
+        let xOffset = ref(x);
+        let yOffset = ref(y);
         let lastChar = ref(None);
         String.iter(
           c => {
-            let advance =
-              drawChar(env, fnt, Some(img), c, lastChar^, offset^, y);
-            offset := offset^ +. advance;
-            lastChar := Some(c);
+            switch (c) {
+              | '\r' =>
+                xOffset := x;
+                lastChar := None;
+              | '\n' =>
+                xOffset := x;
+                yOffset := yOffset^  +. fnt.lineHeight;
+                lastChar := None;
+              | c =>
+                let advance =
+                  drawChar(env, fnt, Some(img), c, lastChar^, xOffset^, yOffset^);
+                xOffset := xOffset^ +. advance;
+                lastChar := Some(c);
+            }
           },
           str
         );
@@ -268,16 +279,22 @@ module Font = {
     | None => 0.
     | Some(fnt) =>
       let offset = ref(0.);
+      let maxOffset = ref(0.);
       let lastChar = ref(None);
       String.iter(
-        c => {
-          offset :=
-            offset^ +. drawChar(env, fnt, None, c, lastChar^, offset^, 0.);
-          lastChar := Some(c);
+        c => switch (c) {
+          | '\r' | '\n' =>
+            maxOffset := max(maxOffset^, offset^);
+            offset := 0.;
+            lastChar := None;
+          | c =>
+            offset :=
+              offset^ +. drawChar(env, fnt, None, c, lastChar^, offset^, 0.);
+            lastChar := Some(c);
         },
         str
       );
-      offset^;
+      max(maxOffset^, offset^);
     };
   };
   let loadDefaultFont = env => {
