@@ -5,6 +5,7 @@ type stateT = Reasongl.Gl.Events.stateT = | MouseDown | MouseUp;
 type keycodeT =
   Reasongl.Gl.Events.keycodeT =
     | Backspace
+    | Delete
     | Tab
     | Enter
     | Escape
