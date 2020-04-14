@@ -1,6 +1,6 @@
 {
   "name": "reprocessing",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Processing library for Reason",
   "scripts": {
     "build": "bsb -make-world -backend js",
