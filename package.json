@@ -9,7 +9,7 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "Reasongl": "github:bsansouci/reasongl#868ca060c7fe41595fe6157c7ab668af82a170e1"
+    "reasongl": "^0.2.0"
   },
   "repository": {
     "type": "git",

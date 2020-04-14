@@ -15,7 +15,7 @@
     "dir": "examples",
     "type": "dev"
   }],
-  "bs-dependencies": ["Reasongl"],
+  "bs-dependencies": ["reasongl"],
   "entries": [{
     "backend": "bytecode",
     "main-module": "IndexHot"
