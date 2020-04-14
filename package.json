@@ -9,7 +9,7 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "reasongl": "^0.2.0"
+    "reasongl": "^0.2.1"
   },
   "repository": {
     "type": "git",
