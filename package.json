@@ -1,6 +1,6 @@
 {
   "name": "reprocessing",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Processing library for Reason",
   "scripts": {
     "build": "bsb -make-world -backend js",
@@ -9,7 +9,7 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "Reasongl": "github:bsansouci/reasongl#868ca060c7fe41595fe6157c7ab668af82a170e1"
+    "@bsansouci/reasongl": "^0.2.4"
   },
   "repository": {
     "type": "git",
