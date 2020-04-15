@@ -9,7 +9,8 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "@bsansouci/reasongl": "^0.2.2"
+    "@bsansouci/reasongl": "^0.2.4",
+    "dynlink": "bsansouci/otherlibs"
   },
   "repository": {
     "type": "git",
