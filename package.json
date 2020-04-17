@@ -1,6 +1,6 @@
 {
   "name": "reprocessing",
-  "version": "0.3.3",
+  "version": "1.0.0",
   "description": "Processing library for Reason",
   "scripts": {
     "build": "bsb -make-world -backend js",
@@ -9,7 +9,9 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "@bsansouci/reasongl": "^0.2.4"
+    "@bsansouci/reasongl": "^1.0.0",
+    "@bsansouci/tsdl": "^1.0.1",
+    "dynlink": "bsansouci/otherlibs"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,6 @@
   "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "bsb-native": "4.0.7000"
+    "bsb-native": "^5.0.0"
   }
 }

@@ -15,7 +15,7 @@
     "dir": "examples",
     "type": "dev"
   }],
-  "bs-dependencies": ["@bsansouci/reasongl"],
+  "bs-dependencies": ["@bsansouci/reasongl", "dynlink"],
   "entries": [{
     "backend": "bytecode",
     "main-module": "IndexHot"

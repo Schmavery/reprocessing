@@ -3,7 +3,7 @@ module NoHotreloading = struct
     false
 end
 
-#if BSB_BACKEND = "bytecode" then
+#if BYTECODE then
   include Reprocessing_Hotreload_Bytecode
 #else
   include NoHotreloading
