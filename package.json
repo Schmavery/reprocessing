@@ -9,9 +9,8 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "@bsansouci/reasongl": "^1.0.0",
-    "@bsansouci/tsdl": "^1.0.1",
-    "dynlink": "bsansouci/otherlibs"
+    "@bsansouci/reasongl-web": "*",
+    "gl-matrix": "^3.3.0"
   },
   "repository": {
     "type": "git",
@@ -29,6 +28,6 @@
   "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "bsb-native": "^5.0.0"
+    "bs-platform": "^8.3.1"
   }
 }

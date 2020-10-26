@@ -11,7 +11,7 @@ let getProgram =
       ~fragmentShader as fragmentShaderSource: string
     )
     : option(Gl.programT) => {
-  let vertexShader = Gl.createShader(~context, RGLConstants.vertex_shader);
+  let vertexShader = Gl.createShader(~context, Constants.vertex_shader);
   Gl.shaderSource(~context, ~shader=vertexShader, ~source=vertexShaderSource);
   Gl.compileShader(~context, vertexShader);
   let compiledCorrectly =
@@ -23,7 +23,7 @@ let getProgram =
     == 1;
   if (compiledCorrectly) {
     let fragmentShader =
-      Gl.createShader(~context, RGLConstants.fragment_shader);
+      Gl.createShader(~context, Constants.fragment_shader);
     Gl.shaderSource(
       ~context,
       ~shader=fragmentShader,
@@ -76,7 +76,7 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
   Gl.clearColor(~context, ~r=0., ~g=0., ~b=0., ~a=1.);
   Gl.clear(
     ~context,
-    ~mask=RGLConstants.color_buffer_bit lor RGLConstants.depth_buffer_bit
+    ~mask=Constants.color_buffer_bit lor Constants.depth_buffer_bit
   );
 
   /*** Camera is a simple record containing one matrix used to project a point in 3D onto the screen. **/
@@ -123,16 +123,16 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
   /*** This tells OpenGL that we're going to be using texture0. OpenGL imposes a limit on the number of
        texture we can manipulate at the same time. That limit depends on the device. We don't care as we'll just
        always use texture0. **/
-  Gl.activeTexture(~context, RGLConstants.texture0);
+  Gl.activeTexture(~context, Constants.texture0);
 
   /*** Bind `texture` to `texture_2d` to modify it's magnification and minification params. **/
-  Gl.bindTexture(~context, ~target=RGLConstants.texture_2d, ~texture);
+  Gl.bindTexture(~context, ~target=Constants.texture_2d, ~texture);
   let uSampler = Gl.getUniformLocation(~context, ~program, ~name="uSampler");
 
   /*** Load a dummy texture. This is because we're using the same shader for things with and without a texture */
   Gl.texImage2D_RGBA(
     ~context,
-    ~target=RGLConstants.texture_2d,
+    ~target=Constants.texture_2d,
     ~level=0,
     ~width=1,
     ~height=1,
@@ -141,23 +141,23 @@ let createCanvas = (window, height: int, width: int) : glEnv => {
   );
   Gl.texParameteri(
     ~context,
-    ~target=RGLConstants.texture_2d,
-    ~pname=RGLConstants.texture_mag_filter,
-    ~param=RGLConstants.linear
+    ~target=Constants.texture_2d,
+    ~pname=Constants.texture_mag_filter,
+    ~param=Constants.linear
   );
   Gl.texParameteri(
     ~context,
-    ~target=RGLConstants.texture_2d,
-    ~pname=RGLConstants.texture_min_filter,
-    ~param=RGLConstants.linear_mipmap_nearest
+    ~target=Constants.texture_2d,
+    ~pname=Constants.texture_min_filter,
+    ~param=Constants.linear_mipmap_nearest
   );
 
   /*** Enable blend and tell OpenGL how to blend. */
-  Gl.enable(~context, RGLConstants.blend);
+  Gl.enable(~context, Constants.blend);
   Gl.blendFunc(
     ~context,
-    RGLConstants.src_alpha,
-    RGLConstants.one_minus_src_alpha
+    Constants.src_alpha,
+    Constants.one_minus_src_alpha
   );
 
   /***
@@ -255,16 +255,16 @@ let drawGeometry =
      `array_buffer` */
   Gl.bindBuffer(
     ~context=env.gl,
-    ~target=RGLConstants.array_buffer,
+    ~target=Constants.array_buffer,
     ~buffer=env.vertexBuffer
   );
 
   /*** Copy all of the data over into whatever's in `array_buffer` (so here it's `vertexBuffer`) **/
   Gl.bufferData(
     ~context=env.gl,
-    ~target=RGLConstants.array_buffer,
+    ~target=Constants.array_buffer,
     ~data=vertexArray,
-    ~usage=RGLConstants.stream_draw
+    ~usage=Constants.stream_draw
   );
 
   /*** Tell the GPU about the shader attribute called `aVertexPosition` so it can access the data per vertex */
@@ -272,7 +272,7 @@ let drawGeometry =
     ~context=env.gl,
     ~attribute=env.aVertexPosition,
     ~size=2,
-    ~type_=RGLConstants.float_,
+    ~type_=Constants.float_,
     ~normalize=false,
     ~stride=vertexSize * 4,
     ~offset=0
@@ -283,7 +283,7 @@ let drawGeometry =
     ~context=env.gl,
     ~attribute=env.aVertexColor,
     ~size=4,
-    ~type_=RGLConstants.float_,
+    ~type_=Constants.float_,
     ~normalize=false,
     ~stride=vertexSize * 4,
     ~offset=2 * 4
@@ -294,7 +294,7 @@ let drawGeometry =
     ~context=env.gl,
     ~attribute=env.aTextureCoord,
     ~size=2,
-    ~type_=RGLConstants.float_,
+    ~type_=Constants.float_,
     ~normalize=false,
     ~stride=vertexSize * 4,
     ~offset=6 * 4
@@ -308,22 +308,22 @@ let drawGeometry =
        the data representing the indices of the vertex. **/
   Gl.bindBuffer(
     ~context=env.gl,
-    ~target=RGLConstants.element_array_buffer,
+    ~target=Constants.element_array_buffer,
     ~buffer=env.elementBuffer
   );
 
   /*** Copy the `elementArray` into whatever buffer is in `element_array_buffer` **/
   Gl.bufferData(
     ~context=env.gl,
-    ~target=RGLConstants.element_array_buffer,
+    ~target=Constants.element_array_buffer,
     ~data=elementArray,
-    ~usage=RGLConstants.stream_draw
+    ~usage=Constants.stream_draw
   );
 
   /*** We bind `texture` to texture_2d, like we did for the vertex buffers in some ways (I think?) **/
   Gl.bindTexture(
     ~context=env.gl,
-    ~target=RGLConstants.texture_2d,
+    ~target=Constants.texture_2d,
     ~texture=textureBuffer
   );
 
@@ -332,7 +332,7 @@ let drawGeometry =
     ~context=env.gl,
     ~mode,
     ~count,
-    ~type_=RGLConstants.unsigned_short,
+    ~type_=Constants.unsigned_short,
     ~offset=0
   );
 };
@@ -364,7 +364,7 @@ let flushGlobalBatch = env =>
           ~offset=0,
           ~len=env.batch.elementPtr
         ),
-      ~mode=RGLConstants.triangles,
+      ~mode=Constants.triangles,
       ~count=env.batch.elementPtr,
       ~textureBuffer,
       env
@@ -796,7 +796,7 @@ let loadImage = (env: glEnv, filename, isPixel) : imageT => {
   let imageRef = {glData: None, drawnTo: false};
   Gl.loadImage(
     ~filename,
-    ~loadOption=LoadRGBA,
+    ~loadOption=Gl.LoadRGBA,
     ~callback=
       imageData =>
         switch imageData {
@@ -849,7 +849,7 @@ let loadImageFromMemory = (env: glEnv, data, isPixel) : imageT => {
   let imageRef = {glData: None, drawnTo: false};
   Gl.loadImageFromMemory(
     ~data,
-    ~loadOption=LoadRGBA,
+    ~loadOption=Gl.LoadRGBA,
     ~callback=
       imageData =>
         switch imageData {

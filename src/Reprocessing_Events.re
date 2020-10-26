@@ -1,9 +1,9 @@
-type buttonStateT = Reasongl.Gl.Events.buttonStateT = | LeftButton | MiddleButton | RightButton;
+type buttonStateT = Reasongl.Events.buttonStateT = | LeftButton | MiddleButton | RightButton;
 
-type stateT = Reasongl.Gl.Events.stateT = | MouseDown | MouseUp;
+type stateT = Reasongl.Events.stateT = | MouseDown | MouseUp;
 
 type keycodeT =
-  Reasongl.Gl.Events.keycodeT =
+  Reasongl.Events.keycodeT =
     | Backspace
     | Delete
     | Tab

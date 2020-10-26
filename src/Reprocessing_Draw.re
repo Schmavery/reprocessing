@@ -797,7 +797,7 @@ let textWidth = (~font=?, ~body, env) =>
 let clear = env =>
   Reasongl.Gl.clear(
     ~context=env.gl,
-    ~mask=Constants.color_buffer_bit lor Constants.depth_buffer_bit
+    ~mask=Reasongl.Constants.color_buffer_bit lor Reasongl.Constants.depth_buffer_bit
   );
 
 let background = (color, env: glEnv) => {
