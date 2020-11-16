@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "description": "Processing library for Reason",
   "scripts": {
-    "build": "bsb -make-world -backend js",
-    "build:bytecode": "bsb -make-world -backend bytecode",
-    "build:native": "bsb -make-world -backend native",
+    "build": "bsb -make-world",
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "@bsansouci/reasongl-web": "*",
+    "@bsansouci/reasongl-web": "^0.2.0",
     "gl-matrix": "^3.3.0"
   },
   "repository": {
