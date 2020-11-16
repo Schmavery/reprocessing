@@ -7,7 +7,7 @@
     "clean": "bsb -clean-world"
   },
   "dependencies": {
-    "@bsansouci/reasongl-web": "^0.2.2",
+    "@bsansouci/reasongl-web": "^0.2.3",
     "gl-matrix": "^3.3.0"
   },
   "repository": {
