@@ -26,6 +26,6 @@
   "license": "MIT",
   "author": "bsansouci & schmavery",
   "devDependencies": {
-    "bs-platform": "^8.3.1"
+    "bs-platform": "^8.3.3"
   }
 }
