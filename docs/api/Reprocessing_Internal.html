@@ -1,0 +1,267 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>Reprocessing_Internal</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="../index.html">Home</a>
+<a href="../fonts/LICENSE.html">LICENSE</a></div>
+      <div class='toc-header'>Page Contents</div>
+      <div class='table-of-contents'>
+      <a href="#Reprocessing_Internal" class='level-1 header'>Reprocessing_Internal</a>
+<a href="#module-Matrix" class='level-2 module'>Matrix</a>
+<a href="#value-getProgram" class='level-2 value'>getProgram</a>
+<a href="#value-createCanvas" class='level-2 value'>createCanvas</a>
+<a href="#value-makeLocalBatch" class='level-2 value'>makeLocalBatch</a>
+<a href="#value-drawGeometry" class='level-2 value'>drawGeometry</a>
+<a href="#value-flushGlobalBatch" class='level-2 value'>flushGlobalBatch</a>
+<a href="#value-maybeFlushBatch" class='level-2 value'>maybeFlushBatch</a>
+<a href="#value-addRectToGlobalBatch" class='level-2 value'>addRectToGlobalBatch</a>
+<a href="#value-drawTriangle" class='level-2 value'>drawTriangle</a>
+<a href="#value-drawLineWithMatrix" class='level-2 value'>drawLineWithMatrix</a>
+<a href="#value-drawArc" class='level-2 value'>drawArc</a>
+<a href="#value-drawEllipse" class='level-2 value'>drawEllipse</a>
+<a href="#value-drawArcStroke" class='level-2 value'>drawArcStroke</a>
+<a href="#value-loadImage" class='level-2 value'>loadImage</a>
+<a href="#value-loadImageFromMemory" class='level-2 value'>loadImageFromMemory</a>
+<a href="#value-drawImage" class='level-2 value'>drawImage</a>
+<a href="#value-drawImageWithMatrix" class='level-2 value'>drawImageWithMatrix</a>
+<a href="#value-drawImageWithMatrixf" class='level-2 value'>drawImageWithMatrixf</a>
+<a href="#value-resetSize" class='level-2 value'>resetSize</a>
+<a href="#value-createImage" class='level-2 value'>createImage</a>
+<a href="#value-drawOnImage" class='level-2 value'>drawOnImage</a>
+<a href="#value-clearImage" class='level-2 value'>clearImage</a>
+      </div>
+      <div class='project-title'>Package modules</div><div class='project-listing'><a href="Reprocessing.html">Reprocessing</a>
+<a href="Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="Reprocessing_Utils.html">Reprocessing_Utils</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/src/Reprocessing_Internal.re" class="edit-link">Edit</a>
+    <a href="#Reprocessing_Internal" id="Reprocessing_Internal"><h1>Reprocessing_Internal</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Matrix" id="module-Matrix">Matrix</a> : <a href="Reprocessing_Matrix.html">Reprocessing_Matrix</a></h4></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-getProgram" id="value-getProgram">getProgram</a> = (
+  ~context: Reasongl.Gl.contextT,
+  ~vertexShader: string,
+  ~fragmentShader: string
+) => option(Reasongl.Gl.programT)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-createCanvas" id="value-createCanvas">createCanvas</a> = (Reasongl.Gl.Window.t, int, int) => <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-makeLocalBatch" id="value-makeLocalBatch">makeLocalBatch</a> = <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a> => <a href="Reprocessing_Common.html#type-batchT" title="Reprocessing_Common.batchT">batchT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawGeometry" id="value-drawGeometry">drawGeometry</a> = (
+  ~vertexArray: Reasongl.Gl.Bigarray.t(
+    float,
+    Reasongl.Gl.Bigarray.float32_elt
+  ),
+  ~elementArray: Reasongl.Gl.Bigarray.t(
+    int,
+    Reasongl.Gl.Bigarray.int16_unsigned_elt
+  ),
+  ~mode: int,
+  ~count: int,
+  ~textureBuffer: Reasongl.Gl.textureT,
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-flushGlobalBatch" id="value-flushGlobalBatch">flushGlobalBatch</a> = <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a> => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-maybeFlushBatch" id="value-maybeFlushBatch">maybeFlushBatch</a> = (
+  ~texture: option(Reasongl.Gl.textureT),
+  ~el: int,
+  ~vert: int,
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-addRectToGlobalBatch" id="value-addRectToGlobalBatch">addRectToGlobalBatch</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  ~bottomRight: (float, float),
+  ~bottomLeft: (float, float),
+  ~topRight: (float, float),
+  ~topLeft: (float, float),
+  ~color: <a href="Reprocessing_Common.html#type-colorT" title="Reprocessing_Common.colorT">colorT</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawTriangle" id="value-drawTriangle">drawTriangle</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  (float, float),
+  (float, float),
+  (float, float),
+  ~color: <a href="Reprocessing_Common.html#type-colorT" title="Reprocessing_Common.colorT">colorT</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawLineWithMatrix" id="value-drawLineWithMatrix">drawLineWithMatrix</a> = (
+  ~p1: (float, float),
+  ~p2: (float, float),
+  ~matrix: array(float),
+  ~color: <a href="Reprocessing_Common.html#type-colorT" title="Reprocessing_Common.colorT">colorT</a>,
+  ~width: float,
+  ~project: bool,
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawArc" id="value-drawArc">drawArc</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  (float, float),
+  float,
+  float,
+  float,
+  float,
+  bool,
+  array(float),
+  <a href="Reprocessing_Common.html#type-colorT" title="Reprocessing_Common.colorT">colorT</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawEllipse" id="value-drawEllipse">drawEllipse</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  (float, float),
+  float,
+  float,
+  array(float),
+  <a href="Reprocessing_Common.html#type-colorT" title="Reprocessing_Common.colorT">colorT</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawArcStroke" id="value-drawArcStroke">drawArcStroke</a> = (
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>,
+  (float, float),
+  float,
+  float,
+  float,
+  float,
+  bool,
+  bool,
+  array(float),
+  <a href="Reprocessing_Common.html#type-colorT" title="Reprocessing_Common.colorT">colorT</a>,
+  int
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-loadImage" id="value-loadImage">loadImage</a> = (<a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>, string, bool) => <a href="Reprocessing_Common.html#type-imageT" title="Reprocessing_Common.imageT">imageT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-loadImageFromMemory" id="value-loadImageFromMemory">loadImageFromMemory</a> = (<a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>, string, bool) => <a href="Reprocessing_Common.html#type-imageT" title="Reprocessing_Common.imageT">imageT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawImage" id="value-drawImage">drawImage</a> = (
+  <a href="Reprocessing_Common.html#type-_imageT" title="Reprocessing_Common._imageT">_imageT</a>,
+  ~p1: (float, float),
+  ~p2: (float, float),
+  ~p3: (float, float),
+  ~p4: (float, float),
+  ~subx: int,
+  ~suby: int,
+  ~subw: int,
+  ~subh: int,
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawImageWithMatrix" id="value-drawImageWithMatrix">drawImageWithMatrix</a> = (
+  <a href="Reprocessing_Common.html#type-_imageT" title="Reprocessing_Common._imageT">_imageT</a>,
+  ~x: int,
+  ~y: int,
+  ~width: int,
+  ~height: int,
+  ~subx: int,
+  ~suby: int,
+  ~subw: int,
+  ~subh: int,
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawImageWithMatrixf" id="value-drawImageWithMatrixf">drawImageWithMatrixf</a> = (
+  <a href="Reprocessing_Common.html#type-_imageT" title="Reprocessing_Common._imageT">_imageT</a>,
+  ~x: float,
+  ~y: float,
+  ~width: float,
+  ~height: float,
+  ~subx: int,
+  ~suby: int,
+  ~subw: int,
+  ~subh: int,
+  <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>
+) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-resetSize" id="value-resetSize">resetSize</a> = (<a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>, int, int) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-createImage" id="value-createImage">createImage</a> = (int, int, <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>) => <a href="Reprocessing_Common.html#type-imageT" title="Reprocessing_Common.imageT">imageT</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-drawOnImage" id="value-drawOnImage">drawOnImage</a> = (<a href="Reprocessing_Common.html#type-imageT" title="Reprocessing_Common.imageT">imageT</a>, <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>, <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a> => 'a) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-clearImage" id="value-clearImage">clearImage</a> = (<a href="Reprocessing_Common.html#type-imageT" title="Reprocessing_Common.imageT">imageT</a>, <a href="Reprocessing_Common.html#type-glEnv" title="Reprocessing_Common.glEnv">glEnv</a>) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

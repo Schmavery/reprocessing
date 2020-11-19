@@ -1,0 +1,474 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='./styles.css'>
+<script defer src='./script.js'></script>
+<title>Home</title>
+<body>
+<script>window.relativeToRoot="./"</script>
+<script defer src="./block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="./search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="./index.html">Home</a>
+<a href="./fonts/LICENSE.html">LICENSE</a></div>
+      <div class='toc-header'>Page Contents</div>
+      <div class='table-of-contents'>
+      <a href="#reprocessing" class='level-1 header'>Reprocessing</a>
+<a href="#example" class='level-2 header'>Example</a>
+<a href="#getting-started" class='level-2 header'>Getting Started</a>
+<a href="#example" class='level-3 header'>Example</a>
+<a href="#build" class='level-3 header'>Build</a>
+<a href="#demo" class='level-2 header'>Demo</a>
+<a href="#some-differences-from-processing" class='level-1 header'>Some Differences from Processing</a>
+<a href="#using-fonts" class='level-1 header'>Using Fonts</a>
+<a href="#projects-using-reprocessing" class='level-2 header'>Projects using Reprocessing</a>
+      </div>
+      <div class='project-title'>Package modules</div><div class='project-listing'><a href="./api/Reprocessing.html">Reprocessing</a>
+<a href="./api/Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="./api/Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="./api/Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="./api/Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="./api/Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="./api/Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="./api/Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="./api/Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="./api/Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="./api/Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="./api/Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="./api/Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="./api/Reprocessing_Utils.html">Reprocessing_Utils</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/README.md" class="edit-link">Edit</a>
+    <a href="#reprocessing" id="reprocessing"><h1>Reprocessing</h1></a>
+
+<p><a href="https://travis-ci.org/Schmavery/reprocessing" target="_blank" rel="noopener nofollow" title="" class="external-link"><img src='https://travis-ci.org/Schmavery/reprocessing.svg?branch=master' alt='Build Status' /></a>
+<a href="https://ci.appveyor.com/project/Schmavery/reprocessing/branch/master" target="_blank" rel="noopener nofollow" title="" class="external-link"><img src='https://ci.appveyor.com/api/projects/status/jgaaw641624db0pq/branch/master?svg=true&amp;passingText=windows%20-%20OK&amp;failingText=windows%20-%20Failing' alt='Build status' /></a></p>
+<p>This is a high-level drawing library, inspired by <a href="https://processing.org" target="_blank" rel="noopener nofollow" title="" class="external-link">Processing</a>, allowing you to write code that&#39;ll run on the web (using WebGL) and natively (using OpenGL).</p>
+<a href="#example" id="example"><h2>Example</h2></a><p>The <a href="https://schmavery.github.io/reprocessing/" target="_blank" rel="noopener nofollow" title="" class="external-link">web environment</a> is the simplest way to try reprocessing. (It uses an older verison of the Reason syntax though, we&#39;re working on fixing that).</p>
+<p>The 2nd simplest way to try is to clone <a href="https://github.com/bsansouci/reprocessing-example" target="_blank" rel="noopener nofollow" title="" class="external-link">reprocessing-example</a>.</p>
+<p>See <a href="#projects-using-reprocessing" title="">below</a> for projects using Reprocessing!</p>
+<!--!
+```reason;shared(sandbox)
+[@bs.val] external sandboxCanvasId: string = "";
+[@bs.val] external sandboxCanvas: 'canvas = "";
+[@bs.val] external containerDiv: 'node = "";
+[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+let id = sandboxCanvasId;
+addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+Reprocessing.setScreenId(sandboxCanvasId);
+```
+-->
+
+<a href="#getting-started" id="getting-started"><h2>Getting Started</h2></a><pre class='bash'><code class='bash'>npm install schmavery/reprocessing</code></pre>
+
+<a href="#example" id="example"><h3>Example</h3></a><div class='code-block' data-block-syntax="re">
+  
+  <pre class='code' data-block-id='4' id='block-4'><code>open Reprocessing;
+
+let <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT => unit">setup</span> = (<span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>) =&gt; {
+  <span class='ident' data-type="(
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Env.size</span>(~width=<span class='int' data-type="int">200</span>, ~height=<span class='int' data-type="int">200</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+};
+
+let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> = (<span class='pattern-ident' data-type="'a">_state</span>, <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>) =&gt; {
+  <span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.background</span>(<span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.black</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.fill</span>(<span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.red</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="(
+  ~pos: (int, int),
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.rect</span>(~pos=(<span class='int' data-type="int">50</span>, <span class='int' data-type="int">50</span>), ~width=<span class='int' data-type="int">100</span>, ~height=<span class='int' data-type="int">100</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>)
+};
+
+<span class='ident' data-type="(
+  ~setup: Reprocessing.glEnvT => unit,
+  ~?screen: option(string),
+  ~?draw: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseMove: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseDragged: option(
+    (unit, Reprocessing.glEnvT) => unit
+  ),
+  ~?mouseDown: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseUp: option((unit, Reprocessing.glEnvT) => unit),
+  ~?keyPressed: option((unit, Reprocessing.glEnvT) => unit),
+  ~?keyReleased: option(
+    (unit, Reprocessing.glEnvT) => unit
+  ),
+  ~?keyTyped: option((unit, Reprocessing.glEnvT) => unit),
+  unit
+) => unit">run</span>(~<span class='ident' data-type="Reprocessing.glEnvT => unit">setup</span>, ~<span class='ident' data-type="(unit, Reprocessing.glEnvT) => unit">draw</span>, <span class='constructor' data-type="unit">()</span>);</code></pre>
+  
+  <script type='docre-source' data-block-id="4">#[@bs.val] external sandboxCanvasId: string = "";
+#[@bs.val] external sandboxCanvas: 'canvas = "";
+#[@bs.val] external containerDiv: 'node = "";
+#[@bs.send] external addEventListener: ('node, string, 'eventT => unit) => unit = "addEventListener";
+#let id = sandboxCanvasId;
+#addEventListener(containerDiv, "mouseleave", (_) => Reprocessing.playPause(id, false) |> ignore);
+#addEventListener(containerDiv, "mouseenter", (_) => Reprocessing.playPause(id, true) |> ignore);
+#Reprocessing.setScreenId(sandboxCanvasId);
+open Reprocessing;
+
+let setup = (env) => {
+  Env.size(~width=200, ~height=200, env);
+};
+
+let draw = (_state, env) => {
+  Draw.background(Constants.black, env);
+  Draw.fill(Constants.red, env);
+  Draw.rect(~pos=(50, 50), ~width=100, ~height=100, env)
+};
+
+run(~setup, ~draw, ());</script>
+  <div data-block-id='4' data-context="canvas" data-block-syntax="re" class='block-target'></div><script type='docre-bundle' data-block-id='4'>
+;(function() { // generated by pack.re
+let modules = {}
+let initializers = {
+    1: function(module, exports, require) {// Generated by BUCKLESCRIPT VERSION 2.1.1, PLEASE EDIT WITH CARE
+'use strict';
+
+var Reprocessing           = window.packRequire("./lib/js/src/Reprocessing.js");
+var Reprocessing_Env       = window.packRequire("./lib/js/src/Reprocessing_Env.js");
+var Reprocessing_Draw      = window.packRequire("./lib/js/src/Reprocessing_Draw.js");
+var Reprocessing_Constants = window.packRequire("./lib/js/src/Reprocessing_Constants.js");
+
+var id = sandboxCanvasId;
+
+containerDiv.addEventListener("mouseleave", (function () {
+        Reprocessing.playPause(id, /* false */0);
+        return /* () */0;
+      }));
+
+containerDiv.addEventListener("mouseenter", (function () {
+        Reprocessing.playPause(id, /* true */1);
+        return /* () */0;
+      }));
+
+Reprocessing.setScreenId(sandboxCanvasId);
+
+function setup(env) {
+  return Reprocessing_Env.size(200, 200, env);
+}
+
+function draw(_, env) {
+  Reprocessing_Draw.background(Reprocessing_Constants.black, env);
+  Reprocessing_Draw.fill(Reprocessing_Constants.red, env);
+  return Reprocessing_Draw.rect(/* tuple */[
+              50,
+              50
+            ], 100, 100, env);
+}
+
+Reprocessing.run(setup, /* None */0, /* Some */[draw], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0);
+
+exports.id    = id;
+exports.setup = setup;
+exports.draw  = draw;
+/* id Not a pure module */
+//# sourceURL=./node_modules/.docre/Reprocessing__Home_md_CODE_BLOCK_4.re_ppx.js
+}
+};
+let nameMap = {
+  "./node_modules/.docre/Reprocessing__Home_md_CODE_BLOCK_4.re_ppx.js": 1
+}
+let require = (id) => {
+  if (!modules[id]) {
+    modules[id] = {exports: {}}
+    initializers[id](modules[id], modules[id].exports, require)
+  }
+  return modules[id].exports
+};
+  require(1)})();</script>
+</div><div class='code-block' data-block-syntax="ml">
+  
+  <pre class='code' data-block-id='4-alt' id='block-4-alt'><code>[@@@ocaml.ppx.context { cookies = [] }]
+external sandboxCanvasId : <span class='type-constructor'>string</span> = &quot;&quot;[@@bs.val ]
+external sandboxCanvas : <span class='type-vbl'>&#39;canvas</span> = &quot;&quot;[@@bs.val ]
+external containerDiv : <span class='type-vbl'>&#39;node</span> = &quot;&quot;[@@bs.val ]
+external addEventListener :
+  <span class='type-vbl'>&#39;node</span> -&gt; <span class='type-constructor'>string</span> -&gt; (<span class='type-vbl'>&#39;eventT</span> -&gt; <span class='type-constructor'>unit</span>) -&gt; <span class='type-constructor'>unit</span> = &quot;addEventListener&quot;[@@bs.send
+                                                                    ]
+let <span class='pattern-ident' data-type="string">id</span> = <span class='ident' data-type="string">sandboxCanvasId</span>
+let _ =
+  <span class='ident' data-type="('a, string, 'a => unit) => unit">addEventListener</span> <span class='ident' data-type="'a">containerDiv</span> <span class='string' data-type="string">&quot;mouseleave&quot;</span>
+    (fun _  -&gt; (<span class='ident' data-type="(string, bool) => option(bool)">Reprocessing.playPause</span> <span class='ident' data-type="string">id</span> <span class='constructor' data-type="bool">false</span>) <span class='operator' data-type="(option(bool), option(bool) => unit) => unit">|&gt;</span> <span class='ident' data-type="option(bool) => unit">ignore</span>)
+let _ =
+  <span class='ident' data-type="('a, string, 'a => unit) => unit">addEventListener</span> <span class='ident' data-type="'a">containerDiv</span> <span class='string' data-type="string">&quot;mouseenter&quot;</span>
+    (fun _  -&gt; (<span class='ident' data-type="(string, bool) => option(bool)">Reprocessing.playPause</span> <span class='ident' data-type="string">id</span> <span class='constructor' data-type="bool">true</span>) <span class='operator' data-type="(option(bool), option(bool) => unit) => unit">|&gt;</span> <span class='ident' data-type="option(bool) => unit">ignore</span>)
+let _ = <span class='ident' data-type="string => unit">Reprocessing.setScreenId</span> <span class='ident' data-type="string">sandboxCanvasId</span>
+open Reprocessing
+let <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT => unit">setup</span> <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> = <span class='ident' data-type="(
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Env.size</span> ~width:<span class='int' data-type="int">200</span> ~height:<span class='int' data-type="int">200</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>
+let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> <span class='pattern-ident' data-type="'a">_state</span> <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> =
+  <span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.background</span> <span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.black</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>;
+  <span class='ident' data-type="(
+  Reprocessing_Types.Types.colorT,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.fill</span> <span class='ident' data-type="Reprocessing_Types.Types.colorT">Constants.red</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>;
+  <span class='ident' data-type="(
+  ~pos: (int, int),
+  ~width: int,
+  ~height: int,
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.rect</span> ~pos:(<span class='int' data-type="int">50</span>, <span class='int' data-type="int">50</span>) ~width:<span class='int' data-type="int">100</span> ~height:<span class='int' data-type="int">100</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>
+let _ = <span class='ident' data-type="(
+  ~setup: Reprocessing.glEnvT => unit,
+  ~?screen: option(string),
+  ~?draw: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseMove: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseDragged: option(
+    (unit, Reprocessing.glEnvT) => unit
+  ),
+  ~?mouseDown: option((unit, Reprocessing.glEnvT) => unit),
+  ~?mouseUp: option((unit, Reprocessing.glEnvT) => unit),
+  ~?keyPressed: option((unit, Reprocessing.glEnvT) => unit),
+  ~?keyReleased: option(
+    (unit, Reprocessing.glEnvT) => unit
+  ),
+  ~?keyTyped: option((unit, Reprocessing.glEnvT) => unit),
+  unit
+) => unit">run</span> ~<span class='ident' data-type="Reprocessing.glEnvT => unit">setup</span> ~<span class='ident' data-type="(unit, Reprocessing.glEnvT) => unit">draw</span> <span class='constructor' data-type="unit">()</span></code></pre>
+  
+  <script type='docre-source' data-block-id="4-alt">[@@@ocaml.ppx.context { cookies = [] }]
+external sandboxCanvasId : string = ""[@@bs.val ]
+external sandboxCanvas : 'canvas = ""[@@bs.val ]
+external containerDiv : 'node = ""[@@bs.val ]
+external addEventListener :
+  'node -> string -> ('eventT -> unit) -> unit = "addEventListener"[@@bs.send
+                                                                    ]
+let id = sandboxCanvasId
+let _ =
+  addEventListener containerDiv "mouseleave"
+    (fun _  -> (Reprocessing.playPause id false) |> ignore)
+let _ =
+  addEventListener containerDiv "mouseenter"
+    (fun _  -> (Reprocessing.playPause id true) |> ignore)
+let _ = Reprocessing.setScreenId sandboxCanvasId
+open Reprocessing
+let setup env = Env.size ~width:200 ~height:200 env
+let draw _state env =
+  Draw.background Constants.black env;
+  Draw.fill Constants.red env;
+  Draw.rect ~pos:(50, 50) ~width:100 ~height:100 env
+let _ = run ~setup ~draw ()</script>
+  <div data-block-id='4-alt' data-context="canvas" data-block-syntax="ml" class='block-target'></div><script type='docre-bundle' data-block-id='4-alt'>
+;(function() { // generated by pack.re
+let modules = {}
+let initializers = {
+    1: function(module, exports, require) {// Generated by BUCKLESCRIPT VERSION 2.1.1, PLEASE EDIT WITH CARE
+'use strict';
+
+var Reprocessing           = window.packRequire("./lib/js/src/Reprocessing.js");
+var Reprocessing_Env       = window.packRequire("./lib/js/src/Reprocessing_Env.js");
+var Reprocessing_Draw      = window.packRequire("./lib/js/src/Reprocessing_Draw.js");
+var Reprocessing_Constants = window.packRequire("./lib/js/src/Reprocessing_Constants.js");
+
+var id = sandboxCanvasId;
+
+containerDiv.addEventListener("mouseleave", (function () {
+        Reprocessing.playPause(id, /* false */0);
+        return /* () */0;
+      }));
+
+containerDiv.addEventListener("mouseenter", (function () {
+        Reprocessing.playPause(id, /* true */1);
+        return /* () */0;
+      }));
+
+Reprocessing.setScreenId(sandboxCanvasId);
+
+function setup(env) {
+  return Reprocessing_Env.size(200, 200, env);
+}
+
+function draw(_, env) {
+  Reprocessing_Draw.background(Reprocessing_Constants.black, env);
+  Reprocessing_Draw.fill(Reprocessing_Constants.red, env);
+  return Reprocessing_Draw.rect(/* tuple */[
+              50,
+              50
+            ], 100, 100, env);
+}
+
+Reprocessing.run(setup, /* None */0, /* Some */[draw], /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* None */0, /* () */0);
+
+exports.id    = id;
+exports.setup = setup;
+exports.draw  = draw;
+/* id Not a pure module */
+//# sourceURL=./node_modules/.docre/Reprocessing__Home_md_CODE_BLOCK_4_alt.re_ppx.js
+}
+};
+let nameMap = {
+  "./node_modules/.docre/Reprocessing__Home_md_CODE_BLOCK_4_alt.re_ppx.js": 1
+}
+let require = (id) => {
+  if (!modules[id]) {
+    modules[id] = {exports: {}}
+    initializers[id](modules[id], modules[id].exports, require)
+  }
+  return modules[id].exports
+};
+  require(1)})();</script>
+</div>
+
+<a href="#build" id="build"><h3>Build</h3></a><pre class='sh'><code class='sh'>npm run build</code></pre>
+
+<p>This will draw a simple red square on a black background.  Compare this to <a href="https://github.com/bsansouci/reasonglexampleproject/blob/simple/src/index.re" target="_blank" rel="noopener nofollow" title="" class="external-link">reglexampleproject</a>, which takes 200+ lines to do the exact same thing.  This difference is even more notable on bigger projects.  Check out the code for a <a href="https://github.com/Schmavery/reprocessing/blob/master/examples/redsquare.re" target="_blank" rel="noopener nofollow" title="" class="external-link">draggable red square</a>.</p>
+<a href="#demo" id="demo"><h2>Demo</h2></a><p>There are a couple demos inside <code>examples</code>. Run <code>npm i</code> to install all deps and <code>npm run build</code> to build to JS (default). Open <code>index.html</code> in safari (or use <code>python -m SimpleHTTPServer 8000</code> to spawn a static server and go to <code>localhost:8000</code> in chrome).</p>
+<p>Run <code>npm run build:bytecode</code> to build to a bytecode executable and run <code>./lib/bs/bytecode/index.byte</code>.</p>
+<p>Run <code>npm run build:native</code> to build to a native executable and run <code>./lib/bs/native/index.native</code>.</p>
+<p>See also <a href="https://github.com/Schmavery/FlappyBird" target="_blank" rel="noopener nofollow" title="" class="external-link">FlappyBird</a> or <a href="https://github.com/bsansouci/reprocessing-example/tree/2048" target="_blank" rel="noopener nofollow" title="" class="external-link">2048</a> for slightly bigger examples.</p>
+<a href="#some-differences-from-processing" id="some-differences-from-processing"><h1>Some Differences from Processing</h1></a><ul><li><p>There is no magic - everything is proper Reason code.  This means that you have to call <code>Reprocessing.run</code> with the functions that you want to use.  You also have a couple of options about which utility modules to open.  See the <code>examples</code> directory for some different ways to do this.  It is recommended to <code>open Reprocessing</code> at the top, and then you can optionally open <code>Draw</code>, <code>Env</code> and <code>Utils</code> to make it look more like Processing code. Alternatively, they can be used directly, as can be seen above.</p>
+</li><li><p>For state management, we encourage the use of the <code>state</code> value that Reprocessing manages for the user.  To use this, decide on a datatype representing the state and return the initial value from <code>setup</code>.  This will be persisted behind the scenes and passed to every callback (such as <code>draw</code> and <code>mouseDown</code>).  Each callback should return the new value of the state (or the old value if it doesn&#39;t change).</p>
+</li><li><p>There are no built-in variables like <code>width</code> and <code>mouseX</code>.  Instead, these are functions that are called, passing in an environment object that is always provided.</p>
+<div class='code-block' data-block-syntax="re">
+  
+  <pre class='code' data-block-id='1' id='block-1'><code>let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> = (<span class='pattern-ident' data-type="'a">state</span>, <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>) =&gt; {
+  let <span class='pattern-ident' data-type="int">w</span> = <span class='ident' data-type="Reprocessing_Types.Types.glEnvT => int">Env.width</span>(<span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="string => unit">print_endline</span>(<span class='string' data-type="string">&quot;The current width is:&quot;</span> <span class='operator' data-type="(string, string) => string">++</span> <span class='ident' data-type="int => string">string_of_int</span>(<span class='ident' data-type="int">w</span>))
+};</code></pre>
+  
+  <script type='docre-source' data-block-id="1">#open Reprocessing;
+let draw = (state, env) => {
+  let w = Env.width(env);
+  print_endline("The current width is:" ++ string_of_int(w))
+};</script>
+  
+</div><div class='code-block' data-block-syntax="ml">
+  
+  <pre class='code' data-block-id='1-alt' id='block-1-alt'><code>[@@@ocaml.ppx.context { cookies = [] }]
+open Reprocessing
+let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> <span class='pattern-ident' data-type="'a">state</span> <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> =
+  let <span class='pattern-ident' data-type="int">w</span> = <span class='ident' data-type="Reprocessing_Types.Types.glEnvT => int">Env.width</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> in
+  <span class='ident' data-type="string => unit">print_endline</span> (<span class='string' data-type="string">&quot;The current width is:&quot;</span> <span class='operator' data-type="(string, string) => string">^</span> (<span class='ident' data-type="int => string">string_of_int</span> <span class='ident' data-type="int">w</span>))</code></pre>
+  
+  <script type='docre-source' data-block-id="1-alt">[@@@ocaml.ppx.context { cookies = [] }]
+open Reprocessing
+let draw state env =
+  let w = Env.width env in
+  print_endline ("The current width is:" ^ (string_of_int w))</script>
+  
+</div></li><li><p>The builtin <code>map</code> function is called <code>remap</code> instead to avoid confusion with the well-known <code>List.map</code> function which maps over a list of values. As, according to the Processing docs, this function &quot;Re-maps a number from one range to another.&quot;, this naming seems appropriate.</p>
+</li><li><p>Because of the limitations of Reason, several utility functions that would otherwise accept either an integer or a float now expose a version with an <code>f</code> suffix, which supports floats.  Ex: <code>random</code> vs <code>randomf</code>.</p>
+</li><li><p>Points are expressed as tuples.  Instead of exposing a <code>mouseX</code> and <code>mouseY</code>, there is a <code>mouse</code>, which is a tuple of x and y values.</p>
+</li></ul>
+
+<div class='code-block' data-block-syntax="re">
+  
+  <pre class='code' data-block-id='3' id='block-3'><code>let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> = (<span class='pattern-ident' data-type="'a">state</span>, <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>) =&gt; {
+  let (<span class='pattern-ident' data-type="int">x</span>, <span class='pattern-ident' data-type="int">y</span>) = <span class='ident' data-type="Reprocessing_Types.Types.glEnvT => (int, int)">Env.mouse</span>(<span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="string => unit">print_endline</span>(<span class='string' data-type="string">&quot;The current mouse position is:&quot;</span> <span class='operator' data-type="(string, string) => string">++</span> (<span class='ident' data-type="int => string">string_of_int</span>(<span class='ident' data-type="int">x</span>) <span class='operator' data-type="(string, string) => string">++</span> <span class='ident' data-type="int => string">string_of_int</span>(<span class='ident' data-type="int">y</span>)))
+};</code></pre>
+  
+  <script type='docre-source' data-block-id="3">#open Reprocessing;
+let draw = (state, env) => {
+  let (x, y) = Env.mouse(env);
+  print_endline("The current mouse position is:" ++ (string_of_int(x) ++ string_of_int(y)))
+};</script>
+  
+</div><div class='code-block' data-block-syntax="ml">
+  
+  <pre class='code' data-block-id='3-alt' id='block-3-alt'><code>[@@@ocaml.ppx.context { cookies = [] }]
+open Reprocessing
+let <span class='pattern-ident' data-type="('a, Reprocessing_Types.Types.glEnvT) => unit">draw</span> <span class='pattern-ident' data-type="'a">state</span> <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> =
+  let (<span class='pattern-ident' data-type="int">x</span>,<span class='pattern-ident' data-type="int">y</span>) = <span class='ident' data-type="Reprocessing_Types.Types.glEnvT => (int, int)">Env.mouse</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> in
+  <span class='ident' data-type="string => unit">print_endline</span>
+    (<span class='string' data-type="string">&quot;The current mouse position is:&quot;</span> <span class='operator' data-type="(string, string) => string">^</span>
+       ((<span class='ident' data-type="int => string">string_of_int</span> <span class='ident' data-type="int">x</span>) <span class='operator' data-type="(string, string) => string">^</span> (<span class='ident' data-type="int => string">string_of_int</span> <span class='ident' data-type="int">y</span>)))</code></pre>
+  
+  <script type='docre-source' data-block-id="3-alt">[@@@ocaml.ppx.context { cookies = [] }]
+open Reprocessing
+let draw state env =
+  let (x,y) = Env.mouse env in
+  print_endline
+    ("The current mouse position is:" ^
+       ((string_of_int x) ^ (string_of_int y)))</script>
+  
+</div>
+
+<a href="#using-fonts" id="using-fonts"><h1>Using Fonts</h1></a><p>The story for using fonts in your Reprocessing app is still under some development to make it nicer.  Right now we have support for writing text in a font defined in the <a href="http://www.angelcode.com/products/bmfont/" target="_blank" rel="noopener nofollow" title="" class="external-link">Angel Code font</a> format. This is basically a bitmap of packed glyph textures along with a text file that describes it.</p>
+<p>Check out <a href="https://github.com/bsansouci/font-generator" target="_blank" rel="noopener nofollow" title="" class="external-link">font-generator</a> for a tool that can take any truetype or opentype font and output font files that Reprocessing can use.</p>
+<p>The assets folder of this repo also has an <a href="https://github.com/Schmavery/reprocessing/tree/master/assets/font" target="_blank" rel="noopener nofollow" title="" class="external-link">example</a> of a font that can be copied to your project and used.  In order to use a font once you have the files:</p>
+<div class='code-block' data-block-syntax="re">
+  
+  <pre class='code' data-block-id='2' id='block-2'><code>  let <span class='pattern-ident' data-type="Reprocessing_Font.fontT">font</span> = <span class='ident' data-type="(
+  ~filename: string,
+  ~?isPixel: option(bool),
+  Reprocessing_Types.Types.glEnvT
+) => Reprocessing_Font.fontT">Draw.loadFont</span>(~<span class='ident' data-type="string">filename</span>, <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);
+  <span class='ident' data-type="(
+  ~?font: option(Reprocessing_Font.fontT),
+  ~body: string,
+  ~pos: (int, int),
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.text</span>(~<span class='ident' data-type="Reprocessing_Font.fontT">font</span>, ~body=<span class='string' data-type="string">&quot;Test!!!&quot;</span>, ~pos=(<span class='int' data-type="int">10</span>, <span class='int' data-type="int">10</span>), <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span>);</code></pre>
+  
+  <script type='docre-source' data-block-id="2">#open Reprocessing;
+#let fn = (filename, env) => {
+  let font = Draw.loadFont(~filename, env);
+  Draw.text(~font, ~body="Test!!!", ~pos=(10, 10), env);
+#}</script>
+  
+</div><div class='code-block' data-block-syntax="ml">
+  
+  <pre class='code' data-block-id='2-alt' id='block-2-alt'><code>[@@@ocaml.ppx.context { cookies = [] }]
+open Reprocessing
+let <span class='pattern-ident' data-type="(string, Reprocessing_Types.Types.glEnvT) => unit">fn</span> <span class='pattern-ident' data-type="string">filename</span> <span class='pattern-ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> =
+  let <span class='pattern-ident' data-type="Reprocessing_Font.fontT">font</span> = <span class='ident' data-type="(
+  ~filename: string,
+  ~?isPixel: option(bool),
+  Reprocessing_Types.Types.glEnvT
+) => Reprocessing_Font.fontT">Draw.loadFont</span> ~<span class='ident' data-type="string">filename</span> <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span> in
+  <span class='ident' data-type="(
+  ~?font: option(Reprocessing_Font.fontT),
+  ~body: string,
+  ~pos: (int, int),
+  Reprocessing_Types.Types.glEnvT
+) => unit">Draw.text</span> ~<span class='ident' data-type="Reprocessing_Font.fontT">font</span> ~body:<span class='string' data-type="string">&quot;Test!!!&quot;</span> ~pos:(<span class='int' data-type="int">10</span>, <span class='int' data-type="int">10</span>) <span class='ident' data-type="Reprocessing_Types.Types.glEnvT">env</span></code></pre>
+  
+  <script type='docre-source' data-block-id="2-alt">[@@@ocaml.ppx.context { cookies = [] }]
+open Reprocessing
+let fn filename env =
+  let font = Draw.loadFont ~filename env in
+  Draw.text ~font ~body:"Test!!!" ~pos:(10, 10) env</script>
+  
+</div>
+
+<a href="#projects-using-reprocessing" id="projects-using-reprocessing"><h2>Projects using Reprocessing</h2></a>
+
+<ul><li><a href="https://github.com/jaredly/gravitron" target="_blank" rel="noopener nofollow" title="" class="external-link">Gravitron</a></li><li><a href="https://github.com/bsansouci/ludum-dare-40" target="_blank" rel="noopener nofollow" title="" class="external-link">Oh No! Zombies!</a></li><li><a href="https://github.com/bsansouci/reprocessing-example/tree/2048" target="_blank" rel="noopener nofollow" title="" class="external-link">2048</a></li><li><a href="https://github.com/bsansouci/reprocessing-example/tree/livestream-flappybird" target="_blank" rel="noopener nofollow" title="" class="external-link">FlappyBird</a></li><li><a href="https://github.com/illbexyz/repong" target="_blank" rel="noopener nofollow" title="" class="external-link">Pong</a></li><li><a href="https://github.com/ekosz/reprocessing-example-flow-field" target="_blank" rel="noopener nofollow" title="" class="external-link">Perlin Noise Flow Field</a></li><li><a href="https://github.com/Rigellute/L-system-reasonml" target="_blank" rel="noopener nofollow" title="" class="external-link">L-System</a></li></ul>
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  
