@@ -1,3 +1,4 @@
+module RGLConstants = Reasongl.Constants
 open Reasongl;
 
 open Reprocessing_Internal;

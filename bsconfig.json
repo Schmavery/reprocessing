@@ -15,7 +15,6 @@
     "dir": "examples",
     "type": "dev"
   }],
-  "bs-dependencies": ["@bsansouci/reasongl", "dynlink"],
   "entries": [{
     "backend": "bytecode",
     "main-module": "IndexHot"
@@ -47,5 +46,6 @@
     "backend": "js",
     "main-module": "Redsquare"
   }],
+  "bs-dependencies": ["@bsansouci/reasongl-web"],
   "refmt": 3
 }

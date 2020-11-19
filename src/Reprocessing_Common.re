@@ -1,7 +1,5 @@
 open Reasongl;
 
-module Constants = RGLConstants;
-
 type strokeCapT =
   | Round
   | Square
