@@ -5,7 +5,7 @@
 
 
 
-This is a high-level drawing library, inspired by [Processing](https://processing.org), allowing you to write code that'll run on the web (using WebGL) and natively (using OpenGL).
+This is a high-level drawing library, inspired by [Processing](https://processing.org), allowing you to write code that'll run on the web (using WebGL).
 
 
 ## Example
@@ -32,9 +32,6 @@ Reprocessing.setScreenId(sandboxCanvasId);
 ```bash
 npm install reprocessing
 ```
-
-> Note: on linux, you may need to also install some libraries):<br>
-`apt install libsdl2-dev fcitx-libs-dev libibus-1.0-dev`
 
 ### Code Example
 _Clone [reprocessing-example](https://github.com/bsansouci/reprocessing-example) and follow instructions there to setup a new project._
@@ -65,9 +62,6 @@ This will draw a simple red square on a black background.  Compare this to [regl
 ## Demo
 There are a couple demos inside `examples`. Run `npm i` to install all deps and `npm run build` to build to JS (default). Open `index.html` in safari (or use `python -m SimpleHTTPServer 8000` to spawn a static server and go to `localhost:8000` in chrome).
 
-Run `npm run build:bytecode` to build to a bytecode executable and run `./lib/bs/bytecode/index.byte`.
-
-Run `npm run build:native` to build to a native executable and run `./lib/bs/native/index.native`.
 
 See [below](#projects-using-reprocessing) for examples!
 
