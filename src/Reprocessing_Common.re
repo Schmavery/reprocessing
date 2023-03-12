@@ -181,23 +181,6 @@ module Stream = {
   let create = (str: string) : t => (str, 0);
 };
 
-let read = (name: string) => {
-  let ic = open_in(name);
-  let try_read = () =>
-    switch (input_line(ic)) {
-    | exception End_of_file => None
-    | x => Some(x)
-    };
-  let rec loop = (acc) =>
-    switch (try_read()) {
-    | Some(s) => loop([String.make(1, '\n'), s, ...acc])
-    | None =>
-      close_in(ic);
-      List.rev(acc)
-    };
-  loop([]) |> String.concat("")
-};
-
 let append_char = (s: string, c: char) : string => s ++ String.make(1, c);
 
 let rec split = (stream, sep, accstr, acc) =>
