@@ -84,7 +84,7 @@ module Font = {
     if (num < 0) {
       (stream, map);
     } else if (Stream.peekn(stream, 4) != Some("char")) {
-      prerr_string(
+      print_string(
         "Warning: encountered end of char sequence early when loading font.\n"
       );
       (stream, map);
