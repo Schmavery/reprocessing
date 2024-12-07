@@ -8,6 +8,11 @@
 This is a high-level drawing library, inspired by [Processing](https://processing.org), allowing you to write code that'll run on the web (using WebGL).
 
 
+# Note:
+Reprocessing depends on bsb-native to build, which is very deprecated/unsupported.
+Unfortunately this means reprocessing is pretty unusable. End of an era :')
+LMK if you feel strongly working to get this building in another way and maybe we can merge it <3
+
 ## Example
 The [interactive docs](https://schmavery.github.io/reprocessing/) are the simplest way to try reprocessing. (They are generated using [redoc](https://github.com/jaredly/redoc)!).
 
