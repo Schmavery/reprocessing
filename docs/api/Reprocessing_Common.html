@@ -1,0 +1,282 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>Reprocessing_Common</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="../index.html">Home</a>
+<a href="../fonts/LICENSE.html">LICENSE</a></div>
+      <div class='toc-header'>Page Contents</div>
+      <div class='table-of-contents'>
+      <a href="#Reprocessing_Common" class='level-1 header'>Reprocessing_Common</a>
+<a href="#module-Constants" class='level-2 module'>Constants</a>
+<a href="#type-strokeCapT" class='level-2 type'>strokeCapT</a>
+<a href="#type-rectModeT" class='level-2 type'>rectModeT</a>
+<a href="#type-glState" class='level-2 type'>glState</a>
+<a href="#type-glCamera" class='level-2 type'>glCamera</a>
+<a href="#type-colorT" class='level-2 type'>colorT</a>
+<a href="#type-styleT" class='level-2 type'>styleT</a>
+<a href="#type-mouseT" class='level-2 type'>mouseT</a>
+<a href="#module-KeySet" class='level-2 module'>KeySet</a>
+<a href="#type-keyboardT" class='level-2 type'>keyboardT</a>
+<a href="#type-frameT" class='level-2 type'>frameT</a>
+<a href="#type-sizeT" class='level-2 type'>sizeT</a>
+<a href="#value-circularBufferSize" class='level-2 value'>circularBufferSize</a>
+<a href="#value-vertexSize" class='level-2 value'>vertexSize</a>
+<a href="#type-_imageT" class='level-2 type'>_imageT</a>
+<a href="#type-imageT" class='level-2 type'>imageT</a>
+<a href="#type-soundLoadStatusT" class='level-2 type'>soundLoadStatusT</a>
+<a href="#type-soundT" class='level-2 type'>soundT</a>
+<a href="#type-batchT" class='level-2 type'>batchT</a>
+<a href="#type-glEnv" class='level-2 type'>glEnv</a>
+<a href="#module-Stream" class='level-2 module'>Stream</a>
+<a href="#type-Stream.t" class='level-3 type'>t</a>
+<a href="#value-Stream.empty" class='level-3 value'>empty</a>
+<a href="#value-Stream.peekch" class='level-3 value'>peekch</a>
+<a href="#value-Stream.popch" class='level-3 value'>popch</a>
+<a href="#value-Stream.peekn" class='level-3 value'>peekn</a>
+<a href="#value-Stream.skipWhite" class='level-3 value'>skipWhite</a>
+<a href="#value-Stream.popn" class='level-3 value'>popn</a>
+<a href="#value-Stream.match_" class='level-3 value'>match_</a>
+<a href="#value-Stream.charsRemaining" class='level-3 value'>charsRemaining</a>
+<a href="#value-Stream.create" class='level-3 value'>create</a>
+<a href="#value-read" class='level-2 value'>read</a>
+<a href="#value-append_char" class='level-2 value'>append_char</a>
+<a href="#value-split" class='level-2 value'>split</a>
+      </div>
+      <div class='project-title'>Package modules</div><div class='project-listing'><a href="Reprocessing.html">Reprocessing</a>
+<a href="Reprocessing_Common.html">Reprocessing_Common</a>
+<a href="Reprocessing_Constants.html">Reprocessing_Constants</a>
+<a href="Reprocessing_DefaultFont.html">Reprocessing_DefaultFont</a>
+<a href="Reprocessing_Draw.html">Reprocessing_Draw</a>
+<a href="Reprocessing_Env.html">Reprocessing_Env</a>
+<a href="Reprocessing_Events.html">Reprocessing_Events</a>
+<a href="Reprocessing_Font.html">Reprocessing_Font</a>
+<a href="Reprocessing_Hotreload.html">Reprocessing_Hotreload</a>
+<a href="Reprocessing_Internal.html">Reprocessing_Internal</a>
+<a href="Reprocessing_Matrix.html">Reprocessing_Matrix</a>
+<a href="Reprocessing_Shaders.html">Reprocessing_Shaders</a>
+<a href="Reprocessing_Types.html">Reprocessing_Types</a>
+<a href="Reprocessing_Utils.html">Reprocessing_Utils</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/schmavery/reprocessing/blob/master/src/Reprocessing_Common.re" class="edit-link">Edit</a>
+    <a href="#Reprocessing_Common" id="Reprocessing_Common"><h1>Reprocessing_Common</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Constants" id="module-Constants">Constants</a> : RGLConstants</h4></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-strokeCapT" id="type-strokeCapT">strokeCapT</a> = | Round | Square | Project</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-rectModeT" id="type-rectModeT">rectModeT</a> = | Corner | Center | Radius</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-glState" id="type-glState">glState</a> = Reasongl.Gl.Window.t</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-glCamera" id="type-glCamera">glCamera</a> = {projectionMatrix: Reasongl.Gl.Mat4.t}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-colorT" id="type-colorT">colorT</a> = {r: float, g: float, b: float, a: float}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-styleT" id="type-styleT">styleT</a> = {
+  strokeColor: option(<a href="#type-colorT">colorT</a>),
+  strokeWeight: int,
+  strokeCap: <a href="#type-strokeCapT">strokeCapT</a>,
+  fillColor: option(<a href="#type-colorT">colorT</a>),
+  tintColor: option(<a href="#type-colorT">colorT</a>),
+  rectMode: <a href="#type-rectModeT">rectModeT</a>
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-mouseT" id="type-mouseT">mouseT</a> = {
+  mut pos: (int, int),
+  mut prevPos: (int, int),
+  mut pressed: bool
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item module'>module <a href="#module-KeySet" id="module-KeySet">KeySet</a> : Set.Make</h4></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-keyboardT" id="type-keyboardT">keyboardT</a> = {
+  mut keyCode: <a href="Reprocessing_Events.html#type-keycodeT" title="Reprocessing_Events.keycodeT">keycodeT</a>,
+  mut pressed: <a href="#module-KeySet">KeySet</a>.<a href="#type-KeySet.t">t</a>,
+  mut released: <a href="#module-KeySet">KeySet</a>.<a href="#type-KeySet.t">t</a>,
+  mut down: <a href="#module-KeySet">KeySet</a>.<a href="#type-KeySet.t">t</a>
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-frameT" id="type-frameT">frameT</a> = {count: int, rate: int, deltaTime: float}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-sizeT" id="type-sizeT">sizeT</a> = {
+  mut height: int,
+  mut width: int,
+  mut resizeable: bool
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-circularBufferSize" id="value-circularBufferSize">circularBufferSize</a> = int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-vertexSize" id="value-vertexSize">vertexSize</a> = int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-_imageT" id="type-_imageT">_imageT</a> = {
+  framebuffer: option(Reasongl.Gl.framebufferT),
+  texture: Reasongl.Gl.textureT,
+  height: int,
+  width: int
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-imageT" id="type-imageT">imageT</a> = {
+  mut glData: option(<a href="#type-_imageT">_imageT</a>),
+  mut drawnTo: bool
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-soundLoadStatusT" id="type-soundLoadStatusT">soundLoadStatusT</a> = 
+  | Loading
+  | ShouldPlay(float, bool)
+  | Loaded(Reasongl.Gl.Audio.t)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-soundT" id="type-soundT">soundT</a> = Pervasives.ref(<a href="#type-soundLoadStatusT">soundLoadStatusT</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-batchT" id="type-batchT">batchT</a> = {
+  vertexArray: Reasongl.Gl.Bigarray.t(
+    float,
+    Reasongl.Gl.Bigarray.float32_elt
+  ),
+  elementArray: Reasongl.Gl.Bigarray.t(
+    int,
+    Reasongl.Gl.Bigarray.int16_unsigned_elt
+  ),
+  mut vertexPtr: int,
+  mut elementPtr: int,
+  mut currTex: option(Reasongl.Gl.textureT),
+  nullTex: Reasongl.Gl.textureT
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-glEnv" id="type-glEnv">glEnv</a> = {
+  camera: <a href="#type-glCamera">glCamera</a>,
+  window: Reasongl.Gl.Window.t,
+  gl: Reasongl.Gl.contextT,
+  vertexBuffer: Reasongl.Gl.bufferT,
+  elementBuffer: Reasongl.Gl.bufferT,
+  aVertexColor: Reasongl.Gl.attributeT,
+  aTextureCoord: Reasongl.Gl.attributeT,
+  aVertexPosition: Reasongl.Gl.attributeT,
+  pMatrixUniform: Reasongl.Gl.uniformT,
+  uSampler: Reasongl.Gl.uniformT,
+  batch: <a href="#type-batchT">batchT</a>,
+  keyboard: <a href="#type-keyboardT">keyboardT</a>,
+  mouse: <a href="#type-mouseT">mouseT</a>,
+  mut style: <a href="#type-styleT">styleT</a>,
+  mut styleStack: list(<a href="#type-styleT">styleT</a>),
+  mut frame: <a href="#type-frameT">frameT</a>,
+  mut matrix: array(float),
+  mut matrixStack: list(array(float)),
+  size: <a href="#type-sizeT">sizeT</a>
+}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Stream" id="module-Stream">Stream</a></h4><div class='body module-body'><p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item'>type <a href="#type-Stream.t" id="type-Stream.t">t</a> = (string, int)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.empty" id="value-Stream.empty">empty</a> = list('a)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.peekch" id="value-Stream.peekch">peekch</a> = <a href="#type-Stream.t">t</a> => option(char)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.popch" id="value-Stream.popch">popch</a> = <a href="#type-Stream.t">t</a> => <a href="#type-Stream.t">t</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.peekn" id="value-Stream.peekn">peekn</a> = ((string, int), int) => option(string)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.skipWhite" id="value-Stream.skipWhite">skipWhite</a> = <a href="#type-Stream.t">t</a> => <a href="#type-Stream.t">t</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.popn" id="value-Stream.popn">popn</a> = (('a, int), int) => ('a, int)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.match_" id="value-Stream.match_">match_</a> = ((string, int), string) => (string, int)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.charsRemaining" id="value-Stream.charsRemaining">charsRemaining</a> = (string, int) => int</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-Stream.create" id="value-Stream.create">create</a> = string => <a href="#type-Stream.t">t</a></h4>
+
+<div class='body body-empty'></div></div>
+</div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-read" id="value-read">read</a> = string => string</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-append_char" id="value-append_char">append_char</a> = (string, char) => string</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-split" id="value-split">split</a> = (string, ~sep: char) => list(string)</h4>
+
+<div class='body body-empty'></div></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  
